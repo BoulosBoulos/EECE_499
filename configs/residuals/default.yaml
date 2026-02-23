@@ -1,0 +1,13 @@
+# Physics-informed critic residuals per System_Architecture.txt sec 7
+lambda_ego: 0.5
+lambda_stop: 0.5
+lambda_fric: 0.3
+lambda_risk: 0.5
+mu: 0.8           # friction coeff
+g: 9.81
+a_max: 5.0        # max decel (m/s^2)
+a_brake: 5.0
+v_creep: 1.0
+a_go: 2.0
+eta: 0.5          # risk threshold for shield
+dt: 0.1           # control step (s)

@@ -1,0 +1,10 @@
+# Reward per System_Architecture.txt sec 9
+w_prog: 1.0       # progress
+w_time: -0.1      # time penalty
+w_risk: -1.0      # TTC below threshold
+w_rule: -2.0      # ROW violation
+w_coll: -10.0     # collision
+w_switch: -0.05   # action switching
+w_comfort: -0.01  # acceleration magnitude
+w_jerk: -0.02     # jerk penalty
+ttc_thr: 3.0      # TTC threshold (s)
