@@ -1,2 +1,11 @@
-# SUMO T-intersection scenario config
-# TODO: Add scenario parameters (lanes, flows, occlusion zones)
+# SUMO T-intersection scenario
+# Ego: stem -> turn right. Other: bar straight.
+stem_length: 100
+bar_half_length: 80
+lane_width: 3.5
+junction_type: priority   # priority = yield rules; or right_before_left, unregulated
+ego_id: ego
+other_id: other
+
+# jmIgnoreJunctionFoeProb: per-episode sampling from [0, 0.05, 0.1, 0.15, 0.2] reduces bias
+# Pass jm_ignore_fixed to SumoEnv to override (e.g. for HPO or ablation)

@@ -1,4 +1,4 @@
-# DRPPO + optional PINN residuals
+# DRPPO + optional PINN residuals (heavier defaults for ablation)
 use_pinn: true
 lr: 3e-4
 gamma: 0.99
@@ -6,8 +6,8 @@ gae_lambda: 0.95
 clip_range: 0.2
 ent_coef: 0.01
 vf_coef: 0.5
-n_steps: 2048
-batch_size: 64
-n_epochs: 10
+n_steps: 4096
+batch_size: 128
+n_epochs: 8
 gru_hidden: 128
 gru_layers: 1

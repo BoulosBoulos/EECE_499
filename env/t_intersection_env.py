@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import numpy as np
 from typing import Any
 
@@ -12,10 +13,42 @@ except ImportError:
     gym = None
     spaces = None
 
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 from state.builder import StateBuilder
 
 
 ACTION_NAMES = ["STOP", "CREEP", "YIELD", "GO", "ABORT"]
+
+_DEFAULT_REWARD_CONFIG = {
+    "w_prog": 1.0,
+    "w_time": -0.1,
+    "w_risk": -1.0,
+    "w_coll": -10.0,
+    "ttc_thr": 3.0,
+    "d_coll": 2.0,  # distance (m) below which counts as collision
+}
+
+
+def _load_reward_config(path: str | None) -> dict:
+    if path is None or yaml is None:
+        return dict(_DEFAULT_REWARD_CONFIG)
+    try:
+        if not os.path.isabs(path):
+            base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            path = os.path.join(base, path)
+        with open(path) as f:
+            cfg = yaml.safe_load(f) or {}
+        out = dict(_DEFAULT_REWARD_CONFIG)
+        for k in out:
+            if k in cfg:
+                out[k] = float(cfg[k])
+        return out
+    except Exception:
+        return dict(_DEFAULT_REWARD_CONFIG)
 N_ACTIONS = 5
 
 
@@ -36,12 +69,14 @@ class TIntersectionEnv(_make_gym()):
         max_steps: int = 200,
         dt: float = 0.1,
         state_config: str | None = None,
+        reward_config: str | None = "configs/reward/default.yaml",
     ):
         if gym is not None:
             super().__init__()
         self.max_steps = max_steps
         self.dt = dt
         self.state_builder = StateBuilder(state_config)
+        self.reward_cfg = _load_reward_config(reward_config)
 
         self._ego = None
         self._agents = None
@@ -170,13 +205,20 @@ class TIntersectionEnv(_make_gym()):
         self._prev_ego = {"a": self._ego["a"], "psi_dot": self._ego["psi_dot"]}
 
         ttc_min = self._compute_ttc_min()
-        prog = (p_new[0] - p[0])
-        r = 1.0 * prog - 0.1 * self.dt
-        if ttc_min < 3.0:
-            r -= 1.0
+        prog = p_new[0] - p[0]
+        w_prog = self.reward_cfg.get("w_prog", 1.0)
+        w_time = self.reward_cfg.get("w_time", -0.1)
+        w_risk = self.reward_cfg.get("w_risk", -1.0)
+        w_coll = self.reward_cfg.get("w_coll", -10.0)
+        ttc_thr = self.reward_cfg.get("ttc_thr", 3.0)
+        d_coll = self.reward_cfg.get("d_coll", 2.0)
+
+        r = w_prog * prog + w_time * self.dt
+        if ttc_min < ttc_thr:
+            r += w_risk
         for ag in self._agents:
-            if np.linalg.norm(ag["p"] - self._ego["p"]) < 2.0:
-                r -= 10.0
+            if np.linalg.norm(ag["p"] - self._ego["p"]) < d_coll:
+                r += w_coll
 
         self._step_count += 1
         done = self._step_count >= self.max_steps or p_new[0] > 30

@@ -1,10 +1,13 @@
 # Reward per System_Architecture.txt sec 9
-w_prog: 1.0       # progress
-w_time: -0.1      # time penalty
-w_risk: -1.0      # TTC below threshold
-w_rule: -2.0      # ROW violation
-w_coll: -10.0     # collision
-w_switch: -0.05   # action switching
-w_comfort: -0.01  # acceleration magnitude
-w_jerk: -0.02     # jerk penalty
+# Env uses: w_prog, w_time, w_risk, w_coll, ttc_thr, d_coll
+w_prog: 1.0       # progress reward per m
+w_time: -0.1      # time penalty per step
+w_risk: -1.0      # penalty when TTC < ttc_thr
+w_rule: -2.0      # ROW violation (not yet implemented)
+w_coll: -10.0     # collision penalty per step
+w_switch: -0.05   # action switching (not yet implemented)
+w_comfort: -0.01  # acceleration magnitude (not yet implemented)
+w_jerk: -0.02     # jerk penalty (not yet implemented)
 ttc_thr: 3.0      # TTC threshold (s)
+d_coll: 2.0       # distance (m) below which counts as collision
+w_pothole: -5.0   # penalty for driving over pothole

@@ -5,6 +5,12 @@ traci
 # Config
 pyyaml>=6.0
 
+# Visualization (optional; run_visualize.py works without it but no plots)
+matplotlib>=3.5
+
+# HPO
+optuna>=3.0.0
+
 # RL
 gymnasium>=0.29.0
 numpy>=1.24.0

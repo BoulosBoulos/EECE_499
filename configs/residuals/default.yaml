@@ -1,8 +1,8 @@
 # Physics-informed critic residuals per System_Architecture.txt sec 7
-lambda_ego: 0.5
-lambda_stop: 0.5
-lambda_fric: 0.3
-lambda_risk: 0.5
+lambda_ego: 0.05
+lambda_stop: 0.01
+lambda_fric: 0.01
+lambda_risk: 0.01
 mu: 0.8           # friction coeff
 g: 9.81
 a_max: 5.0        # max decel (m/s^2)
