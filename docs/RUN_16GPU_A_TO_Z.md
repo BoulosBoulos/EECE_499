@@ -39,17 +39,19 @@ make regen-scenarios
 
 ---
 
-## D. (Optional) Train Intent LSTM
+## D. (Optional) Train Intent LSTM (for use_intent runs)
 
-Only if you plan to use `--use_intent` in the env:
+If you plan to use the **intent LSTM** (state includes VRU intent/style distributions), train it once:
 
 ```bash
 make train-intent
 ```
 
+This writes `results/intent_model.pt`, which `env.SumoEnv` loads when `use_intent=True`.
+
 ---
 
-## E. Run 16-GPU Ablation in Two Batches (48h Each)
+## E. Run 16-GPU Ablation in Two Batches (48h Each, no intent)
 
 ### Run 1 — Batch 1 (scenarios 1a, 1b, 1c, 1d)
 
@@ -111,7 +113,40 @@ This writes:
 
 ---
 
-## F. View Results
+## F. (Optional) Intent LSTM Ablation on 16 GPUs
+
+To compare **with vs without intent LSTM** for every combo (scenario × variant × λ × seed) in the 16‑GPU split pipeline:
+
+1. Make sure `results/intent_model.pt` exists:
+
+   ```bash
+   make train-intent
+   ```
+
+2. Generate manifests that include **both** `use_intent=False` and `use_intent=True` jobs:
+
+   ```bash
+   make jobs-manifest-batch1-intent-ablation   # scenarios 1a–1d
+   make jobs-manifest-batch2-intent-ablation   # scenarios 2–4
+   ```
+
+3. Launch, aggregate, and merge exactly as in sections E.1–E.3:
+
+   ```bash
+   make ablation-16gpu-batch1
+   make ablation-aggregate-batch1
+
+   make ablation-16gpu-batch2
+   make ablation-aggregate-batch2
+
+   make ablation-merge
+   ```
+
+The merged `results/ablation/ablation_results.csv` will contain a `use_intent` column so the dashboard and plots can separate LSTM vs non‑LSTM runs.
+
+---
+
+## G. View Results
 
 **Dashboard (interactive):**
 
@@ -131,7 +166,7 @@ make plot-ablation
 
 ---
 
-## G. Quick Reference — Copy-Paste Block
+## H. Quick Reference — Copy-Paste Block
 
 Assumes you are in the project root, venv is activated, and `PYTHONPATH` and `SUMO_HOME` are set.
 
@@ -164,7 +199,7 @@ make dashboard
 
 ---
 
-## H. Single-Run (Full Manifest, No Split)
+## I. Single-Run (Full Manifest, No Split)
 
 If you have no 48h limit and want one big run with all 7 scenarios:
 
@@ -178,7 +213,7 @@ Then `make dashboard` or `make plot-ablation` (results in `results/ablation/`).
 
 ---
 
-## I. Test One Job (Debug)
+## J. Test One Job (Debug)
 
 To run a single job on GPU 0 before launching the full batch:
 
@@ -189,7 +224,7 @@ CUDA_VISIBLE_DEVICES=0 python3 experiments/run_single_job.py --manifest results/
 
 ---
 
-## J. Failure Handling
+## K. Failure Handling
 
 - **Launcher exits 1:** At least one worker failed. Check `results/ablation_batchN/jobs/worker_*.log`.
 - **Aggregate exits 1:** Some jobs are missing or incomplete (no eval/train CSV or empty). Re-run failed jobs or fix the cause, then aggregate again.

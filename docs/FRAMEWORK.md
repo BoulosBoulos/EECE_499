@@ -298,7 +298,7 @@ step, episode_return, episode_len, actor_loss, vf_loss, collision_count, collisi
 seed, eval_mode, episode, return, length, collision_steps, collision_episode, mean_ttc, min_ttc, pothole_hits
 
 ### Ablation Eval CSV columns:
-scenario, variant, pinn_placement, use_l_ego, use_safety_filter, lambda_phys, seed, eval_mode, mean_return, std_return, collision_rate, pothole_hits_mean, mean_ttc, min_ttc
+scenario, variant, pinn_placement, use_l_ego, use_safety_filter, use_intent, lambda_phys, seed, eval_mode, mean_return, std_return, collision_rate, pothole_hits_mean, mean_ttc, min_ttc
 
 ### Ablation Training Log CSV columns:
 scenario, variant, lambda_phys, seed, step, actor_loss, vf_loss, entropy, total_loss, l_physics, l_actor_physics, l_ego, viol_ttc_rate, viol_stop_rate, viol_fric_rate, viol_ttc_mag, viol_stop_mag, viol_fric_mag

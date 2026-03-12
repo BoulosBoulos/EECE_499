@@ -200,6 +200,7 @@ CUDA_VISIBLE_DEVICES=0 python experiments/run_single_job.py --manifest results/a
 | `make ablation-16gpu` | Run ablation in parallel across 16 GPUs |
 | `make ablation-aggregate` | Merge per-job CSVs into ablation_results.csv and train log |
 | `make dashboard` | Launch Streamlit dashboard at localhost:8501 |
+| `make jobs-manifest-batch1-intent-ablation` / `make jobs-manifest-batch2-intent-ablation` | Generate 16‑GPU manifests with both `use_intent=False` and `use_intent=True` for each combo (intent ablation) |
 | `make hpo` | Bayesian HPO (Optuna) |
 | `make plot` | Plot training curves (return, loss, collision, TTC) |
 | `make plot-ablation` | Plot ablation bar charts |
