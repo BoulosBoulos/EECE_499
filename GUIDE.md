@@ -107,3 +107,37 @@ make ablation-aggregate-batch2
 make ablation-merge
 make dashboard
 ```
+
+---
+
+## Running with intent LSTM (state includes VRU intent/style distributions)
+
+The intent LSTM (IntentStylePredictor) outputs **intent and style distributions** per agent; these are appended to the state vector (+30 dims) so the policy sees predicted VRU behavior. To run the **same** ablation with the LSTM enabled:
+
+1. **Train the intent model once** (writes `results/intent_model.pt`):
+   ```bash
+   make train-intent
+   ```
+2. **Generate manifests with intent enabled** (use the `-intent` targets instead of the default batch1/batch2):
+   ```bash
+   make jobs-manifest-batch1-intent
+   make jobs-manifest-batch2-intent
+   ```
+3. (Optional, recommended) To **compare with and without intent in a single run**, generate a manifest that includes both:
+   ```bash
+   make jobs-manifest-batch1-intent-ablation   # scenarios 1a–1d, with and without intent
+   make jobs-manifest-batch2-intent-ablation   # scenarios 2–4, with and without intent
+   ```
+4. Run the same launch, aggregate, and merge steps as above (they do not change):
+   ```bash
+   make ablation-16gpu-batch1
+   make ablation-aggregate-batch1
+   # (Re‑generate manifest for batch2 only if you hadn’t already)
+   make ablation-16gpu-batch2
+   make ablation-aggregate-batch2
+   make ablation-merge
+   make dashboard
+   ```
+   (Use `jobs-manifest-batch1-intent` / `jobs-manifest-batch2-intent` only when generating manifests; the rest of the commands are unchanged.)
+
+If `results/intent_model.pt` is missing when a job runs with `use_intent=True`, the env falls back to `use_intent=False` for that run, so always run `make train-intent` before using the intent manifests.

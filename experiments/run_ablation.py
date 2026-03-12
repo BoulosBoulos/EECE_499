@@ -75,10 +75,21 @@ def _append_csv(path: str, row: dict, fieldnames: list[str]):
 
 
 EVAL_FIELDS = [
-    "scenario", "variant", "pinn_placement", "use_l_ego", "use_safety_filter",
-    "lambda_phys", "seed", "eval_mode",
-    "mean_return", "std_return", "collision_rate", "pothole_hits_mean",
-    "mean_ttc", "min_ttc",
+    "scenario",
+    "variant",
+    "pinn_placement",
+    "use_l_ego",
+    "use_safety_filter",
+    "use_intent",
+    "lambda_phys",
+    "seed",
+    "eval_mode",
+    "mean_return",
+    "std_return",
+    "collision_rate",
+    "pothole_hits_mean",
+    "mean_ttc",
+    "min_ttc",
 ]
 
 TRAIN_LOG_FIELDS = [
@@ -298,11 +309,16 @@ def main():
                             seed_results.append(m)
 
                             row = {
-                                "scenario": scenario, "variant": vname,
-                                "pinn_placement": placement, "use_l_ego": use_l_ego,
+                                "scenario": scenario,
+                                "variant": vname,
+                                "pinn_placement": placement,
+                                "use_l_ego": use_l_ego,
                                 "use_safety_filter": use_sf,
-                                "lambda_phys": lp, "seed": seed,
-                                "eval_mode": mode, **m,
+                                "use_intent": args.use_intent,
+                                "lambda_phys": lp,
+                                "seed": seed,
+                                "eval_mode": mode,
+                                **m,
                             }
                             _append_csv(results_csv, row, EVAL_FIELDS)
 

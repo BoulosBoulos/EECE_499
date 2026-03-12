@@ -102,10 +102,21 @@ def main():
         print(f"No manifest found at {manifest}; skipping completeness check.")
 
     eval_fields = [
-        "scenario", "variant", "pinn_placement", "use_l_ego", "use_safety_filter",
-        "lambda_phys", "seed", "eval_mode",
-        "mean_return", "std_return", "collision_rate", "pothole_hits_mean",
-        "mean_ttc", "min_ttc",
+        "scenario",
+        "variant",
+        "pinn_placement",
+        "use_l_ego",
+        "use_safety_filter",
+        "use_intent",
+        "lambda_phys",
+        "seed",
+        "eval_mode",
+        "mean_return",
+        "std_return",
+        "collision_rate",
+        "pothole_hits_mean",
+        "mean_ttc",
+        "min_ttc",
     ]
     train_fields = [
         "scenario", "variant", "lambda_phys", "seed", "step",

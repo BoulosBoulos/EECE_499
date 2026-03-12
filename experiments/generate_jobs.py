@@ -66,17 +66,40 @@ def main():
     parser.add_argument("--seeds", type=int, nargs="+", default=DEFAULT_SEEDS)
     parser.add_argument("--lambda_phys", type=float, nargs="+", default=[0.5],
                         help="lambda_physics_critic values (only for PINN variants)")
-    parser.add_argument("--use_intent", action="store_true")
+    parser.add_argument(
+        "--use_intent",
+        action="store_true",
+        help="Enable intent LSTM for all jobs (state dim +30 where applicable)",
+    )
+    parser.add_argument(
+        "--intent_ablation",
+        action="store_true",
+        help="Generate jobs for both use_intent=False and use_intent=True",
+    )
     parser.add_argument("--no_csv", action="store_true", help="Do not write manifest as CSV")
     args = parser.parse_args()
 
-    jobs = build_jobs(
-        scenarios=args.scenarios,
-        variants=args.variants,
-        seeds=args.seeds,
-        lambda_phys=args.lambda_phys,
-        use_intent=args.use_intent,
-    )
+    if args.intent_ablation:
+        # Build two copies of the grid: one without intent features, one with.
+        jobs = []
+        for flag in (False, True):
+            jobs.extend(
+                build_jobs(
+                    scenarios=args.scenarios,
+                    variants=args.variants,
+                    seeds=args.seeds,
+                    lambda_phys=args.lambda_phys,
+                    use_intent=flag,
+                )
+            )
+    else:
+        jobs = build_jobs(
+            scenarios=args.scenarios,
+            variants=args.variants,
+            seeds=args.seeds,
+            lambda_phys=args.lambda_phys,
+            use_intent=args.use_intent,
+        )
 
     os.makedirs(args.out_dir, exist_ok=True)
     manifest_path = os.path.join(args.out_dir, "job_manifest.json")

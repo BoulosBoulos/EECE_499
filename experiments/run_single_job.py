@@ -151,11 +151,16 @@ def main():
                 failed_count += 1
                 continue
             row = {
-                "scenario": scenario, "variant": vname,
-                "pinn_placement": placement, "use_l_ego": use_l_ego,
+                "scenario": scenario,
+                "variant": vname,
+                "pinn_placement": placement,
+                "use_l_ego": use_l_ego,
                 "use_safety_filter": use_sf,
-                "lambda_phys": lp, "seed": seed,
-                "eval_mode": mode, **m,
+                "use_intent": use_intent,
+                "lambda_phys": lp,
+                "seed": seed,
+                "eval_mode": mode,
+                **m,
             }
             _append_csv(eval_csv, row, EVAL_FIELDS)
 
