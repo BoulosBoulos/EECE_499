@@ -200,7 +200,9 @@ CUDA_VISIBLE_DEVICES=0 python experiments/run_single_job.py --manifest results/a
 | `make ablation-16gpu` | Run ablation in parallel across 16 GPUs |
 | `make ablation-aggregate` | Merge per-job CSVs into ablation_results.csv and train log |
 | `make dashboard` | Launch Streamlit dashboard at localhost:8501 |
-| `make jobs-manifest-batch1-intent-ablation` / `make jobs-manifest-batch2-intent-ablation` | Generate 16‑GPU manifests with both `use_intent=False` and `use_intent=True` for each combo (intent ablation) |
+| `make jobs-manifest-batch1` / `make jobs-manifest-batch2` | Default: full ablation **with and without LSTM** for every combo (run `make train-intent` first). |
+| `make jobs-manifest-batch1-no-intent` / `make jobs-manifest-batch2-no-intent` | Manifests with only `use_intent=False`. |
+| `make jobs-manifest-batch1-intent` / `make jobs-manifest-batch2-intent` | Manifests with only `use_intent=True`. |
 | `make hpo` | Bayesian HPO (Optuna) |
 | `make plot` | Plot training curves (return, loss, collision, TTC) |
 | `make plot-ablation` | Plot ablation bar charts |
@@ -223,3 +225,4 @@ CUDA_VISIBLE_DEVICES=0 python experiments/run_single_job.py --manifest results/a
 - `docs/HYPERPARAMETERS.md` — All hyperparameter values
 - `docs/STATE.md` — Full state vector specification
 - `docs/FRAMEWORK.md` — Complete A-to-Z reference
+- `docs/SLURM.md` — SLURM sbatch: 1 job per GPU, 8 concurrent, 16 total

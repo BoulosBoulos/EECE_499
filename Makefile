@@ -1,4 +1,4 @@
-.PHONY: setup train train-1a train-1b train-1c train-1d train-2 train-3 train-4 eval eval-multiseed eval-1a eval-1b eval-1c eval-1d eval-2 eval-3 eval-4 hpo ablation ablation-sensitivity ablation-full jobs-manifest jobs-run-one ablation-16gpu ablation-aggregate jobs-manifest-batch1 jobs-manifest-batch2 jobs-manifest-batch1-intent jobs-manifest-batch2-intent jobs-manifest-batch1-intent-ablation jobs-manifest-batch2-intent-ablation ablation-16gpu-batch1 ablation-16gpu-batch2 ablation-aggregate-batch1 ablation-aggregate-batch2 ablation-merge plot-ablation visualize-ablation visualize visualize-gui plot lint train-intent regen-scenarios dashboard
+.PHONY: setup train train-1a train-1b train-1c train-1d train-2 train-3 train-4 eval eval-multiseed eval-1a eval-1b eval-1c eval-1d eval-2 eval-3 eval-4 hpo ablation ablation-sensitivity ablation-full jobs-manifest jobs-run-one ablation-16gpu ablation-aggregate jobs-manifest-batch1 jobs-manifest-batch2 jobs-manifest-batch1-no-intent jobs-manifest-batch2-no-intent jobs-manifest-batch1-intent jobs-manifest-batch2-intent ablation-16gpu-batch1 ablation-16gpu-batch2 ablation-aggregate-batch1 ablation-aggregate-batch2 ablation-merge plot-ablation visualize-ablation visualize visualize-gui plot lint train-intent regen-scenarios dashboard
 
 PYTHONPATH := $(CURDIR)
 export PYTHONPATH
@@ -73,12 +73,18 @@ ablation-aggregate:
 
 # ─── 16-GPU split into 2 runs by scenario (each run fits in ~48h) ───────────
 # Batch 1: scenarios 1a, 1b, 1c, 1d.  Batch 2: scenarios 2, 3, 4.
-# After both: make ablation-aggregate-batch1, make ablation-aggregate-batch2, then make ablation-merge.
-# Prerequisite for intent: make train-intent (writes results/intent_model.pt).
+# Default: every combo runs WITH and WITHOUT LSTM (--intent_ablation). Prerequisite: make train-intent.
 jobs-manifest-batch1:
-	python3 experiments/generate_jobs.py --out_dir results/ablation_batch1 --scenarios 1a 1b 1c 1d --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0
+	python3 experiments/generate_jobs.py --out_dir results/ablation_batch1 --scenarios 1a 1b 1c 1d --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --intent_ablation
 
 jobs-manifest-batch2:
+	python3 experiments/generate_jobs.py --out_dir results/ablation_batch2 --scenarios 2 3 4 --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --intent_ablation
+
+# Optional: only no-LSTM or only LSTM (subset of full ablation)
+jobs-manifest-batch1-no-intent:
+	python3 experiments/generate_jobs.py --out_dir results/ablation_batch1 --scenarios 1a 1b 1c 1d --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0
+
+jobs-manifest-batch2-no-intent:
 	python3 experiments/generate_jobs.py --out_dir results/ablation_batch2 --scenarios 2 3 4 --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0
 
 jobs-manifest-batch1-intent:
@@ -86,12 +92,6 @@ jobs-manifest-batch1-intent:
 
 jobs-manifest-batch2-intent:
 	python3 experiments/generate_jobs.py --out_dir results/ablation_batch2 --scenarios 2 3 4 --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --use_intent
-
-jobs-manifest-batch1-intent-ablation:
-	python3 experiments/generate_jobs.py --out_dir results/ablation_batch1 --scenarios 1a 1b 1c 1d --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --intent_ablation
-
-jobs-manifest-batch2-intent-ablation:
-	python3 experiments/generate_jobs.py --out_dir results/ablation_batch2 --scenarios 2 3 4 --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --intent_ablation
 
 ablation-16gpu-batch1:
 	./scripts/launch_parallel_16gpu.sh --manifest results/ablation_batch1/job_manifest.json --num_gpus 16 --eval_stochastic

@@ -39,9 +39,9 @@ make regen-scenarios
 
 ---
 
-## D. (Optional) Train Intent LSTM (for use_intent runs)
+## D. Train Intent LSTM (required for default ablation)
 
-If you plan to use the **intent LSTM** (state includes VRU intent/style distributions), train it once:
+The default batch manifests include **every combo with and without LSTM** (`--intent_ablation`). Train the intent model once so jobs with `use_intent=True` can load it:
 
 ```bash
 make train-intent
@@ -51,7 +51,7 @@ This writes `results/intent_model.pt`, which `env.SumoEnv` loads when `use_inten
 
 ---
 
-## E. Run 16-GPU Ablation in Two Batches (48h Each, no intent)
+## E. Run 16-GPU Ablation in Two Batches (48h Each)
 
 ### Run 1 — Batch 1 (scenarios 1a, 1b, 1c, 1d)
 
@@ -113,40 +113,11 @@ This writes:
 
 ---
 
-## F. (Optional) Intent LSTM Ablation on 16 GPUs
-
-To compare **with vs without intent LSTM** for every combo (scenario × variant × λ × seed) in the 16‑GPU split pipeline:
-
-1. Make sure `results/intent_model.pt` exists:
-
-   ```bash
-   make train-intent
-   ```
-
-2. Generate manifests that include **both** `use_intent=False` and `use_intent=True` jobs:
-
-   ```bash
-   make jobs-manifest-batch1-intent-ablation   # scenarios 1a–1d
-   make jobs-manifest-batch2-intent-ablation   # scenarios 2–4
-   ```
-
-3. Launch, aggregate, and merge exactly as in sections E.1–E.3:
-
-   ```bash
-   make ablation-16gpu-batch1
-   make ablation-aggregate-batch1
-
-   make ablation-16gpu-batch2
-   make ablation-aggregate-batch2
-
-   make ablation-merge
-   ```
-
-The merged `results/ablation/ablation_results.csv` will contain a `use_intent` column so the dashboard and plots can separate LSTM vs non‑LSTM runs.
+*(The default `jobs-manifest-batch1` and `jobs-manifest-batch2` already include both with and without LSTM; the merged CSV has a `use_intent` column.)*
 
 ---
 
-## G. View Results
+## F. View Results
 
 **Dashboard (interactive):**
 
@@ -166,7 +137,7 @@ make plot-ablation
 
 ---
 
-## H. Quick Reference — Copy-Paste Block
+## G. Quick Reference — Copy-Paste Block
 
 Assumes you are in the project root, venv is activated, and `PYTHONPATH` and `SUMO_HOME` are set.
 
@@ -175,6 +146,7 @@ Assumes you are in the project root, venv is activated, and `PYTHONPATH` and `SU
 make setup && source .venv/bin/activate
 export PYTHONPATH=$(pwd) SUMO_HOME=/usr/share/sumo
 make regen-scenarios   # if scenarios/ missing
+make train-intent      # required: default ablation includes with and without LSTM
 ```
 
 **Batch 1 (first 48h run; deterministic + stochastic eval):**
@@ -199,7 +171,7 @@ make dashboard
 
 ---
 
-## I. Single-Run (Full Manifest, No Split)
+## H. Single-Run (Full Manifest, No Split)
 
 If you have no 48h limit and want one big run with all 7 scenarios:
 
@@ -213,7 +185,7 @@ Then `make dashboard` or `make plot-ablation` (results in `results/ablation/`).
 
 ---
 
-## J. Test One Job (Debug)
+## I. Test One Job (Debug)
 
 To run a single job on GPU 0 before launching the full batch:
 
@@ -224,7 +196,7 @@ CUDA_VISIBLE_DEVICES=0 python3 experiments/run_single_job.py --manifest results/
 
 ---
 
-## K. Failure Handling
+## J. Failure Handling
 
 - **Launcher exits 1:** At least one worker failed. Check `results/ablation_batchN/jobs/worker_*.log`.
 - **Aggregate exits 1:** Some jobs are missing or incomplete (no eval/train CSV or empty). Re-run failed jobs or fix the cause, then aggregate again.
