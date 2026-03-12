@@ -18,13 +18,14 @@ s_t = [s_ego | s_geom | s_vis | f^1 | f^2 | f^3 | f^4 | f^5]
 |-------|--------|-------------|--------|------|
 | 0 | v | Ego speed | TraCI `getSpeed` | m/s |
 | 1 | a | Ego longitudinal acceleration | TraCI `getAcceleration` | m/s² |
-| 2 | ψ̇ | Yaw rate | Placeholder (0) | rad/s |
+| 2 | ψ̇ | Yaw rate | Derived: (ψ − ψ_prev) / dt | rad/s |
 | 3 | ψ | Ego heading | TraCI `getAngle` → radians | rad |
 | 4 | Δa | Change in acceleration (jerk proxy) | a − a_prev | m/s² |
 | 5 | Δψ̇ | Change in yaw rate | ψ̇ − ψ̇_prev | rad/s |
 
 **Direct from observation:** v, a, ψ  
-**Derived:** Δa, Δψ̇ (from previous step)
+**Derived:** ψ̇ (from consecutive headings), Δa, Δψ̇ (from previous step)  
+**Note:** ψ̇ is computed as the wrapped heading difference divided by dt, giving the actual yaw rate from SUMO.
 
 ---
 
@@ -58,7 +59,7 @@ s_t = [s_ego | s_geom | s_vis | f^1 | f^2 | f^3 | f^4 | f^5]
 | 4 | σ_percep | Perception uncertainty | Fixed 0.05 | — |
 | 5 | n_occ | Number of occluders | Fixed 0 | — |
 
-**All fixed:** No occlusion model implemented.
+**All fixed/placeholder:** No occlusion model implemented. These slots exist for future ray-casting or sensor-based visibility modeling. The network may learn to ignore constant features.
 
 ---
 

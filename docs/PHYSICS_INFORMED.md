@@ -92,7 +92,7 @@ a_{\text{lat}}^2 + a_{\text{lon}}^2 \leq (\mu g)^2
 
 **Usage:** Set `use_l_ego=True` in DRPPO to enable. The critic is penalized when \( V(s_{t+1}) \cdot \text{err}_{\text{ego}} \) is high — i.e., when we land in a state that was poorly predicted, assign lower value.
 
-**Config:** `lambda_physics_ego` (0.1). **Ablation:** Compare `pinn` (L_ego off) vs `pinn_ego` (L_ego on).
+**Config:** `lambda_physics_ego` (0.1). **Ablation:** Compare `pinn_critic` (L_ego off) vs `pinn_ego` (L_ego on).
 
 ---
 
@@ -155,31 +155,64 @@ The physics-informed critic loss penalizes the critic for assigning high value w
 
 ### 4.3 Enabling/Disabling
 
-Set `use_pinn=True` (default) to enable Design A. Set `use_pinn=False` for standard PPO without physics augmentation.
+Use `pinn_placement` to control where physics losses are applied:
+- `"critic"` (default) — Design A: physics loss on critic only
+- `"actor"` — Design B: physics loss on actor only
+- `"both"` — Designs A+B combined
+- `"none"` — standard PPO, no physics
+
+Use `use_safety_filter=True` to add a physics-based action override (STOP when constraints violated).
 
 ---
 
 ## 5. Ablation
 
-The ablation study compares **three variants** across all scenarios:
+The ablation study compares **10 plug-and-play variants** across all scenarios, with **5 seeds** each:
 
-| Variant | use_pinn | use_l_ego | Description |
-|---------|----------|-----------|-------------|
-| `nopinn` | False | False | Standard PPO, no physics |
-| `pinn` | True | False | Design A: TTC + stop + friction only |
-| `pinn_ego` | True | True | Design A + L_ego (ego dynamics) |
+| Variant | pinn_placement | use_l_ego | use_safety_filter | Description |
+|---------|---------------|-----------|-------------------|-------------|
+| `nopinn` | none | False | False | Baseline PPO, no physics |
+| `pinn_critic` | critic | False | False | Design A: physics on critic |
+| `pinn_actor` | actor | False | False | Design B: physics on actor |
+| `pinn_both` | both | False | False | Designs A+B combined |
+| `pinn_ego` | critic | True | False | Design A + L_ego dynamics |
+| `pinn_no_ttc` | critic | False | False | Design A without TTC residual |
+| `pinn_no_stop` | critic | False | False | Design A without stopping-distance |
+| `pinn_no_fric` | critic | False | False | Design A without friction-circle |
+| `safety_filter` | none | False | True | No physics loss, safety filter only |
+| `pinn_critic_sf` | critic | False | True | Design A + safety filter |
 
 ```bash
-make ablation       # trains and evals all 3 variants × 7 scenarios
+make ablation                # 10 variants × 7 scenarios × 5 seeds
+make ablation-sensitivity    # sensitivity sweep: λ_phys from 0.001 to 1.0
 ```
 
 Or manually:
 ```bash
-python experiments/run_ablation.py --total_steps 50000 --eval_episodes 50
+python experiments/run_ablation.py --total_steps 50000 --eval_episodes 50 --seeds 42 123 456 789 999
 python experiments/run_ablation.py --skip_train   # eval only (existing checkpoints)
+python experiments/run_ablation.py --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --variants nopinn pinn_critic pinn_ego
 ```
 
-Results: `results/ablation/ablation_results.csv` and `.json`.
+Results: `results/ablation/ablation_results.csv` and `ablation_train_log.csv`.
+
+### 5.1 Per-Term Logging
+
+`train_step` now returns per-term metrics logged in training CSVs:
+- `l_physics`, `l_ego`: individual loss values
+- `viol_ttc_rate`, `viol_stop_rate`, `viol_fric_rate`: fraction of batch with active violations
+- `viol_ttc_mag`, `viol_stop_mag`, `viol_fric_mag`: mean violation magnitudes
+
+### 5.2 Hyperparameter Sensitivity
+
+See `docs/ABLATION_HYPERPARAMETERS.md` for the full sensitivity sweep design.
+
+### 5.3 Dashboard
+
+View all results interactively:
+```bash
+make dashboard    # opens localhost:8501
+```
 
 ---
 

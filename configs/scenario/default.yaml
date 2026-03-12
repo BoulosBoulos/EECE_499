@@ -1,12 +1,13 @@
 # SUMO T-intersection scenario
-# Ego: stem -> turn right. Other: bar straight. Motorcycle: right -> left.
+# Ego: stem -> turn right.
+# Other car: sampled maneuver (left->right, right->left, turn_left, turn_right)
+# Motorcycle: sampled maneuver (right->left, left->right, turn_into_stem)
+# Pedestrian: sampled maneuver (cross_left_right, cross_right_left)
+# All behaviors + styles sampled per-episode by BehaviorSampler.
 # Doubled size: 2 lanes per direction (car coming + going) on all arms.
 stem_length: 200
 bar_half_length: 160
 lane_width: 3.5
-junction_type: priority   # priority = yield rules; or right_before_left, unregulated
+junction_type: priority   # priority = yield rules
 ego_id: ego
 other_id: other
-
-# jmIgnoreJunctionFoeProb: per-episode sampling from [0, 0.05, 0.1, 0.15, 0.2] reduces bias
-# Pass jm_ignore_fixed to SumoEnv to override (e.g. for HPO or ablation)

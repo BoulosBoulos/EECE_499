@@ -1,20 +1,79 @@
 # Ablation Study: Hyperparameter Sensitivity
 
-**Important**: Ablation results (which variant "wins") can depend strongly on hyperparameters.
-The same model may perform better or worse under different reward scales, learning rates, or physics weights.
+Ablation results are **conditional on the chosen hyperparameters**. A term that appears useless at one setting may be helpful at another. This document describes the experimental design.
 
-## Key Parameters That Affect Ablation
+## Variants
 
-| Parameter | Location | Effect |
-|-----------|----------|--------|
-| `w_risk`, `w_coll` | `configs/reward/default.yaml` | Stronger penalties → policy stops more, lower collision rate. If too weak, no variant may learn to stop. |
-| `lambda_physics_*` | `configs/residuals/default.yaml` | PINN strength. Too high → over-regularization; too low → no benefit over nopinn. |
-| `lr`, `n_steps`, `batch_size` | `configs/algo/default.yaml` | Learning dynamics. Different combos can flip which variant converges best. |
+| Variant | pinn_placement | use_l_ego | use_safety_filter | Description |
+|---------|---------------|-----------|-------------------|-------------|
+| `nopinn` | none | False | False | Baseline PPO (no physics) |
+| `pinn_critic` | critic | False | False | Design A: physics on critic |
+| `pinn_actor` | actor | False | False | Design B: physics on actor |
+| `pinn_both` | both | False | False | Designs A+B combined |
+| `pinn_ego` | critic | True | False | Design A + L_ego dynamics |
+| `pinn_no_ttc` | critic | False | False | Design A without TTC residual |
+| `pinn_no_stop` | critic | False | False | Design A without stopping-distance |
+| `pinn_no_fric` | critic | False | False | Design A without friction-circle |
+| `safety_filter` | none | False | True | No physics loss, safety filter only |
+| `pinn_critic_sf` | critic | False | True | Design A + safety filter |
 
-## Recommendation
+## Sensitivity Sweep
 
-For fair ablation comparison:
+The main ablation uses the canonical config (`lambda_physics_critic=0.5`). The sensitivity sweep tests:
 
-1. **Fix hyperparameters** across all variants (nopinn, pinn, pinn_ego) when comparing.
-2. **Optional**: Run a small hyperparameter sweep (e.g. `w_risk` in [-1, -3, -5], `lambda_physics_critic` in [0.3, 0.5, 0.7]) and report whether the ranking of variants is robust across configs.
-3. **Report** the exact config used for each ablation run.
+- `lambda_physics_critic` in {0.001, 0.01, 0.05, 0.1, 0.2, 0.5, 1.0}
+
+Run with:
+
+```bash
+make ablation-sensitivity
+```
+
+Or manually:
+
+```bash
+python3 experiments/run_ablation.py \
+  --seeds 42 123 456 789 999 \
+  --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 \
+  --variants nopinn pinn_critic pinn_ego
+```
+
+## Seeds
+
+All ablations use 5 seeds (42, 123, 456, 789, 999) and report mean +/- std.
+
+## Canonical Hyperparameters
+
+From `configs/residuals/default.yaml`:
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| `lambda_physics_critic` | 0.5 | Overall physics loss weight |
+| `lambda_physics_ttc` | 1.0 | TTC violation weight |
+| `lambda_physics_stop` | 1.0 | Stopping-distance violation weight |
+| `lambda_physics_fric` | 1.0 | Friction-circle violation weight |
+| `lambda_physics_ego` | 0.1 | L_ego weight |
+| `physics_ttc_thr` | 3.0 | TTC threshold (seconds) |
+| `physics_tau` | 0.5 | Reaction time (seconds) |
+| `a_max` | 5.0 | Max deceleration (m/s^2) |
+| `mu` | 0.8 | Friction coefficient |
+
+## Interpreting Results
+
+- If conclusions hold across λ_phys values, they are robust.
+- If a term helps at λ=0.5 but hurts at λ=1.0, report that the benefit is sensitive to weight tuning.
+- If a drop-one variant (e.g. `pinn_no_ttc`) performs the same as `pinn`, the dropped term contributes little at this config.
+- Always check violation statistics: if a term fires <1% of steps, it may not be active enough to matter.
+
+## Output
+
+Results are saved to `results/ablation/`:
+
+- `ablation_results.csv` — per-seed eval metrics
+- `ablation_train_log.csv` — per-step training metrics (losses, violations)
+
+View with:
+
+```bash
+make dashboard
+```

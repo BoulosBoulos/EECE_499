@@ -74,33 +74,116 @@ make visualize-gui
 python3 experiments/run_visualize_sumo.py --gui --policy checkpoint --checkpoint results/model_pinn_1a.pt --episodes 5
 ```
 
-### 5. Ablation Study (L_ego and physics variants)
+### 5. Ablation Study (10 variants, multi-seed)
 
-Compares **3 variants** across all scenarios (1a–1d, 2–4):
+Compares **10 plug-and-play variants** across all scenarios (1a–1d, 2–4), with **5 seeds** each:
 
-| Variant | use_pinn | use_l_ego | Description |
-|---------|----------|-----------|-------------|
-| `nopinn` | False | False | Standard PPO, no physics |
-| `pinn` | True | False | Design A: TTC + stop + friction only |
-| `pinn_ego` | True | True | Design A + L_ego (ego dynamics prediction error) |
+| Variant | pinn_placement | use_l_ego | use_safety_filter | Description |
+|---------|---------------|-----------|-------------------|-------------|
+| `nopinn` | none | False | False | Baseline PPO, no physics |
+| `pinn_critic` | critic | False | False | Design A: physics on critic |
+| `pinn_actor` | actor | False | False | Design B: physics on actor |
+| `pinn_both` | both | False | False | Designs A+B: both |
+| `pinn_ego` | critic | True | False | Design A + L_ego dynamics |
+| `pinn_no_ttc` | critic | False | False | Design A without TTC residual |
+| `pinn_no_stop` | critic | False | False | Design A without stopping-distance |
+| `pinn_no_fric` | critic | False | False | Design A without friction-circle |
+| `safety_filter` | none | False | True | No physics loss, safety filter only |
+| `pinn_critic_sf` | critic | False | True | Design A + safety filter |
 
-**Run full ablation (train + eval):**
+**Run full ablation (5 seeds, all variants):**
 ```bash
 make ablation
 ```
 
-**Custom steps / eval only:**
+**Custom seeds / variants / eval only:**
 ```bash
-python experiments/run_ablation.py --total_steps 50000 --eval_episodes 50 --out_dir results/ablation
+python experiments/run_ablation.py --total_steps 50000 --eval_episodes 50 --seeds 42 123 456 789 999
 python experiments/run_ablation.py --skip_train --eval_episodes 50   # eval existing checkpoints only
+python experiments/run_ablation.py --variants nopinn pinn_critic pinn_ego   # subset of variants
 ```
 
 **Outputs:**
-- `results/ablation/ablation_{scenario}_{variant}.pt` — checkpoints
-- `results/ablation/ablation_results.csv` — mean_return, std_return, collision_rate, pothole_hits_mean
-- `results/ablation/ablation_results.json` — full results
+- `results/ablation/ablation_{scenario}_{variant}_lp{lambda}_s{seed}.pt` — checkpoints
+- `results/ablation/ablation_results.csv` — per-seed eval metrics
+- `results/ablation/ablation_train_log.csv` — per-step training metrics (losses, violations)
 
-See `docs/PHYSICS_INFORMED.md` for L_ego and Design A details.
+### 6. Hyperparameter Sensitivity Sweep
+
+Tests `lambda_physics_critic` across 7 values (0.001 to 1.0) for main variants:
+
+```bash
+make ablation-sensitivity
+```
+
+Or manually:
+```bash
+python experiments/run_ablation.py --seeds 42 123 456 789 999 --lambda_phys 0.001 0.01 0.05 0.1 0.2 0.5 1.0 --variants nopinn pinn_critic pinn_ego
+```
+
+See `docs/ABLATION_HYPERPARAMETERS.md` for full design and interpretation guidance.
+
+### 7. Dashboard (localhost)
+
+Interactive web dashboard showing training curves, ablation results, sensitivity, violations, and more:
+
+```bash
+make dashboard
+```
+
+Opens at `http://localhost:8501`. Tabs:
+- **Training Curves** — return, losses, collisions, TTC, entropy, L_physics, L_ego
+- **Ablation Summary** — bar charts per variant/scenario with error bars
+- **Sensitivity** — return and collision rate vs λ_phys
+- **Violations** — per-term violation rates and magnitudes over training
+- **Intent Model** — LSTM train/val loss and accuracy
+- **Raw Tables** — browse any CSV from results/
+
+### 8. Running on 16 GPUs (parallel ablation)
+
+To distribute the full ablation across 16 GPUs so each GPU runs a disjoint subset of jobs:
+
+**Step 1 — Generate job manifest** (same scenarios/variants/seeds/lambda as desired):
+
+```bash
+make jobs-manifest
+```
+
+This writes `results/ablation/job_manifest.json` and `results/ablation/job_manifest.csv`. Customize with:
+
+```bash
+python experiments/generate_jobs.py --out_dir results/ablation --seeds 42 123 456 --lambda_phys 0.1 0.5 1.0 --variants nopinn pinn_critic pinn_ego
+```
+
+**Step 2 — Launch 16 workers** (one process per GPU, jobs split by index modulo 16):
+
+```bash
+make ablation-16gpu
+```
+
+Or with a custom manifest or number of GPUs:
+
+```bash
+./scripts/launch_parallel_16gpu.sh --manifest results/ablation/job_manifest.json --num_gpus 8
+```
+
+Worker logs: `results/ablation/jobs/worker_0.log` … `worker_15.log`. Per-job outputs: `results/ablation/jobs/eval_000000.csv`, `train_000000.csv`, etc. Checkpoints are written to `results/ablation/` as usual (`ablation_{scenario}_{variant}_lp{lp}_s{seed}.pt`).
+
+**Step 3 — Aggregate results** for the dashboard and plotting:
+
+```bash
+make ablation-aggregate
+```
+
+This merges all `jobs/eval_*.csv` into `ablation_results.csv` and all `jobs/train_*.csv` into `ablation_train_log.csv`, so `make dashboard` and `make plot-ablation` work unchanged. **Fail-fast:** if any worker exited with an error or any job is missing/incomplete (no eval or train data), the launcher and/or the aggregator will exit with a non-zero code so CI or scripts can detect failure.
+
+**Single-job run** (e.g. for debugging one job on GPU 0):
+
+```bash
+make jobs-run-one
+# or:
+CUDA_VISIBLE_DEVICES=0 python experiments/run_single_job.py --manifest results/ablation/job_manifest.json --job_id 0 --out_dir results/ablation
+```
 
 ## Command summary
 
@@ -109,12 +192,20 @@ See `docs/PHYSICS_INFORMED.md` for L_ego and Design A details.
 | `make train` | Train both PINN and non-PINN on SUMO (50k steps) |
 | `make train-1a` ... `make train-4` | Train on scenario 1a–4 |
 | `make eval` | Evaluate model on SUMO (100 episodes) |
+| `make eval-multiseed` | Multi-seed eval (4 seeds × 50 episodes) |
 | `make eval-1a` ... `make eval-4` | Eval on scenario |
-| `make ablation` | Run ablation study (all scenarios × 3 variants: nopinn, pinn, pinn_ego) |
+| `make ablation` | Ablation study (7 scenarios × 10 variants × 5 seeds) |
+| `make ablation-sensitivity` | Sensitivity sweep (λ_phys: 0.001–1.0, 4 variants × 5 seeds) |
+| `make jobs-manifest` | Generate job list for 16-GPU parallel ablation |
+| `make ablation-16gpu` | Run ablation in parallel across 16 GPUs |
+| `make ablation-aggregate` | Merge per-job CSVs into ablation_results.csv and train log |
+| `make dashboard` | Launch Streamlit dashboard at localhost:8501 |
 | `make hpo` | Bayesian HPO (Optuna) |
 | `make plot` | Plot training curves (return, loss, collision, TTC) |
+| `make plot-ablation` | Plot ablation bar charts |
 | `make visualize` | Run 3 SUMO episodes, log to CSV |
 | `make visualize-gui` | Run 3 SUMO episodes with GUI |
+| `make train-intent` | Train intent/style LSTM |
 
 ## Config
 
@@ -122,9 +213,12 @@ See `docs/PHYSICS_INFORMED.md` for L_ego and Design A details.
 - `configs/algo/default.yaml` — PPO hyperparameters
 - `configs/residuals/default.yaml` — physics-informed critic (Design A) lambdas
 - `configs/scenario/default.yaml` — T-intersection layout
+- `configs/state/default.yaml` — state builder parameters
 
 ## Documentation
 
 - `docs/PHYSICS_INFORMED.md` — Physics-informed critic (Design A) explained
+- `docs/ABLATION_HYPERPARAMETERS.md` — Ablation design, sensitivity sweep, interpretation
 - `docs/HYPERPARAMETERS.md` — All hyperparameter values
 - `docs/STATE.md` — Full state vector specification
+- `docs/FRAMEWORK.md` — Complete A-to-Z reference

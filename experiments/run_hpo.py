@@ -129,11 +129,13 @@ def objective(
         mu=float(res_cfg.get("mu", 0.8)),
         g=float(res_cfg.get("g", 9.81)),
         device=device,
+        dt=float(res_cfg.get("dt", 0.1)),
+        a_go=float(res_cfg.get("a_go", 2.0)),
     )
 
     step = 0
     while step < total_steps:
-        obs_arr, actions_arr, log_probs_arr, returns_arr, advantages_arr, extra = collect_rollouts(
+        obs_arr, actions_arr, log_probs_arr, returns_arr, advantages_arr, extra, hidden_arr = collect_rollouts(
             env, policy, n_steps, gamma, gae_lambda
         )
         step += n_steps
@@ -154,20 +156,22 @@ def objective(
                 if extra:
                     ex = {k: (v[idx] if isinstance(v, np.ndarray) and len(v) == len(obs_arr) else v)
                           for k, v in extra.items()}
-                policy.train_step(o, a, lp, ret, adv, ex)
+                h = hidden_arr[idx] if hidden_arr is not None else None
+                policy.train_step(o, a, lp, ret, adv, hiddens=h, extra=ex)
 
     # Eval
     returns_eval = []
     coll_eval = []
     for _ in range(n_eval_episodes):
         obs, _ = env.reset()
+        policy.reset_hidden()
         total_r = 0.0
         coll = 0
         for _ in range(500):
             a, _, _, _ = policy.get_action(obs, deterministic=True)
-            obs, r, term, trunc, _ = env.step(a)
+            obs, r, term, trunc, info = env.step(a)
             total_r += r
-            if r < -5:
+            if info.get("collision", False):
                 coll += 1
             if term or trunc:
                 break

@@ -45,16 +45,22 @@ class PhysicsPredictor:
         self.mu = mu
         self.g = g
 
-    def action_to_control(self, action: int) -> tuple[float, float]:
-        """Map discrete action to (a, delta). action: 0=STOP, 1=CREEP, 2=YIELD, 3=GO, 4=ABORT."""
+    def action_to_control(self, action: int, kappa: float = 0.0) -> tuple[float, float]:
+        """Map discrete action to (a, delta).
+
+        action: 0=STOP, 1=CREEP, 2=YIELD, 3=GO, 4=ABORT.
+        kappa: current route curvature (1/m). Used to compute steering angle
+               for GO/CREEP via the bicycle model: delta = atan(L * kappa).
+        """
+        delta_from_kappa = math.atan(self.L * kappa) if abs(kappa) > 1e-6 else 0.0
         if action == 0:  # STOP
             return -self.a_brake, 0.0
         if action == 1:  # CREEP
-            return 0.5, 0.0  # gentle accel toward v_creep
+            return 0.5, delta_from_kappa
         if action == 2:  # YIELD
             return 0.0, 0.0
         if action == 3:  # GO
-            return self.a_go, 0.0
+            return self.a_go, delta_from_kappa
         if action == 4:  # ABORT
             return -self.a_brake, 0.0
         return 0.0, 0.0

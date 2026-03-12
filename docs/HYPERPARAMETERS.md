@@ -1,6 +1,7 @@
 # Hyperparameters Reference
 
-Complete list of all hyperparameters and their current values across config files.
+Complete list of all hyperparameters and their **current values** across config files.
+Synchronized with configs as of the latest update.
 
 ---
 
@@ -8,7 +9,7 @@ Complete list of all hyperparameters and their current values across config file
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `use_pinn` | `true` | Enable physics-informed critic (Design A) |
+| `pinn_placement` | `critic` | PINN placement: "critic" / "actor" / "both" / "none" |
 | `lr` | `3e-4` | Adam learning rate |
 | `gamma` | `0.99` | Discount factor |
 | `gae_lambda` | `0.95` | GAE λ for advantage estimation |
@@ -27,25 +28,16 @@ Complete list of all hyperparameters and their current values across config file
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `lambda_physics_critic` | `0.5` | Overall weight for Design A physics-informed critic loss |
+| `lambda_physics_critic` | `0.5` | Overall weight for physics-informed critic loss (sensitivity sweep: 0.001–1.0) |
 | `lambda_physics_ttc` | `1.0` | Per-residual: TTC violation weight |
 | `lambda_physics_stop` | `1.0` | Per-residual: stopping-distance violation weight |
 | `lambda_physics_fric` | `1.0` | Per-residual: friction-circle violation weight |
-| `lambda_physics_ego` | `0.1` | Per-residual: ego dynamics (L_ego) weight; used when use_l_ego=True |
-| `physics_ttc_thr` | `3.0` | TTC threshold (s): penalize V(s) when ttc < this |
-| `physics_tau` | `0.5` | Reaction time (s) for d_stop = v·τ + v²/(2a_max) |
-| `a_max` | `5.0` | Max deceleration (m/s²) for stopping distance |
-| `mu` | `0.8` | Friction coefficient (friction circle) |
+| `lambda_physics_ego` | `0.1` | Per-residual: ego dynamics (L_ego) weight |
+| `physics_ttc_thr` | `3.0` | TTC threshold (s) |
+| `physics_tau` | `0.5` | Reaction time (s) for d_stop |
+| `a_max` | `5.0` | Max deceleration (m/s²) |
+| `mu` | `0.8` | Friction coefficient |
 | `g` | `9.81` | Gravity (m/s²) |
-| `lambda_ego` | `0.05` | (Legacy) Ego dynamics residual weight |
-| `lambda_stop` | `0.01` | (Legacy) Stop distance residual weight |
-| `lambda_fric` | `0.01` | (Legacy) Friction residual weight |
-| `lambda_risk` | `0.01` | (Legacy) Risk residual weight |
-| `a_brake` | `5.0` | Brake deceleration (m/s²) |
-| `v_creep` | `1.0` | Creep speed (m/s) |
-| `a_go` | `2.0` | Go acceleration (m/s²) |
-| `eta` | `0.5` | Risk threshold for shield |
-| `dt` | `0.1` | Control step (s) |
 
 ---
 
@@ -55,11 +47,11 @@ Complete list of all hyperparameters and their current values across config file
 |-----------|-------|-------------|
 | `w_prog` | `1.0` | Progress reward per m |
 | `w_time` | `-0.1` | Time penalty per step |
-| `w_risk` | `-1.0` | Penalty when TTC < ttc_thr |
-| `w_coll` | `-10.0` | Collision penalty per step |
+| `w_risk` | **`-3.0`** | Penalty when TTC < ttc_thr |
+| `w_coll` | **`-20.0`** | Collision penalty (SUMO events + proximity) |
 | `w_pothole` | `-5.0` | Pothole penalty |
-| `ttc_thr` | `3.0` | TTC threshold (s) for risk penalty |
-| `d_coll` | `2.0` | Distance (m) below which counts as collision |
+| `ttc_thr` | `3.0` | TTC threshold (s) |
+| `d_coll` | `2.0` | Proximity collision distance (m) |
 
 ---
 
@@ -68,9 +60,9 @@ Complete list of all hyperparameters and their current values across config file
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | `top_n_agents` | `5` | Max agents in state vector |
-| `epsilon` | `1e-6` | Small constant for numerical stability |
-| `t_h_cpa` | `3.0` | Horizon (s) for closest-point-of-approach |
-| `d_safe` | `2.0` | Safe distance (m) for TTC proxy |
+| `epsilon` | `1e-6` | Numerical stability constant |
+| `t_h_cpa` | `3.0` | CPA horizon (s) |
+| `d_safe` | `2.0` | Safe distance for TTC proxy (m) |
 
 ---
 
@@ -78,19 +70,28 @@ Complete list of all hyperparameters and their current values across config file
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `stem_length` | `100` | Stem lane length (m) |
-| `bar_half_length` | `80` | Bar half-length (m) |
+| `stem_length` | **`200`** | Stem arm length (m) |
+| `bar_half_length` | **`160`** | Bar arm half-length (m) |
 | `lane_width` | `3.5` | Lane width (m) |
-| `junction_type` | `priority` | Junction type (priority, right_before_left, unregulated) |
-| `jm_ignore_probs` | `[0, 0.05, 0.1, 0.15, 0.2]` | Sampled jmIgnoreJunctionFoeProb per episode |
+| `junction_type` | `priority` | Junction type |
 
 ---
 
-## DRPPO Internal (hardcoded / constructor)
+## DRPPO Internal
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `use_l_ego` | `False` | Enable L_ego (ego dynamics) in physics critic; ablation: pinn_ego uses True |
-| `max_grad_norm` | `0.5` | Gradient clipping |
-| `hidden_dim` | `128` | GRU hidden (same as gru_hidden) |
+| `hidden_dim` | `128` | GRU hidden dimension |
 | `n_actions` | `5` | STOP, CREEP, YIELD, GO, ABORT |
+| `max_grad_norm` | `0.5` | Gradient clipping |
+
+---
+
+## Intent LSTM (models/intent_style.py)
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `input_dim` | `9` | Per-timestep feature dimension |
+| `hidden_dim` | `64` | LSTM hidden dimension |
+| `intent_classes` | `3` | yield/proceed/turn |
+| `style_classes` | `3` | soft/mid/aggressive |

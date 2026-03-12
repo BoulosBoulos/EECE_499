@@ -8,6 +8,11 @@ pyyaml>=6.0
 # Visualization (optional; run_visualize.py works without it but no plots)
 matplotlib>=3.5
 
+# Dashboard
+streamlit>=1.30.0
+plotly>=5.18.0
+pandas>=2.0.0
+
 # HPO
 optuna>=3.0.0
 

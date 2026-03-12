@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewsettings>
   <scheme name="real world"/>
-  <delay value="100"/>
-  <vehicleSize value="4"/>
-  <personSize value="2.5"/>
-  <vehicleNameSize value="1"/>
+  <delay value="80"/>
+  <vehicleSize value="5"/>
+  <personSize value="5"/>
+  <vehicleNameSize value="1.5"/>
 </viewsettings>
