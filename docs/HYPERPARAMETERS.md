@@ -9,7 +9,7 @@ Synchronized with configs as of the latest update.
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `pinn_placement` | `critic` | PINN placement: "critic" / "actor" / "both" / "none" |
+| `pinn_placement` | `critic` | Default PINN placement in code (DRPPO): \"critic\" / \"actor\" / \"both\" / \"none\". Controlled via CLI/variants; configs use `use_pinn` flag. |
 | `lr` | `3e-4` | Adam learning rate |
 | `gamma` | `0.99` | Discount factor |
 | `gae_lambda` | `0.95` | GAE λ for advantage estimation |

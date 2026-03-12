@@ -1,5 +1,7 @@
 # SUMO T-Intersection Scenario
 
+> **Note:** This file describes an earlier single-scenario SUMO setup under `scenarios/sumo_t/` and legacy Make targets (`visualize-sumo`, `train-sumo`, etc.). The **current main pipeline** uses per-scenario folders `scenarios/sumo_1a` … `scenarios/sumo_4` and the commands documented in `docs/RUNNING.md` and `docs/SCENARIO.md`. Treat this document as a legacy reference.
+
 ## Layout
 
 - **Ego:** Approaches from stem (south), turns right (east).

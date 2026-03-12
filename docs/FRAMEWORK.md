@@ -354,7 +354,7 @@ docs/
 ## 14. Known Limitations and Future Work
 
 ### Currently Placeholder:
-- κ (curvature), e_y, e_ψ: fixed at 0 (no path model)
+- κ (curvature): derived from yaw rate and speed in `env.sumo_env` (ψ̇ / v); still 0 in the legacy synthetic env. e_y, e_ψ: fixed at 0 (no path model)
 - g_turn: fixed [0,0,1] (always right turn)
 - ρ: fixed [0.5, 0.5] (no ROW model)
 - All visibility features (α_cz, α_cross, d_occ, dt_seen, σ_percep, n_occ): fixed (no occlusion model)

@@ -36,7 +36,7 @@ s_t = [s_ego | s_geom | s_vis | f^1 | f^2 | f^3 | f^4 | f^5]
 | 0 | d_stop | Distance to stop line | lane_len − lane_pos − 5 | m |
 | 1 | d_cz | Distance to conflict zone | lane_len − lane_pos − 10 | m |
 | 2 | d_exit | Distance to exit | lane_len − lane_pos | m |
-| 3 | κ | Path curvature | Fixed 0 (no path model) | 1/m |
+| 3 | κ | Path curvature | Derived from ψ̇ and v (ψ̇ / v) in `env.sumo_env`; fixed 0 in the legacy synthetic env | 1/m |
 | 4 | e_y | Lateral path error | Fixed 0 | m |
 | 5 | e_ψ | Heading path error | Fixed 0 | rad |
 | 6 | w_lane | Lane width | Fixed 3.5 | m |
@@ -44,7 +44,7 @@ s_t = [s_ego | s_geom | s_vis | f^1 | f^2 | f^3 | f^4 | f^5]
 | 10–11 | ρ | Right-of-way context | Fixed [0.5,0.5] | — |
 
 **Direct from observation:** d_stop, d_cz, d_exit (from lane position)  
-**Fixed/placeholder:** κ, e_y, e_ψ, g_turn, ρ (no path/ROW model yet)
+**Fixed/placeholder:** e_y, e_ψ, g_turn, ρ (no path/ROW model yet). κ is derived in `env.sumo_env` but remains 0 in the legacy synthetic env.
 
 ---
 
