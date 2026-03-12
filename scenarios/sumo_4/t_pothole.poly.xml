@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<additional>
+  <poly id="pothole" type="pothole" color=".3,.3,.3" fill="1" layer="0" shape="-4,-1.5 4,-1.5 4,1.5 -4,1.5"/>
+</additional>

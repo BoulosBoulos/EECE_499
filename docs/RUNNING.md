@@ -74,6 +74,34 @@ make visualize-gui
 python3 experiments/run_visualize_sumo.py --gui --policy checkpoint --checkpoint results/model_pinn_1a.pt --episodes 5
 ```
 
+### 5. Ablation Study (L_ego and physics variants)
+
+Compares **3 variants** across all scenarios (1a–1d, 2–4):
+
+| Variant | use_pinn | use_l_ego | Description |
+|---------|----------|-----------|-------------|
+| `nopinn` | False | False | Standard PPO, no physics |
+| `pinn` | True | False | Design A: TTC + stop + friction only |
+| `pinn_ego` | True | True | Design A + L_ego (ego dynamics prediction error) |
+
+**Run full ablation (train + eval):**
+```bash
+make ablation
+```
+
+**Custom steps / eval only:**
+```bash
+python experiments/run_ablation.py --total_steps 50000 --eval_episodes 50 --out_dir results/ablation
+python experiments/run_ablation.py --skip_train --eval_episodes 50   # eval existing checkpoints only
+```
+
+**Outputs:**
+- `results/ablation/ablation_{scenario}_{variant}.pt` — checkpoints
+- `results/ablation/ablation_results.csv` — mean_return, std_return, collision_rate, pothole_hits_mean
+- `results/ablation/ablation_results.json` — full results
+
+See `docs/PHYSICS_INFORMED.md` for L_ego and Design A details.
+
 ## Command summary
 
 | Command | What it does |
@@ -82,7 +110,7 @@ python3 experiments/run_visualize_sumo.py --gui --policy checkpoint --checkpoint
 | `make train-1a` ... `make train-4` | Train on scenario 1a–4 |
 | `make eval` | Evaluate model on SUMO (100 episodes) |
 | `make eval-1a` ... `make eval-4` | Eval on scenario |
-| `make ablation` | Run ablation study (all scenarios × PINN/no-PINN) |
+| `make ablation` | Run ablation study (all scenarios × 3 variants: nopinn, pinn, pinn_ego) |
 | `make hpo` | Bayesian HPO (Optuna) |
 | `make plot` | Plot training curves (return, loss, collision, TTC) |
 | `make visualize` | Run 3 SUMO episodes, log to CSV |
@@ -92,5 +120,11 @@ python3 experiments/run_visualize_sumo.py --gui --policy checkpoint --checkpoint
 
 - `configs/reward/default.yaml` — reward weights
 - `configs/algo/default.yaml` — PPO hyperparameters
-- `configs/residuals/default.yaml` — PINN residual lambdas
+- `configs/residuals/default.yaml` — physics-informed critic (Design A) lambdas
 - `configs/scenario/default.yaml` — T-intersection layout
+
+## Documentation
+
+- `docs/PHYSICS_INFORMED.md` — Physics-informed critic (Design A) explained
+- `docs/HYPERPARAMETERS.md` — All hyperparameter values
+- `docs/STATE.md` — Full state vector specification

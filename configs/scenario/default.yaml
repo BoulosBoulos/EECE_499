@@ -1,7 +1,8 @@
 # SUMO T-intersection scenario
-# Ego: stem -> turn right. Other: bar straight.
-stem_length: 100
-bar_half_length: 80
+# Ego: stem -> turn right. Other: bar straight. Motorcycle: right -> left.
+# Doubled size: 2 lanes per direction (car coming + going) on all arms.
+stem_length: 200
+bar_half_length: 160
 lane_width: 3.5
 junction_type: priority   # priority = yield rules; or right_before_left, unregulated
 ego_id: ego

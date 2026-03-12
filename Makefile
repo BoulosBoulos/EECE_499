@@ -1,4 +1,4 @@
-.PHONY: setup train train-1a train-1b train-1c train-1d train-2 train-3 train-4 eval eval-1a eval-1b eval-1c eval-1d eval-2 eval-3 eval-4 hpo ablation visualize visualize-gui plot lint
+.PHONY: setup train train-1a train-1b train-1c train-1d train-2 train-3 train-4 eval eval-1a eval-1b eval-1c eval-1d eval-2 eval-3 eval-4 hpo ablation plot-ablation visualize-ablation visualize visualize-gui plot lint
 
 PYTHONPATH := $(CURDIR)
 export PYTHONPATH
@@ -29,6 +29,12 @@ hpo:
 
 ablation:
 	python3 experiments/run_ablation.py --total_steps 50000 --eval_episodes 50 --out_dir results/ablation
+
+plot-ablation:
+	python3 experiments/plot_ablation.py --csv results/ablation/ablation_results.csv --out_dir results/ablation
+
+visualize-ablation:
+	python3 experiments/run_visualize_ablation.py --ablation_dir results/ablation --out_dir results/ablation_viz --episodes 2
 
 plot:
 	python3 experiments/plot_comparison.py --dir results

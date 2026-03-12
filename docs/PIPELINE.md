@@ -33,9 +33,15 @@ Perception → State → Intent/Style → Policy → Shield → Action → Rewar
 
 ### 7. Reward
 - Sparse/dense reward from `configs/reward/`
-- Physics-informed critic: auxiliary residual losses (no HJB)
+- **Physics-informed critic (Design A)**: penalizes V(s) when physics is violated (TTC, stopping margin, friction). Gradients flow through the critic → improves policy. See `docs/PHYSICS_INFORMED.md`.
 
 ## Data Flow
 
 - **Configs**: `configs/scenario/`, `configs/state/`, `configs/algo/`, `configs/residuals/`, `configs/reward/`
-- **Modules**: `scenario/generator.py`, `state/builder.py`, `env/sumo_env.py`, `rl/interface.py`
+- **Modules**: `scenario/generator.py`, `state/builder.py`, `env/sumo_env.py`, `models/drppo.py`
+
+## Documentation
+
+- `docs/PHYSICS_INFORMED.md` — Design A: physics-informed critic (full explanation)
+- `docs/HYPERPARAMETERS.md` — All hyperparameters and values
+- `docs/STATE.md` — Full state vector (134/165-D) specification

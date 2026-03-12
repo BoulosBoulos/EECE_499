@@ -76,6 +76,7 @@ def collect_rollouts(env, policy, n_steps: int, gamma: float, gae_lambda: float)
         advantages = (advantages - adv_mean) / adv_std
 
     # Build PINN extra from raw_list
+    # raw_list[i] = info from step i, contains raw_obs for state_{i+1}
     extra = None
     if raw_list and "raw_obs" in raw_list[0]:
         built = [r.get("built", {}) for r in raw_list]
@@ -93,6 +94,45 @@ def collect_rollouts(env, policy, n_steps: int, gamma: float, gae_lambda: float)
             "kappa": np.array(kappa, dtype=np.float32),
             "a_lon": np.array(a_lon, dtype=np.float32),
         }
+        # L_ego: ego dynamics prediction error. For transition (s_t, a_t, s_{t+1}):
+        # raw_list[t-1]=state_t, raw_list[t]=state_{t+1}, actions_list[t]=a_t.
+        # Valid for t=1..N-1 (need raw_list[t] and raw_list[t-1]). Index by "next" state i=t+1, so i>=2.
+        N = len(raw_list)
+        ego_x_prev = np.zeros(N, dtype=np.float32)
+        ego_y_prev = np.zeros(N, dtype=np.float32)
+        ego_psi_prev = np.zeros(N, dtype=np.float32)
+        ego_v_prev = np.zeros(N, dtype=np.float32)
+        ego_x_next = np.zeros(N, dtype=np.float32)
+        ego_y_next = np.zeros(N, dtype=np.float32)
+        ego_psi_next = np.zeros(N, dtype=np.float32)
+        ego_v_next = np.zeros(N, dtype=np.float32)
+        ego_action_prev = np.zeros(N, dtype=np.int64)
+        ego_valid = np.zeros(N, dtype=bool)
+        for i in range(2, N):
+            e_prev = raw_list[i - 2].get("raw_obs", {}).get("ego", {})
+            e_next = raw_list[i - 1].get("raw_obs", {}).get("ego", {})
+            p_prev = np.array(e_prev.get("p", [0, 0]), dtype=np.float32)
+            p_next = np.array(e_next.get("p", [0, 0]), dtype=np.float32)
+            ego_x_prev[i] = p_prev[0]
+            ego_y_prev[i] = p_prev[1]
+            ego_psi_prev[i] = float(e_prev.get("psi", 0))
+            ego_v_prev[i] = float(e_prev.get("v", 0))
+            ego_x_next[i] = p_next[0]
+            ego_y_next[i] = p_next[1]
+            ego_psi_next[i] = float(e_next.get("psi", 0))
+            ego_v_next[i] = float(e_next.get("v", 0))
+            ego_action_prev[i] = actions_arr[i - 1]
+            ego_valid[i] = True
+        extra["ego_x_prev"] = ego_x_prev
+        extra["ego_y_prev"] = ego_y_prev
+        extra["ego_psi_prev"] = ego_psi_prev
+        extra["ego_v_prev"] = ego_v_prev
+        extra["ego_x_next"] = ego_x_next
+        extra["ego_y_next"] = ego_y_next
+        extra["ego_psi_next"] = ego_psi_next
+        extra["ego_v_next"] = ego_v_next
+        extra["ego_action_prev"] = ego_action_prev
+        extra["ego_valid"] = ego_valid
 
     return obs_arr, actions_arr, log_probs_arr, returns, advantages, extra
 
@@ -125,10 +165,15 @@ def main():
     n_epochs = int(cfg.get("n_epochs", 5))
 
     res_cfg = _load_config("configs/residuals/default.yaml")
-    lambda_ego = float(res_cfg.get("lambda_ego", 0.5))
-    lambda_stop = float(res_cfg.get("lambda_stop", 0.5))
-    lambda_fric = float(res_cfg.get("lambda_fric", 0.3))
-    lambda_risk = float(res_cfg.get("lambda_risk", 0.5))
+    lambda_physics_critic = float(res_cfg.get("lambda_physics_critic", 0.5))
+    lambda_physics_ttc = float(res_cfg.get("lambda_physics_ttc", 1.0))
+    lambda_physics_stop = float(res_cfg.get("lambda_physics_stop", 1.0))
+    lambda_physics_fric = float(res_cfg.get("lambda_physics_fric", 1.0))
+    physics_ttc_thr = float(res_cfg.get("physics_ttc_thr", 3.0))
+    physics_tau = float(res_cfg.get("physics_tau", 0.5))
+    a_max = float(res_cfg.get("a_max", 5.0))
+    mu = float(res_cfg.get("mu", 0.8))
+    g = float(res_cfg.get("g", 9.81))
 
     variants = []
     if not args.no_compare:
@@ -146,8 +191,13 @@ def main():
             n_actions=n_actions,
             lr=lr, gamma=gamma, gae_lambda=gae_lambda,
             clip_range=clip_range, use_pinn=use_pinn,
-            lambda_ego=lambda_ego, lambda_stop=lambda_stop,
-            lambda_fric=lambda_fric, lambda_risk=lambda_risk,
+            lambda_physics_critic=lambda_physics_critic,
+            lambda_physics_ttc=lambda_physics_ttc,
+            lambda_physics_stop=lambda_physics_stop,
+            lambda_physics_fric=lambda_physics_fric,
+            physics_ttc_thr=physics_ttc_thr,
+            physics_tau=physics_tau,
+            a_max=a_max, mu=mu, g=g,
             device=device,
         )
 

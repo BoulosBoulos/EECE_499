@@ -69,11 +69,11 @@ def objective(
     ent_coef = trial.suggest_float("ent_coef", 0.001, 0.1, log=True)
     vf_coef = trial.suggest_float("vf_coef", 0.25, 1.0)
 
-    # Residuals
-    lambda_ego = trial.suggest_float("lambda_ego", 0.01, 0.5, log=True)
-    lambda_stop = trial.suggest_float("lambda_stop", 0.01, 0.5, log=True)
-    lambda_fric = trial.suggest_float("lambda_fric", 0.01, 0.3, log=True)
-    lambda_risk = trial.suggest_float("lambda_risk", 0.01, 0.5, log=True)
+    # Design A: physics-informed critic (overall + per-residual)
+    lambda_physics_critic = trial.suggest_float("lambda_physics_critic", 0.1, 1.0)
+    lambda_physics_ttc = trial.suggest_float("lambda_physics_ttc", 0.2, 2.0)
+    lambda_physics_stop = trial.suggest_float("lambda_physics_stop", 0.2, 2.0)
+    lambda_physics_fric = trial.suggest_float("lambda_physics_fric", 0.1, 1.5)
 
     # Reward
     w_prog = trial.suggest_float("w_prog", 0.5, 2.0)
@@ -108,6 +108,7 @@ def objective(
         except OSError:
             pass
 
+    res_cfg = _load_config("configs/residuals/default.yaml")
     policy = DRPPO(
         obs_dim=obs_dim,
         n_actions=5,
@@ -118,10 +119,15 @@ def objective(
         ent_coef=ent_coef,
         vf_coef=vf_coef,
         use_pinn=use_pinn,
-        lambda_ego=lambda_ego,
-        lambda_stop=lambda_stop,
-        lambda_fric=lambda_fric,
-        lambda_risk=lambda_risk,
+        lambda_physics_critic=lambda_physics_critic,
+        lambda_physics_ttc=lambda_physics_ttc,
+        lambda_physics_stop=lambda_physics_stop,
+        lambda_physics_fric=lambda_physics_fric,
+        physics_ttc_thr=float(res_cfg.get("physics_ttc_thr", 3.0)),
+        physics_tau=float(res_cfg.get("physics_tau", 0.5)),
+        a_max=float(res_cfg.get("a_max", 5.0)),
+        mu=float(res_cfg.get("mu", 0.8)),
+        g=float(res_cfg.get("g", 9.81)),
         device=device,
     )
 

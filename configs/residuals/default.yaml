@@ -1,11 +1,21 @@
-# Physics-informed critic residuals per System_Architecture.txt sec 7
+# Physics-informed critic (Design A) and legacy residuals
+# Design A: L_physics_critic penalizes V(s) when physics violated (gradients flow!)
+lambda_physics_critic: 0.5   # overall weight for physics-informed critic loss
+lambda_physics_ttc: 1.0      # per-residual: TTC violation weight
+lambda_physics_stop: 1.0     # per-residual: stopping-distance violation weight
+lambda_physics_fric: 1.0     # per-residual: friction-circle violation weight
+lambda_physics_ego: 0.1      # per-residual: ego dynamics (L_ego) weight; used when use_l_ego=True
+physics_ttc_thr: 3.0         # TTC threshold (s) for "dangerous" - penalize V(s) when ttc < this
+physics_tau: 0.5             # reaction time (s) for stopping distance: d_stop = v*tau + v^2/(2*a_max)
+
+# Legacy (Design B / future): kept for compatibility, currently not used in Design A
 lambda_ego: 0.05
 lambda_stop: 0.01
 lambda_fric: 0.01
 lambda_risk: 0.01
-mu: 0.8           # friction coeff
+mu: 0.8           # friction coeff (for friction-circle violation)
 g: 9.81
-a_max: 5.0        # max decel (m/s^2)
+a_max: 5.0        # max decel (m/s^2) for stopping distance
 a_brake: 5.0
 v_creep: 1.0
 a_go: 2.0

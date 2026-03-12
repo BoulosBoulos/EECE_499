@@ -1,6 +1,9 @@
 """
-Ablation study: train and eval across scenarios (1a-1d, 2-4) and algorithms (PINN vs no-PINN).
-Optionally ablates intent LSTM.
+Ablation study: train and eval across scenarios (1a-1d, 2-4) and variants.
+Variants: nopinn, pinn (Design A only), pinn_ego (Design A + L_ego dynamics).
+
+NOTE: Ablation results can depend on hyperparameters (reward, lr, physics weights).
+See docs/ABLATION_HYPERPARAMETERS.md. Use --reward_config to override reward params.
 """
 
 from __future__ import annotations
@@ -22,6 +25,12 @@ except ImportError:
     yaml = None
 
 SCENARIOS = ["1a", "1b", "1c", "1d", "2", "3", "4"]
+# Variants: (name, use_pinn, use_l_ego)
+VARIANTS = [
+    ("nopinn", False, False),
+    ("pinn", True, False),
+    ("pinn_ego", True, True),
+]
 
 
 def _load_config(path: str) -> dict:
@@ -36,7 +45,8 @@ def collect_rollouts(env, policy, n_steps: int, gamma: float, gae_lambda: float)
     return _c(env, policy, n_steps, gamma, gae_lambda)
 
 
-def train_one(env, scenario: str, use_pinn: bool, total_steps: int, out_dir: str, device: str) -> str:
+def train_one(env, scenario: str, variant_name: str, use_pinn: bool, use_l_ego: bool,
+              total_steps: int, out_dir: str, device: str) -> str:
     from models.drppo import DRPPO
 
     cfg = _load_config("configs/algo/default.yaml")
@@ -50,10 +60,17 @@ def train_one(env, scenario: str, use_pinn: bool, total_steps: int, out_dir: str
         gae_lambda=float(cfg.get("gae_lambda", 0.95)),
         clip_range=float(cfg.get("clip_range", 0.2)),
         use_pinn=use_pinn,
-        lambda_ego=float(res_cfg.get("lambda_ego", 0.05)),
-        lambda_stop=float(res_cfg.get("lambda_stop", 0.01)),
-        lambda_fric=float(res_cfg.get("lambda_fric", 0.01)),
-        lambda_risk=float(res_cfg.get("lambda_risk", 0.01)),
+        use_l_ego=use_l_ego,
+        lambda_physics_critic=float(res_cfg.get("lambda_physics_critic", 0.5)),
+        lambda_physics_ttc=float(res_cfg.get("lambda_physics_ttc", 1.0)),
+        lambda_physics_stop=float(res_cfg.get("lambda_physics_stop", 1.0)),
+        lambda_physics_fric=float(res_cfg.get("lambda_physics_fric", 1.0)),
+        lambda_physics_ego=float(res_cfg.get("lambda_physics_ego", 0.1)),
+        physics_ttc_thr=float(res_cfg.get("physics_ttc_thr", 3.0)),
+        physics_tau=float(res_cfg.get("physics_tau", 0.5)),
+        a_max=float(res_cfg.get("a_max", 5.0)),
+        mu=float(res_cfg.get("mu", 0.8)),
+        g=float(res_cfg.get("g", 9.81)),
         device=device,
     )
     n_steps = int(cfg.get("n_steps", 256))
@@ -80,7 +97,7 @@ def train_one(env, scenario: str, use_pinn: bool, total_steps: int, out_dir: str
                      for k, v in extra.items()} if extra else None
                 policy.train_step(o, a, lp, ret, adv, ex)
 
-    ckpt = os.path.join(out_dir, f"ablation_{scenario}_{'pinn' if use_pinn else 'nopinn'}.pt")
+    ckpt = os.path.join(out_dir, f"ablation_{scenario}_{variant_name}.pt")
     policy.save(ckpt)
     return ckpt
 
@@ -126,6 +143,7 @@ def main():
     parser.add_argument("--scenarios", nargs="+", default=SCENARIOS)
     parser.add_argument("--skip_train", action="store_true", help="Only eval existing checkpoints")
     parser.add_argument("--use_intent", action="store_true")
+    parser.add_argument("--reward_config", default=None, help="Override reward config (affects which variant may win)")
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -134,25 +152,28 @@ def main():
 
     results = []
     for scenario in args.scenarios:
-        env = SumoEnv(scenario_name=scenario, use_intent=args.use_intent)
-        for use_pinn in [True, False]:
-            ckpt = os.path.join(args.out_dir, f"ablation_{scenario}_{'pinn' if use_pinn else 'nopinn'}.pt")
+        env = SumoEnv(scenario_name=scenario, use_intent=args.use_intent, reward_config=args.reward_config)
+        for variant_name, use_pinn, use_l_ego in VARIANTS:
+            ckpt = os.path.join(args.out_dir, f"ablation_{scenario}_{variant_name}.pt")
             if not args.skip_train:
-                print(f"Training {scenario} {'PINN' if use_pinn else 'no-PINN'}...")
-                ckpt = train_one(env, scenario, use_pinn, args.total_steps, args.out_dir, device)
+                print(f"Training {scenario} {variant_name}...")
+                ckpt = train_one(env, scenario, variant_name, use_pinn, use_l_ego,
+                                 args.total_steps, args.out_dir, device)
             if os.path.isfile(ckpt):
-                print(f"Eval {scenario} {'PINN' if use_pinn else 'no-PINN'}...")
+                print(f"Eval {scenario} {variant_name}...")
                 m = eval_one(env, ckpt, args.eval_episodes, device)
                 results.append({
                     "scenario": scenario,
+                    "variant": variant_name,
                     "use_pinn": use_pinn,
+                    "use_l_ego": use_l_ego,
                     **m,
                 })
         env.close()
 
     csv_path = os.path.join(args.out_dir, "ablation_results.csv")
     with open(csv_path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["scenario", "use_pinn", "mean_return", "std_return", "collision_rate", "pothole_hits_mean"])
+        w = csv.DictWriter(f, fieldnames=["scenario", "variant", "use_pinn", "use_l_ego", "mean_return", "std_return", "collision_rate", "pothole_hits_mean"])
         w.writeheader()
         w.writerows(results)
     with open(os.path.join(args.out_dir, "ablation_results.json"), "w") as f:

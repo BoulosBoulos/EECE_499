@@ -107,6 +107,17 @@ class SumoEnv(_make_gym()):
         spec = SCENARIO_SPEC.get(self.scenario_name, (True, False, False, False))
         self._has_car, self._has_ped, self._has_moto, self._has_pothole = spec
         self.scenario_dir = scenario_dir or os.path.join(base, "scenarios", f"sumo_{self.scenario_name}")
+        # Load scenario dims for geom (stem_len, bar_len)
+        self._stem_len, self._bar_len = 200.0, 160.0
+        dims_path = os.path.join(self.scenario_dir, "scenario_dims.yaml")
+        if os.path.isfile(dims_path) and yaml:
+            try:
+                with open(dims_path) as f:
+                    d = yaml.safe_load(f) or {}
+                self._stem_len = float(d.get("stem_length", self._stem_len))
+                self._bar_len = float(d.get("bar_half_length", self._bar_len))
+            except Exception:
+                pass
 
         # State dim: base 134 + intent (5*6=30) + pothole (1)
         self._state_dim = 6 + 12 + 6 + 5 * 22
@@ -159,6 +170,10 @@ class SumoEnv(_make_gym()):
             "--collision.check-junctions", "true",
             "--intermodal-collision.action", "warn",
         ]
+        if self.use_gui:
+            gui_settings = os.path.join(self.scenario_dir, "t_gui.xml")
+            if os.path.isfile(gui_settings):
+                cmd.extend(["--gui-settings-file", gui_settings])
         traci.start(cmd)
 
     def _close_sumo(self):
@@ -174,6 +189,16 @@ class SumoEnv(_make_gym()):
             np.random.seed(seed)
         self._close_sumo()
         self._start_sumo()
+        # Reload scenario dims (generator may have just created scenario)
+        dims_path = os.path.join(self.scenario_dir, "scenario_dims.yaml")
+        if os.path.isfile(dims_path) and yaml:
+            try:
+                with open(dims_path) as f:
+                    d = yaml.safe_load(f) or {}
+                self._stem_len = float(d.get("stem_length", self._stem_len))
+                self._bar_len = float(d.get("bar_half_length", self._bar_len))
+            except Exception:
+                pass
         self._step_count = 0
         self._agent_history = {}
 
@@ -272,11 +297,11 @@ class SumoEnv(_make_gym()):
         edge = traci.vehicle.getRoadID(self.EGO_ID) if self.EGO_ID in traci.vehicle.getIDList() else ""
         lane_pos = traci.vehicle.getLanePosition(self.EGO_ID) if self.EGO_ID in traci.vehicle.getIDList() else 0.0
         if "stem_in" in edge:
-            lane_len = 100.0
+            lane_len = self._stem_len
         elif "right_out" in edge:
-            lane_len = 80.0
+            lane_len = self._bar_len
         else:
-            lane_len = 50.0
+            lane_len = min(self._stem_len, self._bar_len)
         d_stop = max(0, lane_len - lane_pos - 5)
         d_cz = max(0, lane_len - lane_pos - 10)
         d_exit = max(0, lane_len - lane_pos)
@@ -447,7 +472,7 @@ class SumoEnv(_make_gym()):
         if self.EGO_ID in traci.vehicle.getIDList():
             if traci.vehicle.getRoadID(self.EGO_ID) == "right_out":
                 lane_pos = traci.vehicle.getLanePosition(self.EGO_ID)
-                if lane_pos > 70:
+                if lane_pos > self._bar_len - 25:  # near end of right_out
                     done = True
 
         return (
