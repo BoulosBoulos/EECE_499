@@ -1,13 +1,14 @@
-# SUMO T-intersection scenario
+# SUMO T-intersection scenario — tighter geometry for real interactions
 # Ego: stem -> turn right.
 # Other car: sampled maneuver (left->right, right->left, turn_left, turn_right)
 # Motorcycle: sampled maneuver (right->left, left->right, turn_into_stem)
 # Pedestrian: sampled maneuver (cross_left_right, cross_right_left)
 # All behaviors + styles sampled per-episode by BehaviorSampler.
-# Doubled size: 2 lanes per direction (car coming + going) on all arms.
-stem_length: 200
-bar_half_length: 160
+# 2 lanes per direction on all arms.
+stem_length: 60
+bar_half_length: 50
 lane_width: 3.5
-junction_type: priority   # priority = yield rules
+junction_type: priority
 ego_id: ego
 other_id: other
+conflict_guaranteed: true

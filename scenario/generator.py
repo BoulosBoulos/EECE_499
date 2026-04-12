@@ -1,9 +1,10 @@
-"""SUMO T-intersection scenario generation. Eight scenarios:
+"""SUMO T-intersection scenario generation. Seven scenarios:
   1a: ego + other car | 1b: ego + pedestrian | 1c: ego + motorcyclist | 1d: ego + pothole
   2: ego + car + pedestrian | 3: ego + car + pedestrian + motorcyclist
   4: ego + car + pedestrian + motorcyclist + pothole
-  Network: doubled size, bidirectional (2 lanes per direction on all arms).
+  Network: 2 lanes per direction on all arms.
   Routes: all combinations of left/right/stem for diverse maneuvers.
+  Tighter geometry (60m stem, 50m bar arms) for guaranteed actor interactions.
 """
 
 from __future__ import annotations
@@ -77,8 +78,8 @@ class ScenarioGenerator:
         if not os.path.isabs(path):
             path = os.path.join(base, path)
         self.cfg = _load_config(path)
-        self.stem_len = float(self.cfg.get("stem_length", 200))
-        self.bar_len = float(self.cfg.get("bar_half_length", 160))
+        self.stem_len = float(self.cfg.get("stem_length", 60))
+        self.bar_len = float(self.cfg.get("bar_half_length", 50))
         self.junction_type = self.cfg.get("junction_type", "priority")
 
     def generate(self, output_dir: str, scenario_name: str = "1a") -> dict[str, str]:
@@ -126,24 +127,17 @@ class ScenarioGenerator:
                 f.write(f'  <route id="{name}" edges="{edges}"/>\n')
             f.write('</routes>\n')
 
-        if has_ped:
-            ped_path = os.path.join(output_dir, "t_ped.rou.xml")
-            depart_pos = max(0, self.bar_len - 25)
-            with open(ped_path, "w") as f:
-                f.write('<?xml version="1.0" encoding="UTF-8"?>\n<routes>\n')
-                f.write(f'  <person id="ped0" depart="1" departPos="{depart_pos:.0f}" color="0,0.9,0">\n')
-                f.write('    <walk from="left_in" to="right_out"/>\n')
-                f.write('  </person>\n')
-                f.write('</routes>\n')
-            rou_files = f'    <route-files value="{os.path.basename(rou_path)},{os.path.basename(ped_path)}"/>\n'
-        else:
-            rou_files = f'    <route-files value="{os.path.basename(rou_path)}"/>\n'
+        ped_path = os.path.join(output_dir, "t_ped.rou.xml")
+        if os.path.isfile(ped_path):
+            os.remove(ped_path)
+        rou_files = f'    <route-files value="{os.path.basename(rou_path)}"/>\n'
 
+        margin = max(self.stem_len, self.bar_len) + 20
         ground_path = os.path.join(output_dir, "t_ground.poly.xml")
         with open(ground_path, "w") as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n<additional>\n')
-            f.write('  <poly id="ground" type="grass" color="0.35,0.65,0.25,1" fill="1" layer="-10" '
-                    'shape="-50,-50 370,-50 370,250 -50,250"/>\n')
+            f.write(f'  <poly id="ground" type="grass" color="0.35,0.65,0.25,1" fill="1" layer="-10" '
+                    f'shape="-{margin},-{margin} {margin},-{margin} {margin},{margin} -{margin},{margin}"/>\n')
             f.write('</additional>\n')
 
         add_parts = [os.path.basename(ground_path)]

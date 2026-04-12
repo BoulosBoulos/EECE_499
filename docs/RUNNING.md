@@ -209,6 +209,26 @@ CUDA_VISIBLE_DEVICES=0 python experiments/run_single_job.py --manifest results/a
 | `make visualize` | Run 3 SUMO episodes, log to CSV |
 | `make visualize-gui` | Run 3 SUMO episodes with GUI |
 | `make train-intent` | Train intent/style LSTM |
+| `make regen-scenarios` | Regenerate all SUMO scenario folders (run after config changes) |
+| `make train-pde-all` | Train HJB + Soft-HJB on all 7 scenarios |
+| `make eval-pde-all` | Evaluate all PDE checkpoints (all scenarios) |
+| `make pde-train-eval-all` | Train + eval all PDE methods on all scenarios |
+| `make ablation-pde` | PDE ablation grid (scenarios x variants x seeds) |
+| `make plot-pde` | Generate PDE comparison PNGs (training curves, ablation bars, three-way comparison) |
+| `make visualize-pde-gui` | Watch PDE-trained policy in SUMO GUI |
+| `make plot-interaction` | Plot trajectory interaction analysis |
+
+**Important:** Always use `python3 experiments/run_visualize_sumo.py --gui ...` or
+`python3 experiments/pde/visualize_sumo.py --gui ...` to watch the simulation with ego + VRUs.
+Running `sumo-gui -c scenarios/.../t.sumocfg` directly only shows static geometry (no actors).
+
+**For the three-way comparison (nopinn vs HJB vs Soft-HJB):**
+1. `make ablation` (generates legacy nopinn baseline in `results/ablation/`)
+2. `make ablation-pde` (generates PDE results in `results/pde_ablation/`)
+3. `make plot-pde` (generates comparison PNGs)
+4. `make dashboard` (interactive browser at localhost:8501, PDE Methods tab)
+
+**For full details on PDE methods, see** `docs/PDE_METHODS_AND_ENV_UPDATES.md`.
 
 ## Config
 

@@ -1,0 +1,108 @@
+# ── Behavioral Decision-Making Benchmark Configuration ──────────────────────
+# This config drives the interaction_v2 benchmark environment.
+# See docs/BEHAVIORAL_DECISION_BENCHMARK_REDESIGN.md for rationale.
+
+benchmark_mode: interaction_v2
+
+# ── Geometry ────────────────────────────────────────────────────────────────
+stem_length: 50.0          # meters, stem arm
+bar_half_length: 50.0      # meters, each side of the bar
+num_lanes: 1               # single lane per direction (behavioral benchmark)
+lane_width: 3.5
+sidewalk_width: 3.0
+junction_type: priority     # unsignalized T
+
+# ── Ego ─────────────────────────────────────────────────────────────────────
+ego_route: "stem_in right_out"   # fixed: approach from stem, turn right
+
+# ── Decision Zone ───────────────────────────────────────────────────────────
+decision_zone_m: 18.0       # RL control starts when ego is within this of conflict
+decision_eta_band_s: 3.0    # require at least one actor within this ETA overlap
+pre_roll_max_s: 8.0         # max simulation seconds before decision onset
+pre_roll_ego_speed_mps: 8.0 # ego approach speed during pre-roll (autopilot)
+
+# ── Action Latching ─────────────────────────────────────────────────────────
+action_latch_s: 0.5         # each behavioral decision is held for this duration
+sim_step_s: 0.1             # SUMO simulation step length
+
+# ── Episode Limits ──────────────────────────────────────────────────────────
+max_decision_steps: 60      # max RL steps (60 × 0.5s = 30s decision window)
+deadlock_timeout_s: 15.0    # terminate if interaction not resolved
+
+# ── Template Sampling Probabilities ─────────────────────────────────────────
+template_probs:
+  ego_first_clear: 0.20
+  actor_first_clear: 0.25
+  tight_gap_ambiguous: 0.20
+  actor_yields: 0.10
+  actor_violation: 0.05
+  ped_committed: 0.05
+  ped_waiting: 0.05
+  ped_hesitant_then_commit: 0.05
+  late_fast_entry: 0.05
+
+# ── ETA Bands (delta_eta = actor_eta − ego_eta, seconds) ───────────────────
+eta_bands:
+  ego_first_clear: [1.5, 3.5]
+  actor_first_clear: [-3.5, -1.5]
+  tight_gap_ambiguous: [-0.8, 0.8]
+  actor_yields: [0.5, 2.0]
+  actor_violation: [-0.5, 0.5]
+  ped_committed: [-2.0, -0.5]
+  ped_waiting: [1.0, 3.0]
+  ped_hesitant_then_commit: [0.0, 1.5]
+  late_fast_entry: [-0.3, 0.3]
+
+# ── Ego Low-Level Controllers ──────────────────────────────────────────────
+ego_controllers:
+  stop_decel_mps2: 4.0
+  creep_target_mps: 1.0
+  creep_accel_mps2: 0.8
+  yield_decel_mps2: 1.5
+  go_accel_mps2: 2.0
+  go_max_speed_mps: 11.11     # 40 km/h
+  abort_decel_mps2: 6.0
+
+# ── Actor Controller Defaults ──────────────────────────────────────────────
+actor_defaults:
+  car_approach_speed_mps: 11.11
+  moto_approach_speed_mps: 13.89
+  ped_walk_speed_mps: 1.2
+  ped_fast_speed_mps: 2.5
+  gap_accept_s: 3.0
+  yield_decel_mps2: 3.0
+  commit_speed_factor: 1.0
+
+# ── Reward ──────────────────────────────────────────────────────────────────
+reward:
+  r_success: 25.0
+  r_collision: -100.0
+  r_row_violation: -20.0
+  r_conflict_intrusion: -15.0
+  r_forced_other_brake: -8.0
+  r_deadlock: -10.0
+  r_crosswalk_block: -12.0
+  r_progress: 0.2              # per meter of progress
+  r_time: -0.03                # per RL step
+  r_comfort: -0.01             # per unit of jerk squared
+  r_unnecessary_wait: -0.5     # per RL step when safe gap is clearly available
+  r_pothole: -5.0
+
+# ── Detection Thresholds ───────────────────────────────────────────────────
+detection:
+  collision_dist_m: 2.5
+  row_violation_eta_s: 1.5       # ego enters when actor has priority & eta < this
+  conflict_occupied_dist_m: 8.0  # conflict zone radius
+  forced_brake_threshold_mps2: 4.0
+  safe_gap_eta_s: 3.0            # gap is "clearly safe" when delta_eta > this
+  crosswalk_zone_m: 5.0
+
+# ── State Dimensions ────────────────────────────────────────────────────────
+state:
+  top_n_actors: 3
+  ego_kin_dim: 8
+  ego_phase_dim: 5
+  dominant_dim: 12
+  per_actor_dim: 21
+  observability_dim: 3
+  # total = 8 + 5 + 12 + 3*21 + 3 = 91

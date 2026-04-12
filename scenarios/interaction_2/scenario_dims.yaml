@@ -1,0 +1,4 @@
+stem_length: 50.0
+bar_half_length: 50.0
+num_lanes: 1
+benchmark_mode: interaction_v2

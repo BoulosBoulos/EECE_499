@@ -45,9 +45,9 @@ def _safe_numeric(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 st.set_page_config(page_title="DRPPO Dashboard", layout="wide", page_icon="🚗")
 st.title("DRPPO: Physics-Informed RL Dashboard")
 
-tab_overview, tab_train, tab_ablation, tab_sensitivity, tab_violations, tab_intent, tab_tables = st.tabs([
+tab_overview, tab_train, tab_ablation, tab_sensitivity, tab_violations, tab_intent, tab_tables, tab_pde, tab_interaction = st.tabs([
     "Project Overview", "Training Curves", "Ablation Summary", "Sensitivity",
-    "Violations", "Intent Model", "Raw Tables",
+    "Violations", "Intent Model", "Raw Tables", "PDE Methods", "Interaction Benchmark",
 ])
 
 # ── Tab 0: Project Overview ─────────────────────────────────────────────────
@@ -75,17 +75,17 @@ with tab_overview:
     st.subheader("Scenarios")
     scenario_df = pd.DataFrame({
         "Scenario": ["1a", "1b", "1c", "1d", "2", "3", "4"],
-        "Car": ["Yes", "Yes", "No", "No", "Yes", "Yes", "Yes"],
-        "Pedestrian": ["No", "Yes", "No", "Yes", "No", "Yes", "Yes"],
-        "Motorcycle": ["No", "No", "Yes", "Yes", "No", "No", "Yes"],
-        "Pothole": ["No", "No", "No", "No", "Yes", "No", "Yes"],
+        "Car": ["Yes", "No", "No", "No", "Yes", "Yes", "Yes"],
+        "Pedestrian": ["No", "Yes", "No", "No", "Yes", "Yes", "Yes"],
+        "Motorcycle": ["No", "No", "Yes", "No", "No", "Yes", "Yes"],
+        "Pothole": ["No", "No", "No", "Yes", "No", "No", "Yes"],
         "Description": [
             "Ego + car only",
-            "Ego + car + pedestrian",
+            "Ego + pedestrian only",
             "Ego + motorcycle only",
-            "Ego + motorcycle + pedestrian",
-            "Ego + car + pothole",
-            "Ego + car + pedestrian (complex)",
+            "Ego + pothole only",
+            "Ego + car + pedestrian",
+            "Ego + car + pedestrian + motorcycle",
             "Ego + car + ped + moto + pothole (full)",
         ],
     })
@@ -597,7 +597,423 @@ with tab_tables:
             st.download_button("Download CSV", csv_download, file_name=os.path.basename(csv_path))
 
 
+# ── Tab 7: PDE Methods ──────────────────────────────────────────────────────
+
+PDE_RESULTS_DIR = os.path.join(os.path.dirname(RESULTS_DIR), "results", "pde_ablation")
+if not os.path.isdir(PDE_RESULTS_DIR):
+    PDE_RESULTS_DIR = os.path.join(RESULTS_DIR, "pde_ablation")
+
+_THREE_WAY_COLORS = {
+    "nopinn": "#e74c3c", "pinn_critic": "#3498db", "pinn_ego": "#2ecc71",
+    "pinn_actor": "#1abc9c", "hjb_aux": "#9b59b6", "soft_hjb_aux": "#f39c12",
+}
+_METRIC_LABELS = {
+    "mean_return": "Mean Return", "collision_rate": "Collision Rate (%)",
+    "mean_ttc": "Mean TTC (s)", "min_ttc": "Min TTC (s)",
+    "pothole_hits_mean": "Pothole Hits (mean)",
+}
+
+with tab_pde:
+    st.header("PDE-Based PINN Critic Methods")
+    st.markdown("""
+    **HJB Auxiliary Critic** and **Soft-HJB Auxiliary Critic** are PDE-based
+    alternatives to the legacy physics-informed critic. They train a separate
+    auxiliary critic on a reduced physically-interpretable state using
+    Hamilton-Jacobi-Bellman residuals, then distill into the PPO value head.
+
+    The **Soft-HJB** variant additionally aligns the PPO actor to the soft
+    policy induced by the PDE Q-values via a KL divergence term.
+    """)
+
+    pde_train_csvs = _find_csvs("ablation_train_log.csv", PDE_RESULTS_DIR)
+    pde_eval_csvs = _find_csvs("ablation_results.csv", PDE_RESULTS_DIR)
+    pde_single_csvs = _find_csvs("train_*_aux_*.csv", RESULTS_DIR)
+
+    # ── PDE Training Curves ─────────────────────────────────────────────────
+    st.subheader("PDE Training Curves")
+    all_pde_train = pde_train_csvs + pde_single_csvs
+    if not all_pde_train:
+        st.info("No PDE training logs found. Run `make train-hjb-aux` or `make ablation-pde` first.")
+    else:
+        selected_pde = st.multiselect("Select PDE training logs", all_pde_train,
+                                      default=all_pde_train[:4],
+                                      format_func=lambda p: os.path.basename(p),
+                                      key="pde_train_select")
+        if selected_pde:
+            frames = []
+            for path in selected_pde:
+                df = _load_csv(path)
+                if df is not None:
+                    if "variant" in df.columns and "seed" in df.columns:
+                        df["run"] = df["variant"].astype(str) + "_s" + df["seed"].astype(str)
+                    else:
+                        df["run"] = os.path.basename(path).replace(".csv", "")
+                    frames.append(df)
+            if frames:
+                combined = pd.concat(frames, ignore_index=True)
+                numeric_cols = ["step", "actor_loss", "vf_loss", "entropy",
+                                "hjb_residual_mean", "soft_residual_mean",
+                                "anchor_loss", "distill_gap", "actor_align_kl",
+                                "episode_return", "collision_rate", "mean_ttc", "min_ttc",
+                                "collision_count"]
+                combined = _safe_numeric(combined, numeric_cols)
+                run_col = "run"
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    for y_col in ["episode_return", "mean_return"]:
+                        if y_col in combined.columns and combined[y_col].notna().any():
+                            fig = px.line(combined, x="step", y=y_col, color=run_col,
+                                          title="Average Return Over Training")
+                            st.plotly_chart(fig, use_container_width=True)
+                            break
+                with col2:
+                    for y_col in ["collision_rate", "collision_count"]:
+                        if y_col in combined.columns and combined[y_col].notna().any():
+                            fig = px.line(combined, x="step", y=y_col, color=run_col,
+                                          title="Collision Rate Over Training")
+                            st.plotly_chart(fig, use_container_width=True)
+                            break
+
+                col3, col4 = st.columns(2)
+                with col3:
+                    res_col = "hjb_residual_mean" if "hjb_residual_mean" in combined.columns else "soft_residual_mean"
+                    if res_col in combined.columns and combined[res_col].notna().any():
+                        fig = px.line(combined, x="step", y=res_col, color=run_col,
+                                      title="PDE Residual Over Training")
+                        st.plotly_chart(fig, use_container_width=True)
+                with col4:
+                    if "distill_gap" in combined.columns and combined["distill_gap"].notna().any():
+                        fig = px.line(combined, x="step", y="distill_gap", color=run_col,
+                                      title="Distillation Gap")
+                        st.plotly_chart(fig, use_container_width=True)
+
+                col5, col6 = st.columns(2)
+                with col5:
+                    if "actor_align_kl" in combined.columns and combined["actor_align_kl"].notna().any():
+                        fig = px.line(combined, x="step", y="actor_align_kl", color=run_col,
+                                      title="Actor Alignment KL (Soft-HJB)")
+                        st.plotly_chart(fig, use_container_width=True)
+                with col6:
+                    if "anchor_loss" in combined.columns and combined["anchor_loss"].notna().any():
+                        fig = px.line(combined, x="step", y="anchor_loss", color=run_col,
+                                      title="Anchor Loss (MSE to Returns)")
+                        st.plotly_chart(fig, use_container_width=True)
+
+                col7, col8 = st.columns(2)
+                with col7:
+                    if "mean_ttc" in combined.columns and combined["mean_ttc"].notna().any():
+                        fig = px.line(combined, x="step", y="mean_ttc", color=run_col,
+                                      title="Mean TTC Over Training")
+                        st.plotly_chart(fig, use_container_width=True)
+                with col8:
+                    if "entropy" in combined.columns and combined["entropy"].notna().any():
+                        fig = px.line(combined, x="step", y="entropy", color=run_col,
+                                      title="Policy Entropy Over Training")
+                        st.plotly_chart(fig, use_container_width=True)
+
+    # ── PDE Ablation Results (all metrics) ──────────────────────────────────
+    st.subheader("PDE Ablation Results (All Metrics)")
+    if not pde_eval_csvs:
+        st.info("No PDE ablation results found. Run `make ablation-pde` first.")
+    else:
+        pde_eval_path = st.selectbox("PDE Ablation CSV", pde_eval_csvs,
+                                     format_func=lambda p: os.path.basename(p), key="pde_eval_csv")
+        df_pde = _load_csv(pde_eval_path)
+        if df_pde is not None:
+            all_num = ["mean_return", "std_return", "collision_rate",
+                       "mean_ttc", "min_ttc", "pothole_hits_mean", "lambda_hjb"]
+            df_pde = _safe_numeric(df_pde, all_num)
+            if "eval_mode" in df_pde.columns:
+                modes = sorted(df_pde["eval_mode"].unique())
+                sel_mode = st.selectbox("Eval mode", modes, index=0, key="pde_eval_mode")
+                df_pde = df_pde[df_pde["eval_mode"] == sel_mode]
+
+            if "scenario" in df_pde.columns:
+                scenarios = ["All"] + sorted(df_pde["scenario"].unique())
+                sel_sc = st.selectbox("Scenario filter", scenarios, index=0, key="pde_scenario_filter")
+                if sel_sc != "All":
+                    df_pde = df_pde[df_pde["scenario"] == sel_sc]
+
+            agg = df_pde.groupby("variant").agg(
+                mean_return=("mean_return", "mean"),
+                std_return=("mean_return", "std"),
+                collision_rate=("collision_rate", "mean"),
+                mean_ttc=("mean_ttc", "mean") if "mean_ttc" in df_pde.columns else ("mean_return", "count"),
+                min_ttc=("min_ttc", "mean") if "min_ttc" in df_pde.columns else ("mean_return", "count"),
+            ).reset_index()
+
+            col1, col2 = st.columns(2)
+            with col1:
+                fig = px.bar(agg, x="variant", y="mean_return", error_y="std_return",
+                             title="Mean Return by Variant", color="variant",
+                             color_discrete_map=_THREE_WAY_COLORS)
+                st.plotly_chart(fig, use_container_width=True)
+            with col2:
+                fig = px.bar(agg, x="variant", y="collision_rate",
+                             title="Collision Rate by Variant", color="variant",
+                             color_discrete_map=_THREE_WAY_COLORS)
+                st.plotly_chart(fig, use_container_width=True)
+
+            col3, col4 = st.columns(2)
+            with col3:
+                if "mean_ttc" in df_pde.columns and df_pde["mean_ttc"].notna().any():
+                    fig = px.bar(agg, x="variant", y="mean_ttc",
+                                 title="Mean TTC by Variant", color="variant",
+                                 color_discrete_map=_THREE_WAY_COLORS)
+                    st.plotly_chart(fig, use_container_width=True)
+            with col4:
+                if "min_ttc" in df_pde.columns and df_pde["min_ttc"].notna().any():
+                    fig = px.bar(agg, x="variant", y="min_ttc",
+                                 title="Min TTC by Variant", color="variant",
+                                 color_discrete_map=_THREE_WAY_COLORS)
+                    st.plotly_chart(fig, use_container_width=True)
+
+            if "pothole_hits_mean" in df_pde.columns and df_pde["pothole_hits_mean"].notna().any():
+                agg_ph = df_pde.groupby("variant")["pothole_hits_mean"].mean().reset_index()
+                fig = px.bar(agg_ph, x="variant", y="pothole_hits_mean",
+                             title="Pothole Hits by Variant", color="variant",
+                             color_discrete_map=_THREE_WAY_COLORS)
+                st.plotly_chart(fig, use_container_width=True)
+
+            if "scenario" in df_pde.columns and df_pde["scenario"].nunique() > 1:
+                st.subheader("Per-Scenario Breakdown")
+                sc_agg = df_pde.groupby(["scenario", "variant"]).agg(
+                    mean_return=("mean_return", "mean"),
+                    collision_rate=("collision_rate", "mean"),
+                ).reset_index()
+                col1, col2 = st.columns(2)
+                with col1:
+                    fig = px.bar(sc_agg, x="scenario", y="mean_return", color="variant",
+                                 barmode="group", title="Mean Return per Scenario",
+                                 color_discrete_map=_THREE_WAY_COLORS)
+                    st.plotly_chart(fig, use_container_width=True)
+                with col2:
+                    fig = px.bar(sc_agg, x="scenario", y="collision_rate", color="variant",
+                                 barmode="group", title="Collision Rate per Scenario",
+                                 color_discrete_map=_THREE_WAY_COLORS)
+                    st.plotly_chart(fig, use_container_width=True)
+
+            if "lambda_hjb" in df_pde.columns and df_pde["lambda_hjb"].nunique() > 1:
+                st.subheader("PDE Sensitivity (lambda)")
+                for metric in ["mean_return", "collision_rate", "mean_ttc"]:
+                    if metric in df_pde.columns and df_pde[metric].notna().any():
+                        sens = df_pde.groupby(["lambda_hjb", "variant"])[metric].mean().reset_index()
+                        fig = px.line(sens, x="lambda_hjb", y=metric, color="variant",
+                                      title=f"{_METRIC_LABELS.get(metric, metric)} vs lambda",
+                                      markers=True, color_discrete_map=_THREE_WAY_COLORS)
+                        st.plotly_chart(fig, use_container_width=True)
+
+            st.subheader("Full PDE Results Table")
+            st.dataframe(df_pde, use_container_width=True)
+
+    # ── Three-Way Comparison: nopinn vs HJB vs Soft-HJB ────────────────────
+    st.subheader("Three-Way Comparison: nopinn vs HJB vs Soft-HJB")
+    legacy_eval_csvs = _find_csvs("ablation_results.csv", RESULTS_DIR)
+    if pde_eval_csvs and legacy_eval_csvs:
+        legacy_path = st.selectbox("Legacy CSV", legacy_eval_csvs,
+                                   format_func=lambda p: os.path.basename(p), key="legacy_compare")
+        pde_path = st.selectbox("PDE CSV", pde_eval_csvs,
+                                format_func=lambda p: os.path.basename(p), key="pde_compare")
+        df_leg = _load_csv(legacy_path)
+        df_pde2 = _load_csv(pde_path)
+        if df_leg is not None and df_pde2 is not None:
+            all_metrics = ["mean_return", "collision_rate", "mean_ttc", "min_ttc", "pothole_hits_mean"]
+            df_leg = _safe_numeric(df_leg, all_metrics)
+            df_pde2 = _safe_numeric(df_pde2, all_metrics)
+            det_leg = df_leg[df_leg["eval_mode"] == "deterministic"] if "eval_mode" in df_leg.columns else df_leg
+            det_pde = df_pde2[df_pde2["eval_mode"] == "deterministic"] if "eval_mode" in df_pde2.columns else df_pde2
+
+            compare_data = []
+            for v in ["nopinn", "pinn_critic", "pinn_ego", "pinn_actor"]:
+                vr = det_leg[det_leg["variant"] == v] if "variant" in det_leg.columns else pd.DataFrame()
+                if len(vr) > 0:
+                    row = {"variant": v, "family": "legacy"}
+                    for m in all_metrics:
+                        if m in vr.columns:
+                            row[m] = vr[m].mean()
+                    compare_data.append(row)
+            for v in ["hjb_aux", "soft_hjb_aux"]:
+                vr = det_pde[det_pde["variant"] == v] if "variant" in det_pde.columns else pd.DataFrame()
+                if len(vr) > 0:
+                    row = {"variant": v, "family": "pde"}
+                    for m in all_metrics:
+                        if m in vr.columns:
+                            row[m] = vr[m].mean()
+                    compare_data.append(row)
+
+            if compare_data:
+                cdf = pd.DataFrame(compare_data)
+                plot_metrics = [m for m in all_metrics if m in cdf.columns and cdf[m].notna().any()]
+                n_plots = len(plot_metrics)
+                cols_per_row = 2
+                for i in range(0, n_plots, cols_per_row):
+                    cols = st.columns(cols_per_row)
+                    for j, col in enumerate(cols):
+                        idx = i + j
+                        if idx < n_plots:
+                            m = plot_metrics[idx]
+                            with col:
+                                fig = px.bar(cdf, x="variant", y=m, color="variant",
+                                             title=_METRIC_LABELS.get(m, m),
+                                             color_discrete_map=_THREE_WAY_COLORS)
+                                st.plotly_chart(fig, use_container_width=True)
+
+                st.subheader("Comparison Table")
+                st.dataframe(cdf, use_container_width=True)
+    else:
+        st.info("Need both legacy (`results/ablation/ablation_results.csv`) and PDE "
+                "(`results/pde_ablation/ablation_results.csv`) results. "
+                "Run `make ablation` and `make ablation-pde`.")
+
+    # ── Interaction Viewer ──────────────────────────────────────────────────
+    st.subheader("Interaction Viewer")
+    traj_csvs = (_find_csvs("pde_trajectory_*.csv", RESULTS_DIR) +
+                 _find_csvs("pde_trajectory_*.csv", os.path.join(RESULTS_DIR, "pde")) +
+                 _find_csvs("sumo_trajectory_*.csv", RESULTS_DIR))
+    if not traj_csvs:
+        st.info("No trajectory CSVs found. Run visualization first.")
+    else:
+        traj_path = st.selectbox("Trajectory CSV", traj_csvs,
+                                 format_func=lambda p: os.path.basename(p), key="traj_select")
+        df_traj = _load_csv(traj_path)
+        if df_traj is not None:
+            df_traj = _safe_numeric(df_traj, ["step", "ego_x", "ego_y", "ego_v", "ttc_min",
+                                               "nearest_agent_dist", "reward", "collision"])
+            col1, col2 = st.columns(2)
+            with col1:
+                if "ego_x" in df_traj.columns and "ego_y" in df_traj.columns:
+                    fig = px.scatter(df_traj, x="ego_x", y="ego_y",
+                                     color="action_name" if "action_name" in df_traj.columns else None,
+                                     title="Ego Position Trace", size_max=5)
+                    fig.update_yaxes(scaleanchor="x")
+                    st.plotly_chart(fig, use_container_width=True)
+            with col2:
+                if "ego_v" in df_traj.columns:
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(x=df_traj["step"], y=df_traj["ego_v"], name="Ego Speed"))
+                    if "nearest_agent_dist" in df_traj.columns:
+                        fig.add_trace(go.Scatter(x=df_traj["step"], y=df_traj["nearest_agent_dist"],
+                                                  name="Nearest Agent", yaxis="y2"))
+                    fig.update_layout(title="Speed & Agent Distance",
+                                      yaxis2=dict(overlaying="y", side="right"))
+                    st.plotly_chart(fig, use_container_width=True)
+
+            col3, col4 = st.columns(2)
+            with col3:
+                if "ttc_min" in df_traj.columns:
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(x=df_traj["step"], y=df_traj["ttc_min"], name="TTC"))
+                    fig.add_hline(y=3.0, line_dash="dash", line_color="red", annotation_text="TTC threshold")
+                    fig.update_layout(title="Time-to-Collision Profile")
+                    st.plotly_chart(fig, use_container_width=True)
+            with col4:
+                if "reward" in df_traj.columns:
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(x=df_traj["step"], y=df_traj["reward"].cumsum(),
+                                             name="Cumulative Return"))
+                    fig.update_layout(title="Cumulative Return Over Episode")
+                    st.plotly_chart(fig, use_container_width=True)
+
+
 # ── Sidebar ──────────────────────────────────────────────────────────────────
+
+# ── Interaction Benchmark Tab ──────────────────────────────────────────────
+
+_interaction_dir = os.path.join(RESULTS_DIR, "interaction")
+
+def _render_interaction_tab():
+    st.header("Interaction Benchmark (v2)")
+    st.markdown("""
+    **Conflict-centric behavioural decision-making benchmark.**
+    Template-driven episodes with reactive actors, latched ego actions,
+    and explicit right-of-way / conflict-intrusion metrics.
+    See `docs/BEHAVIORAL_DECISION_BENCHMARK_REDESIGN.md` for design rationale.
+    """)
+
+    eval_csv = os.path.join(_interaction_dir, "interaction_eval_results.csv")
+    eval_df = _load_csv(eval_csv)
+
+    # ── Eval results ────────────────────────────────────────────────────
+    if eval_df is not None and len(eval_df) > 0:
+        st.subheader("Evaluation Results")
+        scenarios = sorted(eval_df["scenario"].unique()) if "scenario" in eval_df.columns else []
+        variants = sorted(eval_df["variant"].unique()) if "variant" in eval_df.columns else []
+
+        sel_sc = st.multiselect("Scenarios", scenarios, default=scenarios, key="int_sc")
+        sel_var = st.multiselect("Variants", variants, default=variants, key="int_var")
+        filt = eval_df[eval_df["scenario"].isin(sel_sc) & eval_df["variant"].isin(sel_var)]
+
+        metrics = ["mean_return", "success_rate", "collision_rate",
+                    "row_violation_rate", "conflict_intrusion_rate",
+                    "forced_brake_rate", "deadlock_rate", "unnecessary_wait_rate",
+                    "mean_steps", "mean_progress"]
+        available_metrics = [m for m in metrics if m in filt.columns]
+
+        for m in available_metrics:
+            filt[m] = pd.to_numeric(filt[m], errors="coerce")
+
+        if available_metrics:
+            n_cols = 2
+            for i in range(0, len(available_metrics), n_cols):
+                cols = st.columns(n_cols)
+                for j, col in enumerate(cols):
+                    idx = i + j
+                    if idx >= len(available_metrics):
+                        break
+                    m = available_metrics[idx]
+                    with col:
+                        try:
+                            fig = px.bar(filt, x="scenario", y=m, color="variant",
+                                         barmode="group", title=m.replace("_", " ").title())
+                            st.plotly_chart(fig, use_container_width=True)
+                        except Exception:
+                            st.write(f"Could not plot {m}")
+    else:
+        st.info("No interaction eval results yet. "
+                "Run `make interaction-eval` to generate data.")
+
+    # ── Training curves ─────────────────────────────────────────────────
+    train_csvs = _find_csvs("train_interaction_*.csv", _interaction_dir)
+    if train_csvs:
+        st.subheader("Training Curves")
+        for csv_path in train_csvs:
+            label = os.path.basename(csv_path).replace("train_interaction_", "").replace(".csv", "")
+            df = _load_csv(csv_path)
+            if df is None or len(df) == 0:
+                continue
+            st.markdown(f"**{label}**")
+            train_metrics = ["mean_return", "collision_rate", "success_rate", "row_violation_rate"]
+            avail = [m for m in train_metrics if m in df.columns]
+            if avail and "total_env_steps" in df.columns:
+                cols = st.columns(len(avail))
+                for col, m in zip(cols, avail):
+                    with col:
+                        df[m] = pd.to_numeric(df[m], errors="coerce")
+                        fig = px.line(df, x="total_env_steps", y=m, title=m)
+                        st.plotly_chart(fig, use_container_width=True)
+
+    # ── Rule baseline ───────────────────────────────────────────────────
+    rule_csvs = _find_csvs("rule_baseline_*.csv", _interaction_dir)
+    if rule_csvs:
+        st.subheader("Rule-Based Baseline")
+        for csv_path in rule_csvs:
+            label = os.path.basename(csv_path).replace(".csv", "")
+            df = _load_csv(csv_path)
+            if df is not None and len(df) > 0:
+                st.markdown(f"**{label}**: {len(df)} steps logged")
+                ev_cols = [c for c in df.columns if c.startswith("ev_")]
+                if ev_cols:
+                    event_sums = {c.replace("ev_", ""): int(df[c].sum()) for c in ev_cols}
+                    st.json(event_sums)
+
+    st.markdown("---")
+    st.markdown("*See `experiments/interaction/` for training, eval, and visualization scripts.*")
+
+# ── Tab 9: Interaction Benchmark ───────────────────────────────────────────
+with tab_interaction:
+    _render_interaction_tab()
+
 
 with st.sidebar:
     st.subheader("About")
@@ -606,18 +1022,19 @@ with st.sidebar:
 
     Physics-informed recurrent PPO for T-intersection driving.
 
-    **Plug-and-play variants:**
+    **Legacy variants:**
     - nopinn / pinn_critic / pinn_actor / pinn_both
     - pinn_ego / pinn_no_ttc / pinn_no_stop / pinn_no_fric
     - safety_filter / pinn_critic_sf
 
+    **PDE-based variants (new):**
+    - hjb_aux: HJB-residual auxiliary critic
+    - soft_hjb_aux: Soft-HJB + actor alignment
+
     **Tabs:**
-    - Training Curves: return, losses, collisions, TTC, violations
-    - Ablation: compare all variants + PINN placement
-    - Sensitivity: lambda_phys sweep
-    - Violations: per-term physics constraint tracking
-    - Intent: LSTM training metrics
-    - Raw Tables: browse any CSV
+    - Training Curves, Ablation, Sensitivity, Violations, Intent, Raw Tables
+    - **PDE Methods**: PDE training, ablation, legacy comparison
+    - **Interaction Benchmark**: Conflict-centric behavioral decision benchmark
     """)
     st.markdown("---")
     st.markdown(f"Results dir: `{RESULTS_DIR}`")

@@ -195,7 +195,7 @@ class BehaviorSampler:
         has_ped: bool,
         has_moto: bool,
         has_pothole: bool,
-        bar_len: float = 160.0,
+        bar_len: float = 50.0,
         jm_ignore_fixed: float | None = None,
     ) -> BehaviorConfig:
         cfg = BehaviorConfig()
@@ -204,12 +204,15 @@ class BehaviorSampler:
             maneuver = self.rng.choice(CAR_MANEUVERS)
             style = self.rng.choice(CAR_STYLES)
             sp = CAR_STYLE_PARAMS[style]
-            depart = 3.0 + self.rng.uniform(0, 5)
+            depart = 0.5 + self.rng.uniform(0, 2)
+            safe_len = min(bar_len, 38.0)
+            dep_pos = max(0, safe_len - self.rng.uniform(20, 35))
             cfg.car = ActorBehavior(
                 maneuver=maneuver,
                 style=style,
                 route_edges=CAR_ROUTES[maneuver],
                 depart_time=depart,
+                depart_pos=dep_pos,
                 max_speed=sp["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
                 accel=sp["accel"],
                 decel=sp["decel"],
@@ -225,15 +228,13 @@ class BehaviorSampler:
             maneuver = self.rng.choice(PED_MANEUVERS)
             style = self.rng.choice(PED_STYLES)
             sp = PED_STYLE_PARAMS[style]
-            if maneuver == "cross_left_right":
-                depart_pos = bar_len - self.rng.uniform(15, 35)
-            else:
-                depart_pos = bar_len - self.rng.uniform(15, 35)
+            safe_len = min(bar_len, 38.0)
+            depart_pos = max(0, safe_len - self.rng.uniform(5, 20))
             cfg.pedestrian = ActorBehavior(
                 maneuver=maneuver,
                 style=style,
                 route_edges=f"{'left_in' if 'left_right' in maneuver else 'right_out'} {'right_out' if 'left_right' in maneuver else 'left_in'}",
-                depart_time=0.5 + self.rng.uniform(0, 3),
+                depart_time=0.2 + self.rng.uniform(0, 1.0),
                 depart_pos=depart_pos,
                 ped_speed=sp["speed"],
                 stop_midway=sp["stop_midway"],
@@ -248,12 +249,15 @@ class BehaviorSampler:
             maneuver = self.rng.choice(MOTO_MANEUVERS)
             style = self.rng.choice(MOTO_STYLES)
             sp = MOTO_STYLE_PARAMS[style]
-            depart = 2.0 + self.rng.uniform(0, 6)
+            depart = 0.5 + self.rng.uniform(0, 2)
+            safe_len = min(bar_len, 38.0)
+            dep_pos = max(0, safe_len - self.rng.uniform(20, 35))
             cfg.motorcycle = ActorBehavior(
                 maneuver=maneuver,
                 style=style,
                 route_edges=MOTO_ROUTES[maneuver],
                 depart_time=depart,
+                depart_pos=dep_pos,
                 max_speed=sp["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
                 accel=sp["accel"],
                 decel=sp["decel"],
@@ -266,11 +270,10 @@ class BehaviorSampler:
             cfg.moto_style_label = MOTO_STYLE_LABELS.get(style, 1)
 
         if has_pothole:
-            # Random position within the junction conflict area
-            cx = self.rng.uniform(-8, 8)
-            cy = self.rng.uniform(-5, 5)
-            hw = self.rng.uniform(1.5, 4.0)
-            hh = self.rng.uniform(1.0, 2.5)
+            cx = self.rng.uniform(-2, 5)
+            cy = self.rng.uniform(-3, 3)
+            hw = self.rng.uniform(1.5, 3.0)
+            hh = self.rng.uniform(1.0, 2.0)
             cfg.pothole = PotholeConfig(x=cx, y=cy, half_w=hw, half_h=hh)
 
         return cfg
