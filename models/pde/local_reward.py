@@ -21,6 +21,8 @@ def local_reward(
     w_pothole: float = -5.0,
     ttc_thr: float = 3.0,
     pothole_thr: float = 1.0,
+    ttc_sigmoid_temp: float = 0.3,
+    pothole_sigmoid_temp: float = 0.2,
 ) -> torch.Tensor:
     """Compute one-step surrogate reward r(xi, a).
 
@@ -46,8 +48,49 @@ def local_reward(
     d_pot_next = xi_next[:, IDX_POTHOLE]
 
     r = w_prog * progress + w_time * dynamics.dt
-    r = r + w_risk * (ttc_next < ttc_thr).float()
-    r = r + w_pothole * (d_pot_next < pothole_thr).float()
+    r = r + w_risk * torch.sigmoid((ttc_thr - ttc_next) / ttc_sigmoid_temp)
+    r = r + w_pothole * torch.sigmoid((pothole_thr - d_pot_next) / pothole_sigmoid_temp)
+
+    if squeeze:
+        r = r.squeeze(0)
+    return r
+
+
+def local_reward_from_next(
+    xi: torch.Tensor,
+    action: int,
+    xi_next: torch.Tensor,
+    dynamics: BehavioralDynamics,
+    w_prog: float = 1.0,
+    w_time: float = -0.1,
+    w_risk: float = -3.0,
+    w_pothole: float = -5.0,
+    ttc_thr: float = 3.0,
+    pothole_thr: float = 1.0,
+    ttc_sigmoid_temp: float = 0.3,
+    pothole_sigmoid_temp: float = 0.2,
+) -> torch.Tensor:
+    """Compute one-step surrogate reward using a pre-computed xi_next.
+
+    Same as local_reward but avoids a redundant dynamics.one_step call
+    when the caller already has xi_next (e.g. pde_q_values).
+    """
+    squeeze = xi.dim() == 1
+    if squeeze:
+        xi = xi.unsqueeze(0)
+        xi_next = xi_next.unsqueeze(0)
+
+    v = xi[:, IDX_V]
+    a_nom = dynamics._nominal_accel(v, action)
+    v_new = torch.clamp(v + a_nom * dynamics.dt, min=0.0, max=dynamics.v_max)
+    progress = 0.5 * (v + v_new) * dynamics.dt
+
+    ttc_next = xi_next[:, IDX_TTC_MIN]
+    d_pot_next = xi_next[:, IDX_POTHOLE]
+
+    r = w_prog * progress + w_time * dynamics.dt
+    r = r + w_risk * torch.sigmoid((ttc_thr - ttc_next) / ttc_sigmoid_temp)
+    r = r + w_pothole * torch.sigmoid((pothole_thr - d_pot_next) / pothole_sigmoid_temp)
 
     if squeeze:
         r = r.squeeze(0)

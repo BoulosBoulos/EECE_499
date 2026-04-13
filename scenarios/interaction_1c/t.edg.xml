@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<edges>
-  <edge from="stem" id="stem_in" to="center" numLanes="1" speed="13.89" priority="-1"/>
-  <edge from="center" id="stem_out" to="stem" numLanes="1" speed="13.89" priority="-1"/>
-  <edge from="left" id="left_in" to="center" numLanes="1" speed="13.89" priority="1"/>
-  <edge from="center" id="left_out" to="left" numLanes="1" speed="13.89" priority="1"/>
-  <edge from="right" id="right_in" to="center" numLanes="1" speed="13.89" priority="1"/>
-  <edge from="center" id="right_out" to="right" numLanes="1" speed="13.89" priority="1"/>
-</edges>

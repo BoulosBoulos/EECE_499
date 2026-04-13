@@ -43,6 +43,7 @@ _DEFAULT_REWARD_CONFIG = {
     "w_prog": 1.0, "w_time": -0.1, "w_risk": -3.0, "w_coll": -20.0,
     "ttc_thr": 3.0, "d_coll": 2.0, "w_pothole": -5.0,
     "w_abort_comfort": -0.5,
+    "w_success": 10.0, "w_switch": -0.05, "w_rule": -2.0,
 }
 
 
@@ -135,6 +136,7 @@ class SumoEnv(_make_gym()):
         self._gru_hidden = None
         self._behavior: Optional[BehaviorConfig] = None
         self._behavior_sampler = BehaviorSampler()
+        self._init_occlusion_geometry()
         self._pothole_box = np.array([[-4, 4], [-2, 2]])
         self._collision_flag = False
         self._ped_stopped = False
@@ -167,6 +169,72 @@ class SumoEnv(_make_gym()):
                 self._bar_len = float(d.get("bar_half_length", self._bar_len))
             except Exception:
                 pass
+
+    def _init_occlusion_geometry(self):
+        """Define static occlusion polygons for the T-intersection.
+
+        The T has the stem going south (negative y) and the bar going east-west.
+        The ego approaches from south on stem_in, turns right onto right_out.
+        Buildings at the NW and NE corners of the T block the ego's view
+        of traffic approaching along the bar.
+        Coordinates: junction center is at (0, 0).
+        """
+        self._occlusion_polygons = [
+            {
+                "corners": np.array([
+                    [-3.5, 3.5],
+                    [-30.0, 3.5],
+                    [-30.0, 20.0],
+                    [-3.5, 20.0],
+                ]),
+                "name": "building_NW",
+            },
+            {
+                "corners": np.array([
+                    [3.5, 3.5],
+                    [30.0, 3.5],
+                    [30.0, 20.0],
+                    [3.5, 20.0],
+                ]),
+                "name": "building_NE",
+            },
+        ]
+
+    def _line_intersects_polygon(self, p1: np.ndarray, p2: np.ndarray, polygon: np.ndarray) -> bool:
+        """Check if line segment p1-p2 intersects any edge of the polygon.
+
+        Uses the standard 2D line segment intersection test.
+        polygon: (N, 2) array of corner points.
+        """
+        n = len(polygon)
+        for i in range(n):
+            p3 = polygon[i]
+            p4 = polygon[(i + 1) % n]
+            d1 = p2 - p1
+            d2 = p4 - p3
+            cross = d1[0] * d2[1] - d1[1] * d2[0]
+            if abs(cross) < 1e-10:
+                continue
+            t = ((p3[0] - p1[0]) * d2[1] - (p3[1] - p1[1]) * d2[0]) / cross
+            u = ((p3[0] - p1[0]) * d1[1] - (p3[1] - p1[1]) * d1[0]) / cross
+            if 0 <= t <= 1 and 0 <= u <= 1:
+                return True
+        return False
+
+    def _ray_polygon_edge_distance(
+        self, origin: np.ndarray, direction: np.ndarray, p3: np.ndarray, p4: np.ndarray
+    ) -> float | None:
+        """Return distance along ray from origin in direction to edge p3-p4, or None."""
+        d2 = p4 - p3
+        cross = direction[0] * d2[1] - direction[1] * d2[0]
+        if abs(cross) < 1e-10:
+            return None
+        diff = p3 - origin
+        t = (diff[0] * d2[1] - diff[1] * d2[0]) / cross
+        u = (diff[0] * direction[1] - diff[1] * direction[0]) / cross
+        if t > 0 and 0 <= u <= 1:
+            return float(t)
+        return None
 
     def _scenario_has_static_ped(self, sumocfg: str) -> bool:
         try:
@@ -365,6 +433,7 @@ class SumoEnv(_make_gym()):
         self._ped_stop_counter = 0
         self._ped_hesitant_phase = 0
         self._ped_hesitant_counter = 0
+        self._prev_action = None
         self._prev_psi = None
 
         self._behavior = self._sample_behavior()
@@ -447,8 +516,13 @@ class SumoEnv(_make_gym()):
             dist = np.linalg.norm(np.array(pos, dtype=float) - ego_pos) + 1e-6
             sigma_i = float(np.clip(dist / 50.0, 0.05, 1.0))
 
-            is_decelerating = accel < -0.5
-            chi_i = 0.3 if is_decelerating else 0.7
+            try:
+                agent_route = traci.vehicle.getRoute(vid)
+                has_in = any("_in" in e for e in agent_route)
+                has_out = any("_out" in e for e in agent_route)
+                chi_i = 1.0 if (has_in and has_out) else 0.0
+            except Exception:
+                chi_i = 0.5
 
             try:
                 ego_edge = traci.vehicle.getRoadID(self.EGO_ID) if self.EGO_ID in traci.vehicle.getIDList() else ""
@@ -478,22 +552,35 @@ class SumoEnv(_make_gym()):
             except Exception:
                 ped_psi = 0.0
 
-            dist = np.linalg.norm(np.array(pos, dtype=float) - ego_pos) + 1e-6
-            ped_d_cz = max(0.0, dist - 5.0)
+            ped_pos = np.array(pos, dtype=float)
+            dist = np.linalg.norm(ped_pos - ego_pos) + 1e-6
+            # Pedestrian d_cz: distance along bar to crosswalk region
+            if abs(ped_pos[0]) < 5.0 and abs(ped_pos[1]) < 10.0:
+                ped_d_cz = 0.0  # already in crosswalk
+            else:
+                ped_d_cz = max(0.0, abs(ped_pos[0]) - 5.0)
             sigma_i = float(np.clip(dist / 50.0, 0.05, 1.0))
-            nu_i = self._compute_los(ego_pos, np.array(pos, dtype=float), pid)
+            nu_i = self._compute_los(ego_pos, ped_pos, pid)
+            # Pedestrian ROW: absolute priority when in crosswalk
+            in_crosswalk = abs(ped_pos[0]) < 8.0 and abs(ped_pos[1]) < 10.0
+            pi_row_ped = 1.0 if in_crosswalk else 0.5
 
             agents.append({
-                "id": pid, "p": np.array(pos, dtype=float),
+                "id": pid, "p": ped_pos,
                 "psi": ped_psi, "v": speed, "a": 0.0,
                 "type": "ped", "nu": nu_i, "sigma": sigma_i,
                 "d_cz": ped_d_cz, "d_exit": max(0, ped_d_cz - 5),
-                "chi": 0.5, "pi_row": 0.7,
+                "chi": 1.0, "pi_row": pi_row_ped,
             })
         return agents
 
     def _compute_los(self, ego_pos: np.ndarray, agent_pos: np.ndarray, agent_id: str) -> float:
         """Compute line-of-sight visibility. Returns 1.0 if clear, decays if occluded."""
+        # Check static occlusion (buildings) first
+        for occ in self._occlusion_polygons:
+            if self._line_intersects_polygon(ego_pos, agent_pos, occ["corners"]):
+                return 0.05  # almost fully occluded by building
+
         all_positions = []
         try:
             for vid in traci.vehicle.getIDList():
@@ -575,15 +662,34 @@ class SumoEnv(_make_gym()):
         }
 
         agents = self._get_agents() if not hasattr(self, '_cached_agents') else self._cached_agents
-        n_visible = sum(1 for ag in agents if np.linalg.norm(ag["p"] - ego["p"]) < 40)
-        alpha_cz = min(1.0, n_visible / max(len(agents), 1)) if agents else 1.0
+        ego_pos = np.array(ego["p"])
+
+        # alpha_cz: geometric visibility of the conflict zone via sampling
+        cz_center = np.array([0.0, 0.0])
+        cz_radius = 10.0
+        n_samples = 20
+        visible_count = 0
+        for _ in range(n_samples):
+            sample = cz_center + np.random.uniform(-cz_radius, cz_radius, 2)
+            if not any(self._line_intersects_polygon(ego_pos, sample, occ["corners"])
+                       for occ in self._occlusion_polygons):
+                visible_count += 1
+        alpha_cz = visible_count / n_samples
         alpha_cross = alpha_cz
 
-        min_occ_dist = 200.0
-        for ag in agents:
-            if ag.get("nu", 1.0) < 0.8:
-                d = np.linalg.norm(ag["p"] - ego["p"])
-                min_occ_dist = min(min_occ_dist, d)
+        # d_occ: distance from ego to nearest static occlusion boundary toward CZ
+        d_occ = 200.0
+        ego_to_cz = cz_center - ego_pos
+        ego_to_cz_norm = ego_to_cz / (np.linalg.norm(ego_to_cz) + 1e-6)
+        for occ in self._occlusion_polygons:
+            corners = occ["corners"]
+            n_corners = len(corners)
+            for i in range(n_corners):
+                p3 = corners[i]
+                p4 = corners[(i + 1) % n_corners]
+                d = self._ray_polygon_edge_distance(ego_pos, ego_to_cz_norm, p3, p4)
+                if d is not None and d < d_occ:
+                    d_occ = d
 
         dt_seen = 0.0
         if agents:
@@ -592,12 +698,17 @@ class SumoEnv(_make_gym()):
                 earliest = min(first_seen_times)
                 dt_seen = (self._step_count - earliest) * self.dt
 
+        # sigma_percep: dynamic perception uncertainty based on occlusion
+        n_agents_total = len(agents)
+        n_occluded = sum(1 for ag in agents if ag.get("nu", 1.0) < 0.5)
+        sigma_percep = 0.05 + 0.15 * (n_occluded / max(n_agents_total, 1))
+
         vis = {
             "alpha_cz": alpha_cz,
             "alpha_cross": alpha_cross,
-            "d_occ": min_occ_dist,
+            "d_occ": d_occ,
             "dt_seen": dt_seen,
-            "sigma_percep": 0.05,
+            "sigma_percep": sigma_percep,
             "n_occ": sum(1 for ag in agents if ag.get("nu", 1.0) < 0.8),
         }
         return geom, vis
@@ -642,8 +753,8 @@ class SumoEnv(_make_gym()):
             delta_xy = R @ dp
             delta_v = R @ (v_i_vec - v_e_vec)
             delta_psi = _wrap(psi_i - psi_e)
-            t_cpa = np.clip(-np.dot(dp, delta_v) / (np.dot(delta_v, delta_v) + 1e-6), 0, 3)
-            p_cpa = dp + t_cpa * delta_v
+            t_cpa = np.clip(-np.dot(delta_xy, delta_v) / (np.dot(delta_v, delta_v) + 1e-6), 0, 3)
+            p_cpa = delta_xy + t_cpa * delta_v
             d_cpa = np.linalg.norm(p_cpa)
             z = [delta_xy[0], delta_xy[1], delta_v[0], delta_v[1], delta_psi, d_cz, d_cpa,
                  ag.get("nu", 1.0), ag.get("sigma", 0.1)]
@@ -833,6 +944,22 @@ class SumoEnv(_make_gym()):
         if collision:
             self._collision_flag = True
 
+        # --- Termination & success detection (before reward so success bonus applies) ---
+        success = False
+        terminated = collision
+        if not terminated and ego_present:
+            if traci.vehicle.getRoadID(self.EGO_ID) == "right_out":
+                lane_pos = traci.vehicle.getLanePosition(self.EGO_ID)
+                if lane_pos > self._bar_len - 10:
+                    terminated = True
+                    success = True
+        ego_missing_success = (not collision) and (not ego_present) and (self._step_count > 0)
+        if ego_missing_success:
+            terminated = True
+            success = True
+        truncated = (not terminated) and (self._step_count >= self.max_steps)
+
+        # --- Reward computation ---
         prog = 0.1
         if ego_present:
             prog = traci.vehicle.getSpeed(self.EGO_ID) * self.dt
@@ -845,18 +972,28 @@ class SumoEnv(_make_gym()):
             r += self.reward_cfg["w_pothole"]
         if action == 4:
             r += self.reward_cfg.get("w_abort_comfort", -0.5)
+        if success:
+            r += self.reward_cfg.get("w_success", 10.0)
 
-        terminated = collision
-        if not terminated and ego_present:
-            if traci.vehicle.getRoadID(self.EGO_ID) == "right_out":
-                lane_pos = traci.vehicle.getLanePosition(self.EGO_ID)
-                if lane_pos > self._bar_len - 10:
-                    terminated = True
-        ego_missing_success = (not collision) and (not ego_present) and (self._step_count > 0)
-        if ego_missing_success:
-            terminated = True
-        truncated = (not terminated) and (self._step_count >= self.max_steps)
+        # Action switching penalty
+        if self._prev_action is not None and action != self._prev_action:
+            r += self.reward_cfg.get("w_switch", -0.05)
 
+        # ROW violation penalty
+        if ego_present and not collision:
+            ego_edge = traci.vehicle.getRoadID(self.EGO_ID)
+            if "stem" in ego_edge or ego_edge == "":
+                for ag in agents:
+                    ag_dist = np.linalg.norm(np.array(ag["p"]) - ego["p"])
+                    if ag_dist < 15.0 and ag.get("pi_row", 0) > 0.5:
+                        d_cz_ego = built["s_geom"][1]
+                        if d_cz_ego < 3.0 and ego["v"] > 1.0:
+                            r += self.reward_cfg.get("w_rule", -2.0)
+                            break
+
+        self._prev_action = action
+
+        # --- Info dict ---
         ego_action_name = ACTION_NAMES[action] if 0 <= action < len(ACTION_NAMES) else "UNKNOWN"
         nearest_agent_dist = float("inf")
         if ego_present:
@@ -877,6 +1014,8 @@ class SumoEnv(_make_gym()):
             "nearest_agent_dist": nearest_agent_dist,
             "ego_missing": not ego_present,
             "ego_missing_success": ego_missing_success,
+            "success": success,
+            "prev_action": self._prev_action,
         }
         return state.astype(np.float32), float(r), terminated, truncated, info
 

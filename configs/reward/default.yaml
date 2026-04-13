@@ -4,9 +4,10 @@
 w_prog: 1.0       # progress reward per m
 w_time: -0.1      # time penalty per step
 w_risk: -3.0      # penalty when TTC < ttc_thr (stronger to encourage stopping)
-w_rule: -2.0      # ROW violation (not yet implemented)
+w_rule: -2.0      # ROW violation penalty (ego enters CZ while priority agent is close)
 w_coll: -20.0     # collision penalty per step (uses SUMO collision events + proximity)
-w_switch: -0.05   # action switching (not yet implemented)
+w_switch: -0.05   # action switching penalty (penalizes oscillating actions)
+w_success: 10.0   # terminal bonus for successfully clearing intersection
 w_comfort: -0.01  # acceleration magnitude (not yet implemented)
 w_jerk: -0.02     # jerk penalty (not yet implemented)
 ttc_thr: 3.0      # TTC threshold (s)

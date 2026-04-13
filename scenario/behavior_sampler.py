@@ -189,6 +189,33 @@ class BehaviorSampler:
     def __init__(self, rng: np.random.RandomState | None = None):
         self.rng = rng or np.random.RandomState()
 
+    def _compute_conflict_spawn(
+        self,
+        ego_approach_dist: float,
+        ego_approach_speed: float,
+        agent_approach_dist: float,
+        agent_speed: float,
+        bar_len: float,
+    ) -> tuple[float, float]:
+        """Compute depart_time and depart_pos so agent arrives at CZ near ego.
+
+        Returns (depart_time, depart_pos) for the other agent.
+        """
+        ego_eta = ego_approach_dist / max(ego_approach_speed, 1.0)
+        # Agent arrives within [-2s, +3s] of ego:
+        #   negative = agent arrives before ego (ego must yield)
+        #   positive = agent arrives after ego (ego can go)
+        conflict_offset = self.rng.uniform(-2.0, 3.0)
+        agent_eta = ego_eta + conflict_offset
+
+        depart_time = 0.5 + self.rng.uniform(0, 1.0)
+        travel_time_needed = max(0.5, agent_eta - depart_time)
+        travel_dist = agent_speed * travel_time_needed
+        depart_pos = max(0, bar_len - travel_dist - 5.0)
+        depart_pos = float(np.clip(depart_pos, 0.0, bar_len - 5.0))
+
+        return depart_time, depart_pos
+
     def sample(
         self,
         has_car: bool,
@@ -204,9 +231,13 @@ class BehaviorSampler:
             maneuver = self.rng.choice(CAR_MANEUVERS)
             style = self.rng.choice(CAR_STYLES)
             sp = CAR_STYLE_PARAMS[style]
-            depart = 0.5 + self.rng.uniform(0, 2)
-            safe_len = min(bar_len, 38.0)
-            dep_pos = max(0, safe_len - self.rng.uniform(20, 35))
+            depart, dep_pos = self._compute_conflict_spawn(
+                ego_approach_dist=50.0,  # stem_len - 10
+                ego_approach_speed=6.0,  # avg approach speed
+                agent_approach_dist=bar_len - 5.0,
+                agent_speed=sp["max_speed"],
+                bar_len=bar_len,
+            )
             cfg.car = ActorBehavior(
                 maneuver=maneuver,
                 style=style,
@@ -228,13 +259,21 @@ class BehaviorSampler:
             maneuver = self.rng.choice(PED_MANEUVERS)
             style = self.rng.choice(PED_STYLES)
             sp = PED_STYLE_PARAMS[style]
+            # Ped should enter crosswalk when ego is 5-15m from CZ
+            ego_close_dist = self.rng.uniform(5.0, 15.0)
+            ego_approach_speed = 6.0
+            ego_eta_to_close = (50.0 - ego_close_dist) / max(ego_approach_speed, 1.0)
+            ped_depart_time = 0.5 + self.rng.uniform(0, 0.5)
+            ped_travel_time = max(0.5, ego_eta_to_close - ped_depart_time)
+            ped_travel_dist = sp["speed"] * ped_travel_time
             safe_len = min(bar_len, 38.0)
-            depart_pos = max(0, safe_len - self.rng.uniform(5, 20))
+            depart_pos = max(0, safe_len - ped_travel_dist - 3.0)
+            depart_pos = float(np.clip(depart_pos, 0.0, safe_len - 2.0))
             cfg.pedestrian = ActorBehavior(
                 maneuver=maneuver,
                 style=style,
                 route_edges=f"{'left_in' if 'left_right' in maneuver else 'right_out'} {'right_out' if 'left_right' in maneuver else 'left_in'}",
-                depart_time=0.2 + self.rng.uniform(0, 1.0),
+                depart_time=ped_depart_time,
                 depart_pos=depart_pos,
                 ped_speed=sp["speed"],
                 stop_midway=sp["stop_midway"],
@@ -249,9 +288,13 @@ class BehaviorSampler:
             maneuver = self.rng.choice(MOTO_MANEUVERS)
             style = self.rng.choice(MOTO_STYLES)
             sp = MOTO_STYLE_PARAMS[style]
-            depart = 0.5 + self.rng.uniform(0, 2)
-            safe_len = min(bar_len, 38.0)
-            dep_pos = max(0, safe_len - self.rng.uniform(20, 35))
+            depart, dep_pos = self._compute_conflict_spawn(
+                ego_approach_dist=50.0,
+                ego_approach_speed=6.0,
+                agent_approach_dist=bar_len - 5.0,
+                agent_speed=sp["max_speed"],
+                bar_len=bar_len,
+            )
             cfg.motorcycle = ActorBehavior(
                 maneuver=maneuver,
                 style=style,

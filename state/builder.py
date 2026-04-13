@@ -73,6 +73,9 @@ class StateBuilder:
         kappa = float(geom.get("kappa", 0.0))
         e_y = float(geom.get("e_y", 0.0))
         e_psi = float(geom.get("e_psi", 0.0))
+        # NOTE: g_turn is always [0,0,1] (right turn) and w_lane is always 3.5
+        # for this fixed T-intersection geometry. These are retained for
+        # architectural generality but provide no information to the policy.
         w_lane = float(geom.get("w_lane", 3.5))
         g_turn = np.array(geom.get("g_turn", [0, 1, 0]), dtype=np.float32)  # one-hot left/straight/right
         rho = np.array(geom.get("rho", [1, 0]), dtype=np.float32)  # ROW context

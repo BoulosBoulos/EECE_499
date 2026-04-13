@@ -1,5 +1,4 @@
 from models.intent_style import IntentStylePredictor
-from models.physics import PhysicsPredictor
-from models.drppo import DRPPO
+from models.drppo import RecurrentActorCritic, DRPPO
 
-__all__ = ["IntentStylePredictor", "PhysicsPredictor", "DRPPO"]
+__all__ = ["IntentStylePredictor", "RecurrentActorCritic", "DRPPO"]

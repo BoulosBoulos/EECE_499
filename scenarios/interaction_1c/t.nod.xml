@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<nodes>
-  <node id="center" x="0" y="0" type="priority"/>
-  <node id="stem" x="0" y="-50.0" type="priority"/>
-  <node id="left" x="-50.0" y="0" type="priority"/>
-  <node id="right" x="50.0" y="0" type="priority"/>
-</nodes>

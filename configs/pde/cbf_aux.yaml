@@ -1,9 +1,9 @@
-# HJB-residual auxiliary critic configuration
+# CBF-PDE auxiliary critic configuration
 lambda_anchor: 1.0
-lambda_hjb: 0.2
+lambda_cbf: 0.2
 lambda_bc: 0.5
 lambda_distill: 0.25
+alpha_cbf: 1.0
 aux_hidden_dim: 256
 aux_lr: 1e-3
 collocation_ratio: 0.7
-w_success: 10.0

@@ -1,1 +1,0 @@
-# Interaction benchmark experiments package.
