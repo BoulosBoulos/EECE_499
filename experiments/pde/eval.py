@@ -92,12 +92,18 @@ def main():
                         choices=["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"])
     parser.add_argument("--episodes", type=int, default=50)
     parser.add_argument("--out_dir", default="results/pde")
-    parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4"])
+    parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4", "2_dense", "3_dense", "4_dense"])
     parser.add_argument("--ego_maneuver", default="stem_right",
                         choices=["stem_right", "stem_left", "right_left",
                                  "right_stem", "left_right", "left_stem"])
     parser.add_argument("--use_intent", action="store_true")
     parser.add_argument("--gui", action="store_true")
+    parser.add_argument("--no_buildings", action="store_true",
+                        help="Disable static occlusion buildings (full visibility)")
+    parser.add_argument("--style_filter", default=None, choices=["nominal", "adversarial"],
+                        help="Filter agent behavioral styles for robustness ablation")
+    parser.add_argument("--state_ablation", default=None, choices=["no_visibility"],
+                        help="State ablation: remove specific feature groups")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42])
     parser.add_argument("--save_failures", action="store_true",
                         help="Save trajectory CSVs for episodes that end in collision")
@@ -111,7 +117,9 @@ def main():
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 
     env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario,
-                  ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
+                  ego_maneuver=args.ego_maneuver, use_intent=args.use_intent,
+                  buildings=not args.no_buildings, style_filter=args.style_filter,
+                  state_ablation=args.state_ablation)
     obs_dim = int(env.observation_space.shape[0])
 
     if args.method == "hjb_aux":

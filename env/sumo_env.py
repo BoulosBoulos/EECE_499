@@ -93,7 +93,8 @@ class SumoEnv(_make_gym()):
 
     EGO_ID = "ego"
     OTHER_ID = "other"
-    SCENARIO_TYPES = ["1a", "1b", "1c", "1d", "2", "3", "4"]
+    SCENARIO_TYPES = ["1a", "1b", "1c", "1d", "2", "3", "4",
+                      "2_dense", "3_dense", "4_dense"]
 
     def __init__(
         self,
@@ -107,6 +108,9 @@ class SumoEnv(_make_gym()):
         dt: float = 0.1,
         use_intent: bool = False,
         jm_ignore_fixed: float | None = None,
+        buildings: bool = True,
+        style_filter: str | None = None,
+        state_ablation: str | None = None,
     ):
         if gym:
             super().__init__()
@@ -121,7 +125,9 @@ class SumoEnv(_make_gym()):
         self.scenario_name = scenario_name if scenario_name in self.SCENARIO_TYPES else "1a"
         spec = SCENARIO_SPEC.get(self.scenario_name, (True, False, False, False))
         self._has_car, self._has_ped, self._has_moto, self._has_pothole = spec
-        self.scenario_dir = scenario_dir or os.path.join(base, "scenarios", f"sumo_{self.scenario_name}")
+        self._dense = "dense" in self.scenario_name
+        base_scenario = self.scenario_name.replace("_dense", "")
+        self.scenario_dir = scenario_dir or os.path.join(base, "scenarios", f"sumo_{base_scenario}")
 
         if ego_maneuver not in EGO_MANEUVERS:
             raise ValueError(f"Unknown ego_maneuver '{ego_maneuver}'. Must be one of: {list(EGO_MANEUVERS.keys())}")
@@ -153,7 +159,13 @@ class SumoEnv(_make_gym()):
         self._gru_hidden = None
         self._behavior: Optional[BehaviorConfig] = None
         self._behavior_sampler = BehaviorSampler()
-        self._init_occlusion_geometry()
+        self._buildings_enabled = buildings
+        if buildings:
+            self._init_occlusion_geometry()
+        else:
+            self._occlusion_polygons = []
+        self._style_filter = style_filter
+        self._state_ablation = state_ablation
         self._pothole_box = np.array([[-4, 4], [-2, 2]])
         self._collision_flag = False
         self._ped_stopped = False
@@ -303,6 +315,8 @@ class SumoEnv(_make_gym()):
             bar_len=self._bar_len,
             stem_len=self._stem_len,
             ego_maneuver=self.ego_maneuver,
+            dense=self._dense,
+            style_filter=self._style_filter,
             jm_ignore_fixed=self._jm_ignore_fixed,
         )
 
@@ -409,6 +423,45 @@ class SumoEnv(_make_gym()):
                 except Exception:
                     pass
 
+        # Dense: spawn second car
+        if bcfg.car2 and self._has_car:
+            cb2 = bcfg.car2
+            route_id = self._ensure_route(f"car2_{cb2.maneuver}", cb2.route_edges)
+            first_edge = cb2.route_edges.split()[0]
+            dep_pos_str = _clamp_depart_pos(
+                cb2.depart_pos if cb2.depart_pos is not None else 0.0,
+                first_edge, self._bar_len - 2.0,
+            )
+            traci.vehicle.add("other2", route_id, depart=str(cb2.depart_time),
+                              typeID="CarOther", departPos=dep_pos_str)
+            try:
+                traci.vehicle.setMaxSpeed("other2", cb2.max_speed)
+                traci.vehicle.setAccel("other2", cb2.accel)
+                traci.vehicle.setDecel("other2", cb2.decel)
+                traci.vehicle.setTau("other2", cb2.tau)
+                traci.vehicle.setImperfection("other2", cb2.sigma)
+            except Exception:
+                pass
+
+        # Dense: spawn second pedestrian
+        if bcfg.pedestrian2 and self._has_ped:
+            pb2 = bcfg.pedestrian2
+            try:
+                edges2 = pb2.route_edges.split()
+                from_edge2 = edges2[0] if edges2 else "right_out"
+                to_edge2 = edges2[-1] if len(edges2) > 1 else "left_in"
+                dep_pos2 = pb2.depart_pos if pb2.depart_pos is not None else 0.0
+                try:
+                    edge_len = traci.lane.getLength(f"{from_edge2}_0")
+                    dep_pos2 = float(np.clip(dep_pos2, 0.0, max(0.0, edge_len - 1.0)))
+                except Exception:
+                    dep_pos2 = float(np.clip(dep_pos2, 0.0, max(0.0, self._bar_len - 2.0)))
+                traci.person.add("ped1", from_edge2, pos=dep_pos2, depart=pb2.depart_time)
+                traci.person.appendWalkingStage("ped1", [from_edge2, to_edge2], arrivalPos=-1)
+                traci.person.setSpeed("ped1", pb2.ped_speed)
+            except Exception:
+                pass
+
         if bcfg.pothole and self._has_pothole:
             ph = bcfg.pothole
             self._pothole_box = np.array([
@@ -436,12 +489,56 @@ class SumoEnv(_make_gym()):
         cy = (self._pothole_box[1, 0] + self._pothole_box[1, 1]) / 2
         return float(np.linalg.norm(p - np.array([cx, cy])))
 
+    def _randomize_pothole(self):
+        """Randomize pothole size and position each episode."""
+        length = np.random.uniform(4.0, 12.0)
+        width = np.random.uniform(2.0, 4.0)
+        half_l = length / 2
+        half_w = width / 2
+
+        if self._ego_start_edge == "stem_in":
+            pot_x = np.random.uniform(-2.0, 2.0)
+            pot_y = np.random.uniform(-40.0, -5.0)
+        elif "right" in self._ego_start_edge:
+            pot_x = np.random.uniform(10.0, 40.0)
+            pot_y = np.random.uniform(-2.0, 2.0)
+        else:
+            pot_x = np.random.uniform(-40.0, -10.0)
+            pot_y = np.random.uniform(-2.0, 2.0)
+
+        self._pothole_box = np.array([
+            [pot_x - half_l, pot_x + half_l],
+            [pot_y - half_w, pot_y + half_w],
+        ])
+
+        try:
+            traci.polygon.remove("pothole")
+        except Exception:
+            pass
+        try:
+            shape = [
+                (pot_x - half_l, pot_y - half_w),
+                (pot_x + half_l, pot_y - half_w),
+                (pot_x + half_l, pot_y + half_w),
+                (pot_x - half_l, pot_y + half_w),
+            ]
+            traci.polygon.add("pothole", shape, color=(51, 38, 25, 200),
+                              fill=True, layer=1, polygonType="pothole")
+        except Exception:
+            pass
+
     def reset(self, *, seed=None, options=None):
         if seed is not None:
             np.random.seed(seed)
             self._behavior_sampler.rng = np.random.RandomState(seed)
         self._close_sumo()
         self._start_sumo()
+        if not self._buildings_enabled:
+            try:
+                traci.polygon.remove("building_NW")
+                traci.polygon.remove("building_NE")
+            except Exception:
+                pass
         self._load_dims()
         self._step_count = 0
         self._agent_history = {}
@@ -457,6 +554,9 @@ class SumoEnv(_make_gym()):
 
         self._behavior = self._sample_behavior()
         self._spawn_actors(self._behavior)
+
+        if self._has_pothole:
+            self._randomize_pothole()
 
         for _ in range(30):
             traci.simulationStep()
@@ -741,6 +841,18 @@ class SumoEnv(_make_gym()):
             "sigma_percep": sigma_percep,
             "n_occ": sum(1 for ag in agents if ag.get("nu", 1.0) < 0.8),
         }
+
+        # State ablation: zero out visibility features while keeping physical occlusion
+        if self._state_ablation == "no_visibility":
+            vis = {
+                "alpha_cz": 1.0,
+                "alpha_cross": 1.0,
+                "d_occ": 200.0,
+                "dt_seen": 0.0,
+                "sigma_percep": 0.05,
+                "n_occ": 0.0,
+            }
+
         return geom, vis
 
     def _get_raw_obs(self) -> dict:

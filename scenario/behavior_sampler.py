@@ -96,7 +96,9 @@ class PotholeConfig:
 class BehaviorConfig:
     """Full per-episode behavior configuration."""
     car: Optional[ActorBehavior] = None
+    car2: Optional[ActorBehavior] = None
     pedestrian: Optional[ActorBehavior] = None
+    pedestrian2: Optional[ActorBehavior] = None
     motorcycle: Optional[ActorBehavior] = None
     pothole: Optional[PotholeConfig] = None
     # Ground-truth labels for intent model training
@@ -183,6 +185,17 @@ MOTO_STYLE_LABELS = {
 }
 
 
+# ── Style categories for behavioral robustness ablation ────────────────
+NOMINAL_CAR_STYLES = ["nominal", "timid"]
+ADVERSARIAL_CAR_STYLES = ["aggressive", "distracted", "erratic", "drunk", "rule_violating"]
+
+NOMINAL_PED_STYLES = ["normal_walk", "slow_elderly"]
+ADVERSARIAL_PED_STYLES = ["running", "stop_midway", "hesitant", "distracted_slow", "jaywalking_fast"]
+
+NOMINAL_MOTO_STYLES = ["nominal", "cautious", "yield_to_ego"]
+ADVERSARIAL_MOTO_STYLES = ["aggressive_fast", "late_brake", "swerving"]
+
+
 class BehaviorSampler:
     """Sample diverse per-episode behavior configs."""
 
@@ -255,6 +268,8 @@ class BehaviorSampler:
         bar_len: float = 50.0,
         stem_len: float = 60.0,
         ego_maneuver: str = "stem_right",
+        dense: bool = False,
+        style_filter: str | None = None,
         jm_ignore_fixed: float | None = None,
     ) -> BehaviorConfig:
         cfg = BehaviorConfig()
@@ -268,13 +283,27 @@ class BehaviorSampler:
             ego_approach_speed = 10.0
         conflict_routes = self._conflicting_agent_routes(ego_maneuver)
 
+        # Style pools based on filter
+        if style_filter == "nominal":
+            car_style_pool = NOMINAL_CAR_STYLES
+            ped_style_pool = NOMINAL_PED_STYLES
+            moto_style_pool = NOMINAL_MOTO_STYLES
+        elif style_filter == "adversarial":
+            car_style_pool = ADVERSARIAL_CAR_STYLES
+            ped_style_pool = ADVERSARIAL_PED_STYLES
+            moto_style_pool = ADVERSARIAL_MOTO_STYLES
+        else:
+            car_style_pool = CAR_STYLES
+            ped_style_pool = PED_STYLES
+            moto_style_pool = MOTO_STYLES
+
         if has_car:
             # 70% conflict route, 30% any route
             if self.rng.uniform() < 0.7 and conflict_routes.get("car"):
                 maneuver = self.rng.choice(conflict_routes["car"])
             else:
                 maneuver = self.rng.choice(CAR_MANEUVERS)
-            style = self.rng.choice(CAR_STYLES)
+            style = self.rng.choice(car_style_pool)
             sp = CAR_STYLE_PARAMS[style]
             depart, dep_pos = self._compute_conflict_spawn(
                 ego_approach_dist=ego_approach_dist,
@@ -300,9 +329,34 @@ class BehaviorSampler:
             cfg.car_intent_label = CAR_INTENT_LABELS.get(maneuver, 1)
             cfg.car_style_label = CAR_STYLE_LABELS.get(style, 1)
 
+            # Dense: spawn second car on a different conflict route
+            if dense and len(conflict_routes.get("car", [])) > 1:
+                man2_choices = [m for m in conflict_routes["car"] if m != maneuver]
+                man2 = self.rng.choice(man2_choices) if man2_choices else self.rng.choice(CAR_MANEUVERS)
+                style2 = self.rng.choice(car_style_pool)
+                sp2 = CAR_STYLE_PARAMS[style2]
+                dep2, dpos2 = self._compute_conflict_spawn(
+                    ego_approach_dist=ego_approach_dist,
+                    ego_approach_speed=ego_approach_speed,
+                    agent_approach_dist=bar_len - 5.0,
+                    agent_speed=sp2["max_speed"],
+                    bar_len=bar_len,
+                )
+                cfg.car2 = ActorBehavior(
+                    maneuver=man2, style=style2,
+                    route_edges=CAR_ROUTES[man2],
+                    depart_time=dep2 + 1.0,  # offset to avoid overlap
+                    depart_pos=dpos2,
+                    max_speed=sp2["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
+                    accel=sp2["accel"], decel=sp2["decel"],
+                    sigma=sp2["sigma"], tau=sp2["tau"],
+                    jm_ignore=jm_ignore_fixed if jm_ignore_fixed is not None else sp2["jm"],
+                    color="0.8,0,0",
+                )
+
         if has_ped:
             maneuver = self.rng.choice(PED_MANEUVERS)
-            style = self.rng.choice(PED_STYLES)
+            style = self.rng.choice(ped_style_pool)
             sp = PED_STYLE_PARAMS[style]
             # Ped should enter crosswalk when ego is 5-15m from CZ
             ego_close_dist = self.rng.uniform(5.0, 15.0)
@@ -329,12 +383,36 @@ class BehaviorSampler:
             cfg.ped_intent_label = PED_INTENT_LABELS.get(maneuver, 1)
             cfg.ped_style_label = PED_STYLE_LABELS.get(style, 1)
 
+            # Dense: spawn second pedestrian from opposite direction
+            if dense:
+                man2 = "cross_right_left" if maneuver == "cross_left_right" else "cross_left_right"
+                style2 = self.rng.choice(ped_style_pool)
+                sp2 = PED_STYLE_PARAMS[style2]
+                ego_close_dist2 = self.rng.uniform(5.0, 15.0)
+                ego_eta2 = (ego_approach_dist - ego_close_dist2) / max(ego_approach_speed, 1.0)
+                dep_time2 = 0.5 + self.rng.uniform(0, 0.5)
+                trav_time2 = max(0.5, ego_eta2 - dep_time2)
+                trav_dist2 = sp2["speed"] * trav_time2
+                dep_pos2 = max(0, safe_len - trav_dist2 - 3.0)
+                dep_pos2 = float(np.clip(dep_pos2, 0.0, safe_len - 2.0))
+                cfg.pedestrian2 = ActorBehavior(
+                    maneuver=man2, style=style2,
+                    route_edges=f"{'left_in' if 'left_right' in man2 else 'right_out'} {'right_out' if 'left_right' in man2 else 'left_in'}",
+                    depart_time=dep_time2 + 1.0,
+                    depart_pos=dep_pos2,
+                    ped_speed=sp2["speed"],
+                    stop_midway=sp2["stop_midway"],
+                    stop_duration=self.rng.uniform(2, 5) if sp2["stop_midway"] else 0,
+                    hesitant=sp2["hesitant"],
+                    color="0,0.7,0",
+                )
+
         if has_moto:
             if self.rng.uniform() < 0.7 and conflict_routes.get("moto"):
                 maneuver = self.rng.choice(conflict_routes["moto"])
             else:
                 maneuver = self.rng.choice(MOTO_MANEUVERS)
-            style = self.rng.choice(MOTO_STYLES)
+            style = self.rng.choice(moto_style_pool)
             sp = MOTO_STYLE_PARAMS[style]
             depart, dep_pos = self._compute_conflict_spawn(
                 ego_approach_dist=ego_approach_dist,

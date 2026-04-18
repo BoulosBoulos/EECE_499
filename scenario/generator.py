@@ -26,6 +26,10 @@ SCENARIO_SPEC = {
     "2": (True, True, False, False),
     "3": (True, True, True, False),
     "4": (True, True, True, True),
+    # Dense variants: multiple agents per type
+    "2_dense": (True, True, False, False),
+    "3_dense": (True, True, True, False),
+    "4_dense": (True, True, True, True),
 }
 SCENARIO_TYPES = list(SCENARIO_SPEC.keys())
 

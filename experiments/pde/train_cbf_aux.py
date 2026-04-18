@@ -37,13 +37,19 @@ def main():
     parser.add_argument("--algo_config", default="configs/algo/default.yaml")
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--total_steps", type=int, default=50_000)
-    parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4"])
+    parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4", "2_dense", "3_dense", "4_dense"])
     parser.add_argument("--ego_maneuver", default="stem_right",
                         choices=["stem_right", "stem_left", "right_left",
                                  "right_stem", "left_right", "left_stem"])
     parser.add_argument("--use_intent", action="store_true")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--sumo_gui", action="store_true")
+    parser.add_argument("--no_buildings", action="store_true",
+                        help="Disable static occlusion buildings (full visibility)")
+    parser.add_argument("--style_filter", default=None, choices=["nominal", "adversarial"],
+                        help="Filter agent behavioral styles for robustness ablation")
+    parser.add_argument("--state_ablation", default=None, choices=["no_visibility"],
+                        help="State ablation: remove specific feature groups")
     args = parser.parse_args()
 
     script_start_time = time.time()
@@ -60,7 +66,9 @@ def main():
 
     from env.sumo_env import SumoEnv
     env_kwargs = {"use_gui": args.sumo_gui, "scenario_name": args.scenario,
-                  "ego_maneuver": args.ego_maneuver, "use_intent": args.use_intent}
+                  "ego_maneuver": args.ego_maneuver, "use_intent": args.use_intent,
+                  "buildings": not args.no_buildings, "style_filter": args.style_filter,
+                  "state_ablation": args.state_ablation}
     obs_dim = int(SumoEnv(**env_kwargs).observation_space.shape[0])
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 

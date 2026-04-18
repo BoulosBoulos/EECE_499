@@ -53,12 +53,18 @@ def main():
     parser.add_argument("--episodes", type=int, default=3)
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--gui", action="store_true")
-    parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4"])
+    parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4", "2_dense", "3_dense", "4_dense"])
     parser.add_argument("--ego_maneuver", default="stem_right",
                         choices=["stem_right", "stem_left", "right_left",
                                  "right_stem", "left_right", "left_stem"])
     parser.add_argument("--use_intent", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--no_buildings", action="store_true",
+                        help="Disable static occlusion buildings (full visibility)")
+    parser.add_argument("--style_filter", default=None, choices=["nominal", "adversarial"],
+                        help="Filter agent behavioral styles for robustness ablation")
+    parser.add_argument("--state_ablation", default=None, choices=["no_visibility"],
+                        help="State ablation: remove specific feature groups")
     args = parser.parse_args()
 
     np.random.seed(args.seed)
@@ -70,7 +76,9 @@ def main():
         torch = None
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 
-    env_for_dim = SumoEnv(scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
+    env_for_dim = SumoEnv(scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent,
+                          buildings=not args.no_buildings, style_filter=args.style_filter,
+                          state_ablation=args.state_ablation)
     obs_dim = int(env_for_dim.observation_space.shape[0])
 
     if args.method == "hjb_aux":
@@ -93,7 +101,9 @@ def main():
     def policy_fn(obs):
         return policy.get_action(obs, deterministic=True)[0]
 
-    env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
+    env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent,
+                  buildings=not args.no_buildings, style_filter=args.style_filter,
+                  state_ablation=args.state_ablation)
     try:
         for ep in range(args.episodes):
             policy.reset_hidden()
