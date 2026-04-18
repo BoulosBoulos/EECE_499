@@ -70,6 +70,14 @@ visualize-pde-gui:
 plot-pde:
 	$(PYTHON) experiments/pde/plot_pde.py --pde_dir results/ablation --out_dir results/ablation
 
+# ── Calibration ────────────────────────────────────────────────────
+
+calibrate:
+	$(PYTHON) experiments/pde/run_calibration.py --scenario $(SCENARIO) --ego_maneuver $(MANEUVER) --steps 200000 --seed $(SEED)
+
+calibrate-analyze:
+	$(PYTHON) experiments/pde/run_calibration.py --scenario $(SCENARIO) --ego_maneuver $(MANEUVER) --analyze_only
+
 # ── Cleanup ─────────────────────────────────────────────────────────────
 
 clean:

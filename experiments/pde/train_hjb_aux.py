@@ -50,6 +50,8 @@ def main():
                         help="Filter agent behavioral styles for robustness ablation")
     parser.add_argument("--state_ablation", default=None, choices=["no_visibility"],
                         help="State ablation: remove specific feature groups")
+    parser.add_argument("--lambda_aux", type=float, default=None,
+                        help="Override PDE residual weight (for lambda sweep ablation)")
     args = parser.parse_args()
 
     script_start_time = time.time()
@@ -83,7 +85,7 @@ def main():
         ent_coef=float(algo_cfg.get("ent_coef", 0.01)),
         vf_coef=float(algo_cfg.get("vf_coef", 0.5)),
         lambda_anchor=float(pde_cfg.get("lambda_anchor", 1.0)),
-        lambda_hjb=float(pde_cfg.get("lambda_hjb", 0.2)),
+        lambda_hjb=args.lambda_aux if args.lambda_aux is not None else float(pde_cfg.get("lambda_hjb", 0.2)),
         lambda_bc=float(pde_cfg.get("lambda_bc", 0.5)),
         lambda_distill=float(pde_cfg.get("lambda_distill", 0.25)),
         aux_hidden_dim=int(pde_cfg.get("aux_hidden_dim", 256)),
@@ -187,6 +189,8 @@ def main():
         "pde_config": pde_cfg,
         "algo_config": algo_cfg,
         "device": device,
+        "lambda_aux_override": args.lambda_aux,
+        "lambda_hjb_effective": args.lambda_aux if args.lambda_aux is not None else float(pde_cfg.get("lambda_hjb", 0.2)),
         "start_time": start_time_iso,
         "wall_time_seconds": time.time() - script_start_time,
     }
