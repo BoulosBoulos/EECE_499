@@ -162,6 +162,20 @@ class ScenarioGenerator:
                         'shape="-4,-2 4,-2 4,2 -4,2" lineWidth="0.5"/>\n')
                 f.write('</additional>\n')
             add_parts.append(os.path.basename(poly_path))
+
+        # Building polygons — visual representation of occlusion geometry
+        buildings_path = os.path.join(output_dir, "t_buildings.poly.xml")
+        with open(buildings_path, "w") as f:
+            f.write('<?xml version="1.0" encoding="UTF-8"?>\n<additional>\n')
+            f.write('  <poly id="building_NW" type="building" '
+                    'color="0.55,0.45,0.35,1" fill="1" layer="5" '
+                    'shape="-3.5,3.5 -30,3.5 -30,20 -3.5,20"/>\n')
+            f.write('  <poly id="building_NE" type="building" '
+                    'color="0.55,0.45,0.35,1" fill="1" layer="5" '
+                    'shape="3.5,3.5 30,3.5 30,20 3.5,20"/>\n')
+            f.write('</additional>\n')
+        add_parts.append(os.path.basename(buildings_path))
+
         add_files = f'    <additional-files value="{",".join(add_parts)}"/>\n'
 
         gui_path = os.path.join(output_dir, "t_gui.xml")

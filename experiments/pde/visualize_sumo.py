@@ -9,8 +9,42 @@ import numpy as np
 
 from env.sumo_env import SumoEnv, ACTION_NAMES
 
+try:
+    import traci
+except ImportError:
+    traci = None
 
-def run_episode(env, policy_fn, max_steps: int = 500):
+
+def _update_visibility_overlay(env, ego_pos, step):
+    """Update visibility overlay POIs in SUMO GUI."""
+    if traci is None:
+        return
+    for i in range(20):
+        try:
+            traci.poi.remove(f"vis_{i}")
+        except Exception:
+            pass
+    cz_center = np.array([0.0, 0.0])
+    cz_radius = 12.0
+    n_samples = 20
+    for i in range(n_samples):
+        angle = 2 * np.pi * i / n_samples
+        radius = cz_radius * (0.3 + 0.7 * (i % 3) / 2)
+        sample = cz_center + radius * np.array([np.cos(angle), np.sin(angle)])
+        visible = True
+        for occ in env._occlusion_polygons:
+            if env._line_intersects_polygon(ego_pos, sample, occ["corners"]):
+                visible = False
+                break
+        color = (0, 200, 0, 180) if visible else (200, 0, 0, 180)
+        try:
+            traci.poi.add(f"vis_{i}", sample[0], sample[1],
+                          color=color, layer=8, imgWidth=1.5, imgHeight=1.5)
+        except Exception:
+            pass
+
+
+def run_episode(env, policy_fn, max_steps: int = 500, show_visibility: bool = False):
     obs, info = env.reset()
     log = []
     for step in range(max_steps):
@@ -39,6 +73,9 @@ def run_episode(env, policy_fn, max_steps: int = 500):
             row[f"ag{i}_y"] = p[1] if isinstance(p, (list, np.ndarray)) else 0
             row[f"ag{i}_v"] = ag.get("v", 0)
             row[f"ag{i}_type"] = ag.get("type", "?")
+        if show_visibility:
+            ego_pos = np.array(ego.get("p", [0, 0]))
+            _update_visibility_overlay(env, ego_pos, step)
         log.append(row)
         if done:
             break
@@ -65,6 +102,8 @@ def main():
                         help="Filter agent behavioral styles for robustness ablation")
     parser.add_argument("--state_ablation", default=None, choices=["no_visibility"],
                         help="State ablation: remove specific feature groups")
+    parser.add_argument("--show_visibility", action="store_true",
+                        help="Show visibility overlay (green=visible, red=occluded) in GUI")
     args = parser.parse_args()
 
     np.random.seed(args.seed)
@@ -107,7 +146,7 @@ def main():
     try:
         for ep in range(args.episodes):
             policy.reset_hidden()
-            log = run_episode(env, policy_fn)
+            log = run_episode(env, policy_fn, show_visibility=args.show_visibility)
             if not log:
                 continue
             csv_path = os.path.join(args.out_dir, f"pde_trajectory_{args.method}_{args.ego_maneuver}_ep{ep}.csv")
