@@ -48,7 +48,8 @@ def run_episode(env, policy_fn, max_steps: int = 500):
 def main():
     parser = argparse.ArgumentParser(description="Visualize PDE-family model in SUMO")
     parser.add_argument("--checkpoint", required=True, help="Path to PDE-family checkpoint")
-    parser.add_argument("--method", choices=["hjb_aux", "soft_hjb_aux"], required=True)
+    parser.add_argument("--method", required=True,
+                        choices=["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"])
     parser.add_argument("--episodes", type=int, default=3)
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--gui", action="store_true")
@@ -75,9 +76,18 @@ def main():
     if args.method == "hjb_aux":
         from models.pde.hjb_aux_agent import HJBAuxAgent
         policy = HJBAuxAgent(obs_dim=obs_dim, device=device)
-    else:
+    elif args.method == "soft_hjb_aux":
         from models.pde.soft_hjb_aux_agent import SoftHJBAuxAgent
         policy = SoftHJBAuxAgent(obs_dim=obs_dim, device=device)
+    elif args.method == "eikonal_aux":
+        from models.pde.eikonal_aux_agent import EikonalAuxAgent
+        policy = EikonalAuxAgent(obs_dim=obs_dim, device=device)
+    elif args.method == "cbf_aux":
+        from models.pde.cbf_aux_agent import CBFAuxAgent
+        policy = CBFAuxAgent(obs_dim=obs_dim, device=device)
+    elif args.method == "drppo":
+        from models.drppo import DRPPO
+        policy = DRPPO(obs_dim=obs_dim, device=device)
     policy.load(args.checkpoint)
 
     def policy_fn(obs):

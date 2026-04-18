@@ -1,4 +1,4 @@
-"""Train HJB-residual auxiliary critic on SUMO T-intersection."""
+"""Train CBF-PDE auxiliary critic on SUMO T-intersection."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def _load_config(path: str) -> dict:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/pde/hjb_aux.yaml")
+    parser.add_argument("--config", default="configs/pde/cbf_aux.yaml")
     parser.add_argument("--algo_config", default="configs/algo/default.yaml")
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--total_steps", type=int, default=50_000)
@@ -64,8 +64,8 @@ def main():
     obs_dim = int(SumoEnv(**env_kwargs).observation_space.shape[0])
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 
-    from models.pde.hjb_aux_agent import HJBAuxAgent
-    policy = HJBAuxAgent(
+    from models.pde.cbf_aux_agent import CBFAuxAgent
+    policy = CBFAuxAgent(
         obs_dim=obs_dim,
         lr=float(algo_cfg.get("lr", 3e-4)),
         aux_lr=float(pde_cfg.get("aux_lr", 1e-3)),
@@ -75,9 +75,10 @@ def main():
         ent_coef=float(algo_cfg.get("ent_coef", 0.01)),
         vf_coef=float(algo_cfg.get("vf_coef", 0.5)),
         lambda_anchor=float(pde_cfg.get("lambda_anchor", 1.0)),
-        lambda_hjb=float(pde_cfg.get("lambda_hjb", 0.2)),
+        lambda_cbf=float(pde_cfg.get("lambda_cbf", 0.2)),
         lambda_bc=float(pde_cfg.get("lambda_bc", 0.5)),
         lambda_distill=float(pde_cfg.get("lambda_distill", 0.25)),
+        alpha_cbf=float(pde_cfg.get("alpha_cbf", 1.0)),
         aux_hidden_dim=int(pde_cfg.get("aux_hidden_dim", 256)),
         collocation_ratio=float(pde_cfg.get("collocation_ratio", 0.7)),
         hidden_dim=int(algo_cfg.get("gru_hidden", 128)),
@@ -90,11 +91,11 @@ def main():
     gamma = float(algo_cfg.get("gamma", 0.99))
     gae_lambda = float(algo_cfg.get("gae_lambda", 0.95))
 
-    csv_path = os.path.join(args.out_dir, f"train_hjb_aux_{args.scenario}_{args.ego_maneuver}.csv")
+    csv_path = os.path.join(args.out_dir, f"train_cbf_aux_{args.scenario}_{args.ego_maneuver}.csv")
     header = [
         "step", "episode_return", "episode_len", "actor_loss", "vf_loss",
         "collision_count", "collision_rate", "mean_ttc", "min_ttc", "entropy",
-        "hjb_residual_mean", "anchor_loss", "bc_loss", "distill_loss", "distill_gap",
+        "cbf_residual_mean", "anchor_loss", "bc_loss", "distill_loss", "distill_gap",
         "train_time_per_iter",
     ]
     with open(csv_path, "w", newline="") as f:
@@ -126,7 +127,6 @@ def main():
                     returns_arr[idx], advantages_arr[idx],
                     hiddens=h, extra=ex,
                 )
-
         train_time = time.time() - t_iter_start
 
         rewards = []
@@ -154,21 +154,21 @@ def main():
                 step, np.mean(ep_returns[-10:]) if ep_returns else 0,
                 len(rewards), metrics.get("actor_loss", 0), metrics.get("vf_loss", 0),
                 coll_count, coll_rate, mean_ttc, min_ttc, metrics.get("entropy", 0),
-                metrics.get("hjb_residual_mean", 0), metrics.get("anchor_loss", 0),
+                metrics.get("cbf_residual_mean", 0), metrics.get("anchor_loss", 0),
                 metrics.get("bc_loss", 0), metrics.get("distill_loss", 0),
                 metrics.get("distill_gap", 0), train_time,
             ])
         if step % 5000 == 0:
-            print(f"[hjb_aux] step={step} ret={np.mean(ep_returns[-10:]):.2f} "
-                  f"coll={coll_count} ttc={mean_ttc:.2f} hjb_res={metrics.get('hjb_residual_mean', 0):.4f}")
+            print(f"[cbf_aux] step={step} ret={np.mean(ep_returns[-10:]):.2f} "
+                  f"coll={coll_count} ttc={mean_ttc:.2f} cbf_res={metrics.get('cbf_residual_mean', 0):.4f}")
 
-    ckpt_path = os.path.join(args.out_dir, f"model_hjb_aux_{args.scenario}_{args.ego_maneuver}.pt")
+    ckpt_path = os.path.join(args.out_dir, f"model_cbf_aux_{args.scenario}_{args.ego_maneuver}.pt")
     policy.save(ckpt_path)
-    print(f"Saved hjb_aux to {ckpt_path}")
+    print(f"Saved cbf_aux to {ckpt_path}")
 
     # Provenance metadata
     meta = {
-        "method": "hjb_aux",
+        "method": "cbf_aux",
         "scenario": args.scenario,
         "ego_maneuver": args.ego_maneuver,
         "seed": args.seed,
@@ -188,7 +188,7 @@ def main():
         ).strip()
     except Exception:
         meta["git_hash"] = "unknown"
-    meta_path = os.path.join(args.out_dir, f"meta_hjb_aux_{args.scenario}_{args.ego_maneuver}.json")
+    meta_path = os.path.join(args.out_dir, f"meta_cbf_aux_{args.scenario}_{args.ego_maneuver}.json")
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2, default=str)
 

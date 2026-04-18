@@ -1,2 +1,0 @@
-# Deprecated: heuristic physics methods removed. Kept for backward compatibility.
-# PDE methods use configs/pde/*.yaml instead.

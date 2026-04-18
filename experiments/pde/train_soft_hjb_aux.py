@@ -5,6 +5,9 @@ from __future__ import annotations
 import argparse
 import os
 import csv
+import time
+import json
+import subprocess
 import numpy as np
 
 try:
@@ -42,6 +45,9 @@ def main():
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--sumo_gui", action="store_true")
     args = parser.parse_args()
+
+    script_start_time = time.time()
+    start_time_iso = time.strftime("%Y-%m-%dT%H:%M:%S")
 
     if args.seed is not None:
         np.random.seed(args.seed)
@@ -91,7 +97,7 @@ def main():
         "step", "episode_return", "episode_len", "actor_loss", "vf_loss",
         "collision_count", "collision_rate", "mean_ttc", "min_ttc", "entropy",
         "soft_residual_mean", "anchor_loss", "bc_loss", "distill_loss",
-        "distill_gap", "actor_align_kl",
+        "distill_gap", "actor_align_kl", "train_time_per_iter",
     ]
     with open(csv_path, "w", newline="") as f:
         csv.writer(f).writerow(header)
@@ -103,6 +109,7 @@ def main():
     ep_returns = []
 
     while step < args.total_steps:
+        t_iter_start = time.time()
         obs_arr, actions_arr, log_probs_arr, returns_arr, advantages_arr, extra, hidden_arr = \
             collect_rollouts(env, policy, n_steps, gamma, gae_lambda)
         step += n_steps
@@ -121,6 +128,7 @@ def main():
                     returns_arr[idx], advantages_arr[idx],
                     hiddens=h, extra=ex,
                 )
+        train_time = time.time() - t_iter_start
 
         rewards = []
         ttc_list = []
@@ -150,6 +158,7 @@ def main():
                 metrics.get("soft_residual_mean", 0), metrics.get("anchor_loss", 0),
                 metrics.get("bc_loss", 0), metrics.get("distill_loss", 0),
                 metrics.get("distill_gap", 0), metrics.get("actor_align_kl", 0),
+                train_time,
             ])
         if step % 5000 == 0:
             print(f"[soft_hjb_aux] step={step} ret={np.mean(ep_returns[-10:]):.2f} "
@@ -159,6 +168,33 @@ def main():
     ckpt_path = os.path.join(args.out_dir, f"model_soft_hjb_aux_{args.scenario}_{args.ego_maneuver}.pt")
     policy.save(ckpt_path)
     print(f"Saved soft_hjb_aux to {ckpt_path}")
+
+    # Provenance metadata
+    meta = {
+        "method": "soft_hjb_aux",
+        "scenario": args.scenario,
+        "ego_maneuver": args.ego_maneuver,
+        "seed": args.seed,
+        "use_intent": args.use_intent,
+        "total_steps": args.total_steps,
+        "config_file": args.config,
+        "algo_config_file": args.algo_config,
+        "pde_config": pde_cfg,
+        "algo_config": algo_cfg,
+        "device": device,
+        "start_time": start_time_iso,
+        "wall_time_seconds": time.time() - script_start_time,
+    }
+    try:
+        meta["git_hash"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except Exception:
+        meta["git_hash"] = "unknown"
+    meta_path = os.path.join(args.out_dir, f"meta_soft_hjb_aux_{args.scenario}_{args.ego_maneuver}.json")
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2, default=str)
+
     env.close()
     print(f"Training complete. Metrics in {csv_path}")
 
