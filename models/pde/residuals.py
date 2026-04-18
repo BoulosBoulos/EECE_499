@@ -121,28 +121,33 @@ def eikonal_residual(
 ) -> torch.Tensor:
     """Eikonal PDE residual: ||nabla_xi U||^2 - c(xi)^2.
 
-    c(xi) = 1 / v_eff(xi) where v_eff incorporates safety margins.
+    c(xi) = 1 / v_eff(xi) where v_eff is the maximum safe speed achievable
+    by any action. An action is "safe" if the post-action TTC remains above
+    ttc_thr. This grounds the Eikonal constraint in the actual dynamics
+    and action space rather than hand-crafted heuristic features.
     """
     U_val, grad_U = _compute_grad_U(U_net, xi)
     grad_norm_sq = (grad_U ** 2).sum(dim=-1)
 
-    # Compute effective safe speed
-    v = xi[:, IDX_V].clamp(min=1e-6)
-    d_cz = xi[:, IDX_D_CZ]
-    ttc_min = xi[:, IDX_TTC_MIN]
     alpha_cz = xi[:, 8]  # visibility of conflict zone
 
-    # Stopping margin: m_stop = d_cz - d_stop(v)
-    d_stop_v = v * 0.5 + v ** 2 / (2 * 5.0)  # tau=0.5, a_max=5.0
-    m_stop = (d_cz - d_stop_v).clamp(min=0.0)
+    # Compute maximum safe speed from dynamics
+    safe_speeds = []
+    for a in range(5):
+        xi_next = dynamics.one_step(xi, a)
+        v_next = xi_next[:, IDX_V]
+        ttc_next = xi_next[:, IDX_TTC_MIN]
+        # Smooth safety indicator: 1.0 if ttc >> ttc_thr, 0.0 if ttc << ttc_thr
+        safe_weight = torch.sigmoid((ttc_next - ttc_thr) / 0.5)
+        safe_speeds.append(v_next * safe_weight)
 
-    # Safety multiplier sigma in (0, 1]
-    sigma_stop = torch.sigmoid((m_stop - 1.0) / 1.0)     # smooth ramp around m_stop=1
-    sigma_ttc = torch.sigmoid((ttc_min - ttc_thr) / 0.5)  # smooth ramp around TTC threshold
-    sigma_vis = alpha_cz.clamp(min=0.1)                    # visibility factor
-    sigma_safe = sigma_stop * sigma_ttc * sigma_vis
+    # v_eff = max safe speed across all actions
+    v_eff_dynamics = torch.stack(safe_speeds, dim=0).max(dim=0).values
 
-    v_eff = (v * sigma_safe).clamp(min=v_min)
+    # Visibility modulation: can't go fast if you can't see
+    vis_factor = alpha_cz.clamp(min=0.1)
+    v_eff = (v_eff_dynamics * vis_factor).clamp(min=v_min)
+
     c_sq = (1.0 / v_eff) ** 2
 
     rho = grad_norm_sq - c_sq
@@ -154,21 +159,32 @@ def cbf_residual(
     xi: torch.Tensor,
     dynamics: BehavioralDynamics,
     alpha_cbf: float = 1.0,
+    cbf_safe_offset: float = 10.0,
 ) -> torch.Tensor:
-    """CBF-PDE residual: ReLU(-max_a [h_dot(xi,a) + alpha*h(xi)]) where h = U.
+    """CBF-PDE residual: ReLU(-max_a [h_dot(xi,a) + alpha*h(xi)]) where h(xi) = U(xi) + offset.
 
-    Uses U_phi itself as the barrier function. The CBF condition requires
-    that for each state, there exists at least one action maintaining
-    forward invariance of the safe superlevel set {xi : U(xi) >= 0}.
+    The barrier function h(xi) = U(xi) + cbf_safe_offset shifts the zero-level
+    set so that the safe/unsafe boundary occurs at U = -cbf_safe_offset,
+    which is the midpoint between typical safe returns and the collision
+    penalty. This ensures:
+      - Success states (U ~ 0): h > 0, safely inside the safe set
+      - Collision states (U ~ -20): h < 0, in the unsafe set
+      - Safety boundary (U = -10): h = 0, meaningful transition point
+
+    Since the offset is constant, grad_h = grad_U -- only the barrier value
+    changes, not the gradient computation.
     """
     U_val, grad_U = _compute_grad_U(U_net, xi)
 
-    # For each action, compute h_dot = grad_U^T * delta_xi_a (corrected state change)
+    # Shifted barrier: h(xi) = U(xi) + offset
+    h_val = U_val + cbf_safe_offset
+
+    # For each action, compute h_dot = grad_U^T * delta_xi (grad_h = grad_U since offset is const)
     h_dot_list = []
     for a in range(5):
         delta_xi_a = dynamics.one_step(xi, a) - xi
-        h_dot_a = (grad_U * delta_xi_a).sum(dim=-1)  # grad_U^T * (F_a - xi)
-        h_dot_list.append(h_dot_a + alpha_cbf * U_val)  # h_dot + alpha*h
+        h_dot_a = (grad_U * delta_xi_a).sum(dim=-1)
+        h_dot_list.append(h_dot_a + alpha_cbf * h_val)  # h_dot + alpha*h (shifted h)
 
     # max over actions: if ANY action satisfies the CBF condition, residual = 0
     h_dot_all = torch.stack(h_dot_list, dim=-1)

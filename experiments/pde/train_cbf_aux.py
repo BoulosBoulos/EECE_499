@@ -89,6 +89,7 @@ def main():
         lambda_bc=float(pde_cfg.get("lambda_bc", 0.5)),
         lambda_distill=float(pde_cfg.get("lambda_distill", 0.25)),
         alpha_cbf=float(pde_cfg.get("alpha_cbf", 1.0)),
+        cbf_safe_offset=float(pde_cfg.get("cbf_safe_offset", 10.0)),
         aux_hidden_dim=int(pde_cfg.get("aux_hidden_dim", 256)),
         collocation_ratio=float(pde_cfg.get("collocation_ratio", 0.7)),
         hidden_dim=int(algo_cfg.get("gru_hidden", 128)),

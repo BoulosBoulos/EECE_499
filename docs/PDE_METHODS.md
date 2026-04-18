@@ -158,23 +158,32 @@ acts as an isotropic simplification.
 
 ### Formulation
 
-Uses U_phi as a control barrier function (CBF). The CBF condition requires
-forward invariance of the safe superlevel set {xi : U(xi) >= 0}:
+Uses a shifted barrier function h(xi) = U(xi) + c_offset, where c_offset = |w_coll|/2 = 10.0.
+This shifts the zero-level set so the safe/unsafe boundary occurs at U = -10 (midpoint
+between typical safe returns and the collision penalty -20).
 
-For each state xi, there must exist at least one action a such that:
+| State | U value | h = U + 10 | Interpretation |
+|-------|---------|------------|----------------|
+| Success | ~0 | +10 | Safe (goal reached) |
+| Typical safe | +10 | +20 | Deeply safe |
+| Safety boundary | -10 | 0 | Transition point |
+| Collision | -20 | -10 | Deeply unsafe |
+
+Since c_offset is constant, grad_h = grad_U. The CBF condition requires
+forward invariance of {xi : h(xi) >= 0}:
+
 ```
 h_dot(xi, a) + alpha * h(xi) >= 0
 ```
-where h = U_phi and h_dot = grad_U^T * (F_a(xi) - xi).
+where h_dot = grad_U^T * (F_a(xi) - xi).
 
 ### Residual
 ```
-max_val = max_a [grad_U^T * (F_a(xi) - xi) + alpha_cbf * U(xi)]
+h_val = U(xi) + cbf_safe_offset
+max_val = max_a [grad_U^T * (F_a(xi) - xi) + alpha_cbf * h_val]
 rho = ReLU(-max_val)
 L_cbf = E[rho^2]
 ```
-
-The residual is non-negative. It is zero when at least one action satisfies the CBF condition, and positive when no action can maintain safety -- penalizing states where the critic assigns values inconsistent with controllability.
 
 ### Theoretical Note
 
@@ -187,11 +196,25 @@ consistent with the existence of safe control actions.
 
 ---
 
+## Mathematical Notes
+
+### Approximations Used
+
+| Method | Approximation | Justification |
+|--------|--------------|---------------|
+| Hard-HJB | First-order Taylor: U(F_a) ~ U(xi) + grad_U * (F_a - xi) | Valid for small dt, one-step transitions |
+| Soft-HJB | Same Taylor + log-sum-exp soft-max | Entropy regularization prevents policy collapse |
+| Eikonal | Dynamics-derived v_eff via post-action TTC check | Grounds speed constraint in actual action space |
+| CBF-PDE | Shifted barrier h = U + c, c = |w_coll|/2 | Places zero-level at meaningful safety boundary |
+| All methods | Top-3 agent reduction in xi (79D) | Captures most relevant interactions within fixed budget |
+
+---
+
 ## Summary Table
 
 | Method | Residual | Key Idea |
 |--------|----------|----------|
 | Hard-HJB | `U*ln(gamma) + max_a[r + gamma*grad_U*(F_a-xi)]` | Discrete Bellman consistency |
 | Soft-HJB | `U*ln(gamma) + tau*logsumexp([r + gamma*grad_U*(F_a-xi)]/tau)` | Entropy-regularized Bellman |
-| Eikonal | `||grad_U||^2 - (1/v_eff)^2` | Travel-time structure |
-| CBF-PDE | `ReLU(-max_a[grad_U*(F_a-xi) + alpha*U])` | Safe set invariance |
+| Eikonal | `||grad_U||^2 - (1/v_eff)^2`, v_eff from dynamics | Travel-time with dynamics-derived speed |
+| CBF-PDE | `ReLU(-max_a[grad_U*(F_a-xi) + alpha*(U+offset)])` | Shifted barrier safe set invariance |

@@ -45,6 +45,7 @@ class CBFAuxAgent:
         lambda_bc: float = 0.5,
         lambda_distill: float = 0.25,
         alpha_cbf: float = 1.0,
+        cbf_safe_offset: float = 10.0,
         aux_hidden_dim: int = 256,
         collocation_ratio: float = 0.7,
         hidden_dim: int = 128,
@@ -64,6 +65,7 @@ class CBFAuxAgent:
         self.lambda_bc = lambda_bc
         self.lambda_distill = lambda_distill
         self.alpha_cbf = alpha_cbf
+        self.cbf_safe_offset = cbf_safe_offset
         self.collocation_ratio = collocation_ratio
         self.device = device
         self.w_coll = w_coll
@@ -141,7 +143,8 @@ class CBFAuxAgent:
             xi_colloc = sample_collocation(xi_t, ratio_real=self.collocation_ratio)
 
             rho = cbf_residual(self.aux_critic, xi_colloc, self.dynamics,
-                               alpha_cbf=self.alpha_cbf)
+                               alpha_cbf=self.alpha_cbf,
+                               cbf_safe_offset=self.cbf_safe_offset)
             L_cbf = (rho ** 2).mean()
 
             U_rollout = self.aux_critic(xi_t)
@@ -213,6 +216,7 @@ class CBFAuxAgent:
                 "lambda_bc": self.lambda_bc,
                 "lambda_distill": self.lambda_distill,
                 "alpha_cbf": self.alpha_cbf,
+                "cbf_safe_offset": self.cbf_safe_offset,
                 "gamma": self.gamma,
             },
         )

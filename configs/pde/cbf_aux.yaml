@@ -4,6 +4,7 @@ lambda_cbf: 0.2
 lambda_bc: 0.5
 lambda_distill: 0.25
 alpha_cbf: 1.0
+cbf_safe_offset: 10.0
 aux_hidden_dim: 256
 aux_lr: 1e-3
 collocation_ratio: 0.7
