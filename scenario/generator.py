@@ -58,6 +58,16 @@ def _get_netconvert() -> str:
 
 
 ALL_VEHICLE_ROUTES = {
+    # Ego routes (all 6 legal maneuvers at T-intersection)
+    "ego_stem_right": "stem_in right_out",
+    "ego_stem_left":  "stem_in left_out",
+    "ego_right_left": "right_in left_out",
+    "ego_right_stem": "right_in stem_out",
+    "ego_left_right": "left_in right_out",
+    "ego_left_stem":  "left_in stem_out",
+    # Legacy alias for backward compatibility
+    "ego_route":      "stem_in right_out",
+    # Other agent routes
     "car_left_right":  "left_in right_out",
     "car_right_left":  "right_in left_out",
     "car_left_stem":   "left_in stem_out",
@@ -65,7 +75,6 @@ ALL_VEHICLE_ROUTES = {
     "moto_right_left": "right_in left_out",
     "moto_left_right": "left_in right_out",
     "moto_right_stem": "right_in stem_out",
-    "ego_route":       "stem_in right_out",
 }
 
 

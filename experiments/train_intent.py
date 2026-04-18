@@ -209,10 +209,13 @@ def main():
     parser.add_argument("--out_dir", default="results")
     parser.add_argument("--scenario", default="3", choices=["1a", "1b", "1c", "1d", "2", "3", "4"],
                         help="Use scenario 3 or 4 for maximum actor diversity")
+    parser.add_argument("--ego_maneuver", default="stem_right",
+                        choices=["stem_right", "stem_left", "right_left",
+                                 "right_stem", "left_right", "left_stem"])
     args = parser.parse_args()
 
     from env.sumo_env import SumoEnv
-    env = SumoEnv(scenario_name=args.scenario, use_gui=False)
+    env = SumoEnv(scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_gui=False)
 
     print(f"Collecting data from {args.n_episodes} episodes of scenario {args.scenario}...")
     samples = collect_intent_data(env, n_episodes=args.n_episodes)

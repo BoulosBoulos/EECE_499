@@ -176,6 +176,9 @@ def main():
     parser.add_argument("--seeds", type=int, nargs="+", default=DEFAULT_SEEDS)
     parser.add_argument("--lambda_hjb", type=float, nargs="+", default=[0.2])
     parser.add_argument("--use_intent", action="store_true")
+    parser.add_argument("--ego_maneuver", default="stem_right",
+                        choices=["stem_right", "stem_left", "right_left",
+                                 "right_stem", "left_right", "left_stem"])
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -186,7 +189,7 @@ def main():
     train_csv = os.path.join(args.out_dir, "ablation_train_log.csv")
 
     for scenario in args.scenarios:
-        env = SumoEnv(scenario_name=scenario, use_intent=args.use_intent)
+        env = SumoEnv(scenario_name=scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
         for variant in args.variants:
             for lh in args.lambda_hjb:
                 for seed in args.seeds:

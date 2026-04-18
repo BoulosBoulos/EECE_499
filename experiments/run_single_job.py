@@ -106,7 +106,7 @@ def main():
         train_csv = os.path.join(jobs_dir, f"train_{job_id:06d}.csv")
 
         try:
-            env = SumoEnv(scenario_name=scenario, use_intent=use_intent, reward_config=args.reward_config)
+            env = SumoEnv(scenario_name=scenario, ego_maneuver="stem_right", use_intent=use_intent, reward_config=args.reward_config)
         except Exception as e:
             print(f"Job {job_id} ({run_tag}): env init failed: {e}", file=sys.stderr)
             failed_count += 1

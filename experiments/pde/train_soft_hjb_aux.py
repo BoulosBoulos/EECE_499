@@ -35,6 +35,9 @@ def main():
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--total_steps", type=int, default=50_000)
     parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4"])
+    parser.add_argument("--ego_maneuver", default="stem_right",
+                        choices=["stem_right", "stem_left", "right_left",
+                                 "right_stem", "left_right", "left_stem"])
     parser.add_argument("--use_intent", action="store_true")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--sumo_gui", action="store_true")
@@ -50,7 +53,8 @@ def main():
     os.makedirs(args.out_dir, exist_ok=True)
 
     from env.sumo_env import SumoEnv
-    env_kwargs = {"use_gui": args.sumo_gui, "scenario_name": args.scenario, "use_intent": args.use_intent}
+    env_kwargs = {"use_gui": args.sumo_gui, "scenario_name": args.scenario,
+                  "ego_maneuver": args.ego_maneuver, "use_intent": args.use_intent}
     obs_dim = int(SumoEnv(**env_kwargs).observation_space.shape[0])
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 
@@ -82,7 +86,7 @@ def main():
     gamma = float(algo_cfg.get("gamma", 0.99))
     gae_lambda = float(algo_cfg.get("gae_lambda", 0.95))
 
-    csv_path = os.path.join(args.out_dir, f"train_soft_hjb_aux_{args.scenario}.csv")
+    csv_path = os.path.join(args.out_dir, f"train_soft_hjb_aux_{args.scenario}_{args.ego_maneuver}.csv")
     header = [
         "step", "episode_return", "episode_len", "actor_loss", "vf_loss",
         "collision_count", "collision_rate", "mean_ttc", "min_ttc", "entropy",
@@ -152,7 +156,7 @@ def main():
                   f"coll={coll_count} ttc={mean_ttc:.2f} soft_res={metrics.get('soft_residual_mean', 0):.4f} "
                   f"align_kl={metrics.get('actor_align_kl', 0):.4f}")
 
-    ckpt_path = os.path.join(args.out_dir, f"model_soft_hjb_aux_{args.scenario}.pt")
+    ckpt_path = os.path.join(args.out_dir, f"model_soft_hjb_aux_{args.scenario}_{args.ego_maneuver}.pt")
     policy.save(ckpt_path)
     print(f"Saved soft_hjb_aux to {ckpt_path}")
     env.close()

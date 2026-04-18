@@ -39,6 +39,15 @@ from scenario.behavior_sampler import BehaviorSampler, BehaviorConfig
 ACTION_NAMES = ["STOP", "CREEP", "YIELD", "GO", "ABORT"]
 N_ACTIONS = 5
 
+EGO_MANEUVERS = {
+    "stem_right": {"route": "ego_stem_right", "start_edge": "stem_in", "exit_edge": "right_out"},
+    "stem_left":  {"route": "ego_stem_left",  "start_edge": "stem_in", "exit_edge": "left_out"},
+    "right_left": {"route": "ego_right_left", "start_edge": "right_in", "exit_edge": "left_out"},
+    "right_stem": {"route": "ego_right_stem", "start_edge": "right_in", "exit_edge": "stem_out"},
+    "left_right": {"route": "ego_left_right", "start_edge": "left_in", "exit_edge": "right_out"},
+    "left_stem":  {"route": "ego_left_stem",  "start_edge": "left_in", "exit_edge": "stem_out"},
+}
+
 _DEFAULT_REWARD_CONFIG = {
     "w_prog": 1.0, "w_time": -0.1, "w_risk": -3.0, "w_coll": -20.0,
     "ttc_thr": 3.0, "d_coll": 2.0, "w_pothole": -5.0,
@@ -90,6 +99,7 @@ class SumoEnv(_make_gym()):
         self,
         scenario_dir: str | None = None,
         scenario_name: str = "1a",
+        ego_maneuver: str = "stem_right",
         use_gui: bool = False,
         state_config: str | None = None,
         reward_config: str | None = "configs/reward/default.yaml",
@@ -112,6 +122,13 @@ class SumoEnv(_make_gym()):
         spec = SCENARIO_SPEC.get(self.scenario_name, (True, False, False, False))
         self._has_car, self._has_ped, self._has_moto, self._has_pothole = spec
         self.scenario_dir = scenario_dir or os.path.join(base, "scenarios", f"sumo_{self.scenario_name}")
+
+        if ego_maneuver not in EGO_MANEUVERS:
+            raise ValueError(f"Unknown ego_maneuver '{ego_maneuver}'. Must be one of: {list(EGO_MANEUVERS.keys())}")
+        self.ego_maneuver = ego_maneuver
+        self._ego_route_id = EGO_MANEUVERS[ego_maneuver]["route"]
+        self._ego_start_edge = EGO_MANEUVERS[ego_maneuver]["start_edge"]
+        self._ego_exit_edge = EGO_MANEUVERS[ego_maneuver]["exit_edge"]
 
         self._stem_len, self._bar_len = 60.0, 50.0
         self._load_dims()
@@ -284,6 +301,8 @@ class SumoEnv(_make_gym()):
         return self._behavior_sampler.sample(
             self._has_car, self._has_ped, self._has_moto, self._has_pothole,
             bar_len=self._bar_len,
+            stem_len=self._stem_len,
+            ego_maneuver=self.ego_maneuver,
             jm_ignore_fixed=self._jm_ignore_fixed,
         )
 
@@ -305,7 +324,7 @@ class SumoEnv(_make_gym()):
 
     def _spawn_actors(self, bcfg: BehaviorConfig):
         """Spawn actors with sampled behavior using TraCI."""
-        traci.vehicle.add(self.EGO_ID, "ego_route", depart="0", typeID="Car")
+        traci.vehicle.add(self.EGO_ID, self._ego_route_id, depart="0", typeID="Car")
 
         if bcfg.car and self._has_car:
             cb = bcfg.car
@@ -609,18 +628,33 @@ class SumoEnv(_make_gym()):
         return 1.0
 
     def _get_geom_vis(self, ego: dict) -> tuple[dict, dict]:
-        edge = traci.vehicle.getRoadID(self.EGO_ID) if self.EGO_ID in traci.vehicle.getIDList() else ""
-        lane_pos = traci.vehicle.getLanePosition(self.EGO_ID) if self.EGO_ID in traci.vehicle.getIDList() else 0.0
-        on_right_out = "right_out" in edge
-        if "stem_in" in edge:
-            lane_len = self._stem_len
-        elif on_right_out:
-            lane_len = self._bar_len
+        ego_present = self.EGO_ID in traci.vehicle.getIDList()
+        edge = traci.vehicle.getRoadID(self.EGO_ID) if ego_present else ""
+        lane_pos = traci.vehicle.getLanePosition(self.EGO_ID) if ego_present else 0.0
+
+        on_start_edge = self._ego_start_edge in edge if edge else False
+        on_exit_edge = self._ego_exit_edge in edge if edge else False
+        in_junction = (edge == "" or ":center" in edge or ":J" in edge) if edge else False
+
+        if on_start_edge:
+            edge_len = self._stem_len if "stem" in edge else self._bar_len
+            remaining = max(0, edge_len - lane_pos)
+            d_cz = max(0, remaining - 10)
+            d_stop = max(0, remaining - 5)
+            d_exit = remaining
+        elif in_junction:
+            d_cz = 0.0
+            d_stop = 0.0
+            d_exit = max(0, 10.0 - lane_pos) if lane_pos > 0 else 5.0
+        elif on_exit_edge:
+            d_cz = 0.0
+            d_stop = 0.0
+            exit_edge_len = self._stem_len if "stem" in edge else self._bar_len
+            d_exit = max(0, exit_edge_len - lane_pos)
         else:
-            lane_len = min(self._stem_len, self._bar_len)
-        d_stop = max(0, lane_len - lane_pos - 5)
-        d_exit = max(0, lane_len - lane_pos)
-        d_cz = 0.0 if on_right_out else max(0, lane_len - lane_pos - 10)
+            d_cz = 0.0
+            d_stop = 0.0
+            d_exit = 0.0
 
         v_ego = float(ego.get("v", 0.0))
         psi_dot_ego = float(ego.get("psi_dot", 0.0))
@@ -640,19 +674,15 @@ class SumoEnv(_make_gym()):
         except Exception:
             pass
 
-        rho_ego_priority = 0.0
-        rho_ego_must_yield = 1.0
-        try:
-            if self.EGO_ID in traci.vehicle.getIDList():
-                ego_edge = traci.vehicle.getRoadID(self.EGO_ID)
-                if "stem" in ego_edge:
-                    rho_ego_priority = 0.0
-                    rho_ego_must_yield = 1.0
-                else:
-                    rho_ego_priority = 1.0
-                    rho_ego_must_yield = 0.0
-        except Exception:
-            pass
+        if self._ego_start_edge == "stem_in":
+            rho_ego_priority = 0.0
+            rho_ego_must_yield = 1.0
+        elif self.ego_maneuver in ("right_stem", "left_stem"):
+            rho_ego_priority = 0.5
+            rho_ego_must_yield = 0.5
+        else:
+            rho_ego_priority = 1.0
+            rho_ego_must_yield = 0.0
 
         geom = {
             "d_stop": d_stop, "d_cz": d_cz, "d_exit": d_exit,
@@ -912,6 +942,21 @@ class SumoEnv(_make_gym()):
         else:               # ABORT: emergency braking (harder than STOP)
             traci.vehicle.slowDown(self.EGO_ID, max(0, v - 8.0 * self.dt), self.dt)
 
+    def _ego_must_yield(self, current_edge: str) -> bool:
+        """Determine if the ego must yield based on maneuver and current position."""
+        # Stem-origin: ego always yields when approaching from minor road
+        if self._ego_start_edge == "stem_in":
+            if "stem" in current_edge or current_edge == "" or ":center" in current_edge:
+                return True
+        # Bar-origin turns into stem: yield to oncoming bar traffic
+        if self.ego_maneuver == "right_stem":
+            if "right" in current_edge or current_edge == "" or ":center" in current_edge:
+                return True
+        if self.ego_maneuver == "left_stem":
+            if "left" in current_edge or current_edge == "" or ":center" in current_edge:
+                return True
+        return False
+
     def step(self, action: int) -> tuple[np.ndarray, float, bool, bool, dict]:
         self._apply_action(action)
         self._apply_ped_behavior()
@@ -948,9 +993,11 @@ class SumoEnv(_make_gym()):
         success = False
         terminated = collision
         if not terminated and ego_present:
-            if traci.vehicle.getRoadID(self.EGO_ID) == "right_out":
+            current_edge = traci.vehicle.getRoadID(self.EGO_ID)
+            if current_edge == self._ego_exit_edge:
                 lane_pos = traci.vehicle.getLanePosition(self.EGO_ID)
-                if lane_pos > self._bar_len - 10:
+                exit_len = self._bar_len if "left" in self._ego_exit_edge or "right" in self._ego_exit_edge else self._stem_len
+                if lane_pos > exit_len - 10:
                     terminated = True
                     success = True
         ego_missing_success = (not collision) and (not ego_present) and (self._step_count > 0)
@@ -982,7 +1029,7 @@ class SumoEnv(_make_gym()):
         # ROW violation penalty
         if ego_present and not collision:
             ego_edge = traci.vehicle.getRoadID(self.EGO_ID)
-            if "stem" in ego_edge or ego_edge == "":
+            if self._ego_must_yield(ego_edge):
                 for ag in agents:
                     ag_dist = np.linalg.norm(np.array(ag["p"]) - ego["p"])
                     if ag_dist < 15.0 and ag.get("pi_row", 0) > 0.5:

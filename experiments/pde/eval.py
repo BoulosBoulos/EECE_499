@@ -53,6 +53,9 @@ def main():
     parser.add_argument("--episodes", type=int, default=50)
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4"])
+    parser.add_argument("--ego_maneuver", default="stem_right",
+                        choices=["stem_right", "stem_left", "right_left",
+                                 "right_stem", "left_right", "left_stem"])
     parser.add_argument("--use_intent", action="store_true")
     parser.add_argument("--gui", action="store_true")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42])
@@ -64,7 +67,8 @@ def main():
         torch = None
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 
-    env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario, use_intent=args.use_intent)
+    env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario,
+                  ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
     obs_dim = int(env.observation_space.shape[0])
 
     if args.method == "hjb_aux":
@@ -84,7 +88,7 @@ def main():
             all_results[(seed, mode)] = m
             print(f"  return={m['mean_return']:.2f} coll={m['collision_rate']:.3f} ttc={m['mean_ttc']:.2f}")
 
-    csv_path = os.path.join(args.out_dir, f"eval_{args.method}_{args.scenario}.csv")
+    csv_path = os.path.join(args.out_dir, f"eval_{args.method}_{args.scenario}_{args.ego_maneuver}.csv")
     with open(csv_path, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["seed", "eval_mode", "mean_return", "std_return", "collision_rate",

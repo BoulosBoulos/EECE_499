@@ -216,6 +216,36 @@ class BehaviorSampler:
 
         return depart_time, depart_pos
 
+    def _conflicting_agent_routes(self, ego_maneuver: str) -> dict:
+        """Return agent route keys that create meaningful conflict with the ego."""
+        conflicts = {
+            "stem_right": {
+                "car": ["straight_left_right", "straight_right_left", "turn_left"],
+                "moto": ["straight_right_left", "straight_left_right"],
+            },
+            "stem_left": {
+                "car": ["straight_right_left", "straight_left_right", "turn_right"],
+                "moto": ["straight_right_left", "straight_left_right"],
+            },
+            "right_left": {
+                "car": ["turn_left", "turn_right"],
+                "moto": ["turn_into_stem"],
+            },
+            "right_stem": {
+                "car": ["straight_left_right", "turn_left"],
+                "moto": ["straight_left_right"],
+            },
+            "left_right": {
+                "car": ["turn_left", "turn_right"],
+                "moto": ["turn_into_stem"],
+            },
+            "left_stem": {
+                "car": ["straight_right_left", "turn_right"],
+                "moto": ["straight_right_left"],
+            },
+        }
+        return conflicts.get(ego_maneuver, conflicts["stem_right"])
+
     def sample(
         self,
         has_car: bool,
@@ -223,17 +253,32 @@ class BehaviorSampler:
         has_moto: bool,
         has_pothole: bool,
         bar_len: float = 50.0,
+        stem_len: float = 60.0,
+        ego_maneuver: str = "stem_right",
         jm_ignore_fixed: float | None = None,
     ) -> BehaviorConfig:
         cfg = BehaviorConfig()
 
+        # Ego approach distance to CZ depends on starting arm
+        if ego_maneuver.startswith("stem"):
+            ego_approach_dist = stem_len - 10
+            ego_approach_speed = 6.0
+        else:
+            ego_approach_dist = bar_len - 10
+            ego_approach_speed = 10.0
+        conflict_routes = self._conflicting_agent_routes(ego_maneuver)
+
         if has_car:
-            maneuver = self.rng.choice(CAR_MANEUVERS)
+            # 70% conflict route, 30% any route
+            if self.rng.uniform() < 0.7 and conflict_routes.get("car"):
+                maneuver = self.rng.choice(conflict_routes["car"])
+            else:
+                maneuver = self.rng.choice(CAR_MANEUVERS)
             style = self.rng.choice(CAR_STYLES)
             sp = CAR_STYLE_PARAMS[style]
             depart, dep_pos = self._compute_conflict_spawn(
-                ego_approach_dist=50.0,  # stem_len - 10
-                ego_approach_speed=6.0,  # avg approach speed
+                ego_approach_dist=ego_approach_dist,
+                ego_approach_speed=ego_approach_speed,
                 agent_approach_dist=bar_len - 5.0,
                 agent_speed=sp["max_speed"],
                 bar_len=bar_len,
@@ -262,7 +307,7 @@ class BehaviorSampler:
             # Ped should enter crosswalk when ego is 5-15m from CZ
             ego_close_dist = self.rng.uniform(5.0, 15.0)
             ego_approach_speed = 6.0
-            ego_eta_to_close = (50.0 - ego_close_dist) / max(ego_approach_speed, 1.0)
+            ego_eta_to_close = (ego_approach_dist - ego_close_dist) / max(ego_approach_speed, 1.0)
             ped_depart_time = 0.5 + self.rng.uniform(0, 0.5)
             ped_travel_time = max(0.5, ego_eta_to_close - ped_depart_time)
             ped_travel_dist = sp["speed"] * ped_travel_time
@@ -285,12 +330,15 @@ class BehaviorSampler:
             cfg.ped_style_label = PED_STYLE_LABELS.get(style, 1)
 
         if has_moto:
-            maneuver = self.rng.choice(MOTO_MANEUVERS)
+            if self.rng.uniform() < 0.7 and conflict_routes.get("moto"):
+                maneuver = self.rng.choice(conflict_routes["moto"])
+            else:
+                maneuver = self.rng.choice(MOTO_MANEUVERS)
             style = self.rng.choice(MOTO_STYLES)
             sp = MOTO_STYLE_PARAMS[style]
             depart, dep_pos = self._compute_conflict_spawn(
-                ego_approach_dist=50.0,
-                ego_approach_speed=6.0,
+                ego_approach_dist=ego_approach_dist,
+                ego_approach_speed=ego_approach_speed,
                 agent_approach_dist=bar_len - 5.0,
                 agent_speed=sp["max_speed"],
                 bar_len=bar_len,

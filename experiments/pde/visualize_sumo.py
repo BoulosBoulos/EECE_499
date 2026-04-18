@@ -53,6 +53,9 @@ def main():
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--gui", action="store_true")
     parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4"])
+    parser.add_argument("--ego_maneuver", default="stem_right",
+                        choices=["stem_right", "stem_left", "right_left",
+                                 "right_stem", "left_right", "left_stem"])
     parser.add_argument("--use_intent", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
@@ -66,7 +69,7 @@ def main():
         torch = None
     device = "cuda" if torch and torch.cuda.is_available() else "cpu"
 
-    env_for_dim = SumoEnv(scenario_name=args.scenario, use_intent=args.use_intent)
+    env_for_dim = SumoEnv(scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
     obs_dim = int(env_for_dim.observation_space.shape[0])
 
     if args.method == "hjb_aux":
@@ -80,14 +83,14 @@ def main():
     def policy_fn(obs):
         return policy.get_action(obs, deterministic=True)[0]
 
-    env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario, use_intent=args.use_intent)
+    env = SumoEnv(use_gui=args.gui, scenario_name=args.scenario, ego_maneuver=args.ego_maneuver, use_intent=args.use_intent)
     try:
         for ep in range(args.episodes):
             policy.reset_hidden()
             log = run_episode(env, policy_fn)
             if not log:
                 continue
-            csv_path = os.path.join(args.out_dir, f"pde_trajectory_{args.method}_ep{ep}.csv")
+            csv_path = os.path.join(args.out_dir, f"pde_trajectory_{args.method}_{args.ego_maneuver}_ep{ep}.csv")
             all_keys = sorted(set().union(*(set(r.keys()) for r in log)))
             with open(csv_path, "w", newline="") as f:
                 writer = csv.DictWriter(f, fieldnames=all_keys, extrasaction="ignore")
