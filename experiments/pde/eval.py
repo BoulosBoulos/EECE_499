@@ -6,6 +6,8 @@ import argparse
 import os
 import csv
 import json
+import time
+import collections
 import numpy as np
 
 from env.sumo_env import SumoEnv, ACTION_NAMES
@@ -14,7 +16,9 @@ from env.sumo_env import SumoEnv, ACTION_NAMES
 def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
                save_failures: bool = False, max_failures: int = 10,
                fail_dir: str | None = None, fail_prefix: str = "") -> dict:
-    returns, coll_eps, success_eps, pothole_hits, ttc_means, ttc_mins = [], [], [], [], [], []
+    returns, coll_eps, success_eps, pothole_hits = [], [], [], []
+    ttc_means, ttc_mins, ttc_p10s = [], [], []
+    action_entropies, hard_brake_counts, row_violation_counts = [], [], []
     failure_count = 0
 
     for ep in range(n_episodes):
@@ -24,18 +28,34 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
         ttc_list = []
         trajectory = []
         ep_success = False
+        actions_this_ep = []
+        hard_brakes = 0
+        prev_ego_v = None
+        row_violations = 0
 
         for step_i in range(500):
             a, _, _, _ = policy.get_action(obs, deterministic=deterministic)
             obs, r, term, trunc, info = env.step(a)
             r_tot += r
 
+            actions_this_ep.append(int(a))
+
+            # Hard-brake detection
+            ego_v = info.get("ego_speed", 0.0)
+            if prev_ego_v is not None and (prev_ego_v - ego_v) > 3.0:
+                hard_brakes += 1
+            prev_ego_v = ego_v
+
+            # ROW violation heuristic
+            nearest = info.get("nearest_agent_dist", 1e9)
+            if nearest < 10.0 and a in (1, 3):
+                row_violations += 1
+
             if save_failures:
                 ego = info.get("raw_obs", {}).get("ego", {})
                 p = ego.get("p", np.zeros(2))
                 trajectory.append({
-                    "step": step_i,
-                    "action": a,
+                    "step": step_i, "action": a,
                     "action_name": ACTION_NAMES[a] if 0 <= a < len(ACTION_NAMES) else "?",
                     "reward": r,
                     "ego_x": float(p[0]) if hasattr(p, '__len__') else 0,
@@ -70,9 +90,23 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
         coll_eps.append(1 if coll > 0 else 0)
         success_eps.append(1 if ep_success else 0)
         pothole_hits.append(pot)
-        ttc_arr = np.array(ttc_list)
+        ttc_arr = np.array(ttc_list) if ttc_list else np.array([10.0])
         ttc_means.append(float(np.mean(ttc_arr)))
         ttc_mins.append(float(np.min(ttc_arr)))
+        ttc_p10s.append(float(np.percentile(ttc_arr, 10)))
+
+        # Action entropy
+        if actions_this_ep:
+            counts = collections.Counter(actions_this_ep)
+            total = len(actions_this_ep)
+            probs = [c / total for c in counts.values()]
+            ent = -sum(p * np.log(p + 1e-12) for p in probs)
+            action_entropies.append(ent)
+        else:
+            action_entropies.append(0.0)
+
+        hard_brake_counts.append(hard_brakes)
+        row_violation_counts.append(row_violations)
 
     return {
         "mean_return": float(np.mean(returns)),
@@ -82,15 +116,22 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
         "pothole_hits_mean": float(np.mean(pothole_hits)),
         "mean_ttc": float(np.mean(ttc_means)),
         "min_ttc": float(np.mean(ttc_mins)),
+        "ttc_p10_mean": float(np.mean(ttc_p10s)),
+        "action_entropy_mean": float(np.mean(action_entropies)),
+        "hard_brakes_per_ep_mean": float(np.mean(hard_brake_counts)),
+        "row_violations_per_ep_mean": float(np.mean(row_violation_counts)),
     }
 
 
 def main():
+    eval_start_time = time.time()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--method", required=True,
                         choices=["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"])
-    parser.add_argument("--episodes", type=int, default=50)
+    parser.add_argument("--episodes", type=int, default=100,
+                        help="Eval episodes per seed per mode (3 seeds x 100 eps x 2 modes = 600 total)")
     parser.add_argument("--out_dir", default="results/pde")
     parser.add_argument("--scenario", default="1a", choices=["1a", "1b", "1c", "1d", "2", "3", "4", "2_dense", "3_dense", "4_dense"])
     parser.add_argument("--ego_maneuver", default="stem_right",
@@ -104,7 +145,8 @@ def main():
                         help="Filter agent behavioral styles for robustness ablation")
     parser.add_argument("--state_ablation", default=None, choices=["no_visibility"],
                         help="State ablation: remove specific feature groups")
-    parser.add_argument("--seeds", type=int, nargs="+", default=[42])
+    parser.add_argument("--seeds", type=int, nargs="+", default=[42, 123, 456],
+                        help="Three eval seeds by default (disjoint from training)")
     parser.add_argument("--save_failures", action="store_true",
                         help="Save trajectory CSVs for episodes that end in collision")
     parser.add_argument("--max_failures", type=int, default=10)
@@ -153,17 +195,42 @@ def main():
                            fail_dir=fail_dir, fail_prefix=f"{fail_prefix}s{seed}_{mode}_")
             all_results[(seed, mode)] = m
             print(f"  return={m['mean_return']:.2f} coll={m['collision_rate']:.3f} "
-                  f"success={m['success_rate']:.3f} ttc={m['mean_ttc']:.2f}")
+                  f"success={m['success_rate']:.3f} ttc={m['mean_ttc']:.2f} "
+                  f"ent={m['action_entropy_mean']:.2f} brakes={m['hard_brakes_per_ep_mean']:.1f}")
 
     csv_path = os.path.join(args.out_dir, f"eval_{args.method}_{args.scenario}_{args.ego_maneuver}.csv")
+    header = ["seed", "eval_mode", "mean_return", "std_return",
+              "collision_rate", "success_rate", "pothole_hits_mean",
+              "mean_ttc", "min_ttc", "ttc_p10_mean",
+              "action_entropy_mean", "hard_brakes_per_ep_mean",
+              "row_violations_per_ep_mean"]
     with open(csv_path, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["seed", "eval_mode", "mean_return", "std_return", "collision_rate",
-                     "success_rate", "pothole_hits_mean", "mean_ttc", "min_ttc"])
+        w.writerow(header)
         for (seed, mode), m in all_results.items():
-            w.writerow([seed, mode, m["mean_return"], m["std_return"], m["collision_rate"],
-                        m["success_rate"], m["pothole_hits_mean"], m["mean_ttc"], m["min_ttc"]])
+            w.writerow([seed, mode] + [m[h] for h in header[2:]])
     print(f"Saved {csv_path}")
+
+    # Eval provenance metadata
+    eval_meta = {
+        "method": args.method,
+        "checkpoint_path": args.checkpoint,
+        "scenario": args.scenario,
+        "ego_maneuver": args.ego_maneuver,
+        "no_buildings": args.no_buildings,
+        "style_filter": args.style_filter,
+        "state_ablation": args.state_ablation,
+        "n_eval_seeds": len(args.seeds),
+        "eval_seeds": list(args.seeds),
+        "episodes_per_seed": args.episodes,
+        "total_eval_episodes": len(args.seeds) * args.episodes * 2,
+        "eval_wall_time_seconds": time.time() - eval_start_time,
+    }
+    eval_meta_path = os.path.join(args.out_dir,
+        f"meta_eval_{args.method}_{args.scenario}_{args.ego_maneuver}.json")
+    with open(eval_meta_path, "w") as f:
+        json.dump(eval_meta, f, indent=2, default=str)
+
     env.close()
 
 

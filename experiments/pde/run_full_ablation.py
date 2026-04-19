@@ -104,6 +104,32 @@ def _build_train_cmd(method, scenario, maneuver, seed, out_dir,
     return cmd
 
 
+def _build_eval_cmd(method, scenario, maneuver, train_seed, out_dir,
+                    n_eval_episodes=100, no_buildings=False,
+                    style_filter=None, state_ablation=None):
+    """Build eval command for a trained checkpoint."""
+    ckpt_path = os.path.join(out_dir, f"model_{method}_{scenario}_{maneuver}.pt")
+    eval_seeds = [train_seed + 1000, train_seed + 2000, train_seed + 3000]
+    cmd = [
+        "python3", "experiments/pde/eval.py",
+        "--method", method,
+        "--checkpoint", ckpt_path,
+        "--scenario", scenario,
+        "--ego_maneuver", maneuver,
+        "--episodes", str(n_eval_episodes),
+        "--seeds", *[str(s) for s in eval_seeds],
+        "--out_dir", out_dir,
+        "--save_failures", "--max_failures", "5",
+    ]
+    if no_buildings:
+        cmd.append("--no_buildings")
+    if style_filter:
+        cmd.extend(["--style_filter", style_filter])
+    if state_ablation:
+        cmd.extend(["--state_ablation", state_ablation])
+    return cmd
+
+
 def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
     """Generate all jobs for the given tier."""
     jobs = []
@@ -118,8 +144,9 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "tier1",
                                    f"{scen}_{man}_{method}_{intent_tag}_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(method, scen, man, seed, out_dir,
-                                        total_steps, use_intent=intent),
+                "cmd_train": _build_train_cmd(method, scen, man, seed, out_dir,
+                                              total_steps, use_intent=intent),
+                "cmd_eval": _build_eval_cmd(method, scen, man, seed, out_dir),
                 "tag": f"T1_{scen}_{man}_{method}_{intent_tag}_s{seed}",
                 "tier": 1,
             })
@@ -133,8 +160,9 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "tier2_lambda",
                                    f"{scen}_{man}_{method}_l{lam}_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(method, scen, man, seed, out_dir,
-                                        total_steps, lambda_aux=lam),
+                "cmd_train": _build_train_cmd(method, scen, man, seed, out_dir,
+                                              total_steps, lambda_aux=lam),
+                "cmd_eval": _build_eval_cmd(method, scen, man, seed, out_dir),
                 "tag": f"T2L_{scen}_{method}_l{lam}_s{seed}",
                 "tier": 2,
             })
@@ -146,8 +174,10 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "tier2_noocc",
                                    f"{scen}_{man}_{method}_noocc_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(method, scen, man, seed, out_dir,
-                                        total_steps, no_buildings=True),
+                "cmd_train": _build_train_cmd(method, scen, man, seed, out_dir,
+                                              total_steps, no_buildings=True),
+                "cmd_eval": _build_eval_cmd(method, scen, man, seed, out_dir,
+                                            no_buildings=True),
                 "tag": f"T2O_{scen}_{method}_noocc_s{seed}",
                 "tier": 2,
             })
@@ -161,8 +191,10 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "tier3_state",
                                    f"{scen}_{man}_{method}_novis_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(method, scen, man, seed, out_dir,
-                                        total_steps, state_ablation="no_visibility"),
+                "cmd_train": _build_train_cmd(method, scen, man, seed, out_dir,
+                                              total_steps, state_ablation="no_visibility"),
+                "cmd_eval": _build_eval_cmd(method, scen, man, seed, out_dir,
+                                            state_ablation="no_visibility"),
                 "tag": f"T3S_{scen}_{method}_novis_s{seed}",
                 "tier": 3,
             })
@@ -174,8 +206,10 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "tier3_behav",
                                    f"{scen}_{man}_{method}_nominal_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(method, scen, man, seed, out_dir,
-                                        total_steps, style_filter="nominal"),
+                "cmd_train": _build_train_cmd(method, scen, man, seed, out_dir,
+                                              total_steps, style_filter="nominal"),
+                "cmd_eval": _build_eval_cmd(method, scen, man, seed, out_dir,
+                                            style_filter="nominal"),
                 "tag": f"T3B_{scen}_{method}_nominal_s{seed}",
                 "tier": 3,
             })
@@ -187,8 +221,9 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "tier3_dense",
                                    f"{scen}_stem_right_{method}_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(method, scen, "stem_right", seed,
-                                        out_dir, total_steps),
+                "cmd_train": _build_train_cmd(method, scen, "stem_right", seed,
+                                              out_dir, total_steps),
+                "cmd_eval": _build_eval_cmd(method, scen, "stem_right", seed, out_dir),
                 "tag": f"T3D_{scen}_{method}_s{seed}",
                 "tier": 3,
             })
@@ -200,8 +235,9 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
             out_dir = os.path.join(base_dir, "supplementary",
                                    f"{scen}_{man}_{best_method}_s{seed}")
             jobs.append({
-                "cmd": _build_train_cmd(best_method, scen, man, seed,
-                                        out_dir, total_steps),
+                "cmd_train": _build_train_cmd(best_method, scen, man, seed,
+                                              out_dir, total_steps),
+                "cmd_eval": _build_eval_cmd(best_method, scen, man, seed, out_dir),
                 "tag": f"SUP_{scen}_{man}_s{seed}",
                 "tier": "supp",
             })
@@ -230,7 +266,9 @@ def main():
 
     if args.dry_run:
         for j in jobs:
-            print(f"  {j['tag']}: {' '.join(j['cmd'])}")
+            print(f"  {j['tag']}:")
+            print(f"    TRAIN: {' '.join(j['cmd_train'])}")
+            print(f"    EVAL:  {' '.join(j['cmd_eval'])}")
         return
 
     active = []
@@ -242,30 +280,37 @@ def main():
         while len(active) >= args.max_parallel:
             time.sleep(5)
             still_active = []
-            for proc, tag in active:
+            for proc, tag, log_f in active:
                 ret = proc.poll()
                 if ret is None:
-                    still_active.append((proc, tag))
+                    still_active.append((proc, tag, log_f))
                 elif ret == 0:
+                    log_f.close()
                     completed += 1
                     elapsed = time.time() - start
                     print(f"  [OK] {tag} ({completed}/{len(jobs)}, {elapsed/60:.0f}m elapsed)")
                 else:
+                    log_f.close()
                     failed += 1
                     print(f"  [FAIL] {tag} (exit {ret})")
             active = still_active
 
-        out_dir_idx = job["cmd"].index("--out_dir") + 1
-        job_out_dir = job["cmd"][out_dir_idx]
+        out_dir_idx = job["cmd_train"].index("--out_dir") + 1
+        job_out_dir = job["cmd_train"][out_dir_idx]
         os.makedirs(job_out_dir, exist_ok=True)
         log_path = os.path.join(job_out_dir, "stdout.log")
-        with open(log_path, "w") as log_f:
-            proc = subprocess.Popen(job["cmd"], stdout=log_f, stderr=subprocess.STDOUT)
-        active.append((proc, job["tag"]))
+        # Chain train then eval in one shell command
+        train_str = " ".join(f"'{c}'" for c in job["cmd_train"])
+        eval_str = " ".join(f"'{c}'" for c in job["cmd_eval"])
+        shell_cmd = f"({train_str} && echo '=== EVAL ===' && {eval_str})"
+        log_f = open(log_path, "w")
+        proc = subprocess.Popen(shell_cmd, stdout=log_f, stderr=subprocess.STDOUT, shell=True)
+        active.append((proc, job["tag"], log_f))
         print(f"  [START] {job['tag']} (pid {proc.pid})")
 
-    for proc, tag in active:
+    for proc, tag, log_f in active:
         proc.wait()
+        log_f.close()
         if proc.returncode == 0:
             completed += 1
         else:
