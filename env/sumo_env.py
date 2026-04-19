@@ -836,13 +836,19 @@ class SumoEnv(_make_gym()):
         agents = self._get_agents() if not hasattr(self, '_cached_agents') else self._cached_agents
         ego_pos = np.array(ego["p"])
 
-        # alpha_cz: geometric visibility of the conflict zone via sampling
-        cz_center = self._junction_offset.copy()
-        cz_radius = 10.0
+        # alpha_cz: geometric visibility of cross-traffic along the bar road.
+        # Sampled as a rectangle along the bar (where conflicting traffic lives),
+        # not a square at the junction center. This correctly reflects corner
+        # buildings' occluding effect on ego's view of bar traffic.
+        cz_cx, cz_cy = self._junction_offset
+        CZ_BAR_HALF_LENGTH = 30.0   # extent along bar road (east + west of junction)
+        CZ_BAR_HALF_WIDTH = 7.0     # bar road half-width
         n_samples = 20
         visible_count = 0
         for _ in range(n_samples):
-            sample = cz_center + np.random.uniform(-cz_radius, cz_radius, 2)
+            sx = cz_cx + np.random.uniform(-CZ_BAR_HALF_LENGTH, CZ_BAR_HALF_LENGTH)
+            sy = cz_cy + np.random.uniform(-CZ_BAR_HALF_WIDTH, CZ_BAR_HALF_WIDTH)
+            sample = np.array([sx, sy])
             if not any(self._line_intersects_polygon(ego_pos, sample, occ["corners"])
                        for occ in self._occlusion_polygons):
                 visible_count += 1
@@ -851,6 +857,7 @@ class SumoEnv(_make_gym()):
 
         # d_occ: distance from ego to nearest static occlusion boundary toward CZ
         d_occ = 200.0
+        cz_center = self._junction_offset
         ego_to_cz = cz_center - ego_pos
         ego_to_cz_norm = ego_to_cz / (np.linalg.norm(ego_to_cz) + 1e-6)
         for occ in self._occlusion_polygons:
