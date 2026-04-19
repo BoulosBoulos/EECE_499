@@ -77,6 +77,94 @@ ALL_MANEUVERS = ["stem_right", "stem_left", "right_left", "right_stem",
                  "left_right", "left_stem"]
 SUPP_SEEDS = [42, 123, 456]
 
+# ── Tier 4: Held-out evaluation (eval-only on existing checkpoints) ────
+TIER4_HELDOUT_CONFIGS = [
+    {"name": "HO1_occ_to_noocc", "source_tier": "tier1",
+     "eval_overrides": {"no_buildings": True}},
+    {"name": "HO2_noocc_to_occ", "source_tier": "tier2_noocc",
+     "eval_overrides": {"no_buildings": False}},
+    {"name": "HO3_full_to_adversarial", "source_tier": "tier1",
+     "eval_overrides": {"style_filter": "adversarial"}},
+    {"name": "HO4_nominal_to_adversarial", "source_tier": "tier3_behav",
+     "eval_overrides": {"style_filter": "adversarial"}},
+    {"name": "HO5_vis_to_novis", "source_tier": "tier1",
+     "eval_overrides": {"state_ablation": "no_visibility"}},
+]
+
+
+def generate_tier4_jobs(total_steps: int = 50000) -> list[dict]:
+    """Generate held-out eval-only jobs from existing checkpoints."""
+    import glob as _glob
+    jobs = []
+    base_dir = "results/ablation"
+    METHODS_SET = ["soft_hjb_aux", "hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
+
+    for ho_cfg in TIER4_HELDOUT_CONFIGS:
+        ho_name = ho_cfg["name"]
+        source_dir = os.path.join(base_dir, ho_cfg["source_tier"])
+        if not os.path.isdir(source_dir):
+            continue
+        ckpt_paths = _glob.glob(os.path.join(source_dir, "*", "model_*.pt"))
+        for ckpt_path in ckpt_paths:
+            ckpt_file = os.path.basename(ckpt_path)
+            ckpt_dir = os.path.basename(os.path.dirname(ckpt_path))
+            # Skip intermediate checkpoints (contain "_step")
+            if "_step" in ckpt_file:
+                continue
+            # Parse method from filename
+            name = ckpt_file.replace("model_", "").replace(".pt", "")
+            method = None
+            for m in sorted(METHODS_SET, key=len, reverse=True):
+                if name.startswith(m + "_"):
+                    method = m
+                    rest = name[len(m) + 1:]
+                    break
+            if method is None:
+                continue
+            # Parse scenario
+            scenario = None
+            for s in ["4_dense", "3_dense", "2_dense", "1a", "1b", "1c", "1d", "2", "3", "4"]:
+                if rest.startswith(s + "_"):
+                    scenario = s
+                    maneuver = rest[len(s) + 1:]
+                    break
+                elif rest == s:
+                    scenario = s
+                    maneuver = "stem_right"
+                    break
+            if scenario is None:
+                continue
+            # Parse seed
+            seed = None
+            for part in ckpt_dir.split("_"):
+                if part.startswith("s") and part[1:].isdigit():
+                    seed = int(part[1:])
+                    break
+            if seed is None:
+                continue
+
+            eval_out_dir = os.path.join(base_dir, f"tier4_{ho_name}",
+                                        f"{scenario}_{maneuver}_{method}_s{seed}")
+            eval_cmd = _build_eval_cmd(
+                method, scenario, maneuver, seed, eval_out_dir,
+                n_eval_episodes=100,
+                no_buildings=ho_cfg["eval_overrides"].get("no_buildings", False),
+                style_filter=ho_cfg["eval_overrides"].get("style_filter", None),
+                state_ablation=ho_cfg["eval_overrides"].get("state_ablation", None),
+            )
+            # Override checkpoint path to point to source
+            if "--checkpoint" in eval_cmd:
+                ckpt_idx = eval_cmd.index("--checkpoint") + 1
+                eval_cmd[ckpt_idx] = ckpt_path
+
+            jobs.append({
+                "cmd_train": None,
+                "cmd_eval": eval_cmd,
+                "tag": f"T4_{ho_name}_{scenario}_{maneuver}_{method}_s{seed}",
+                "tier": 4,
+            })
+    return jobs
+
 
 def _build_train_cmd(method, scenario, maneuver, seed, out_dir,
                      total_steps=50000, use_intent=False, lambda_aux=None,
@@ -247,12 +335,16 @@ def generate_jobs(tier: str, total_steps: int = 50000) -> list[dict]:
                 "tier": "supp",
             })
 
+    # ── TIER 4: Held-out eval (eval-only on existing checkpoints) ────────
+    if tier in ("4",):
+        jobs.extend(generate_tier4_jobs(total_steps))
+
     return jobs
 
 
 def main():
     parser = argparse.ArgumentParser(description="Launch parallel ablation jobs")
-    parser.add_argument("--tier", default="1", choices=["1", "2", "3", "all", "supp"])
+    parser.add_argument("--tier", default="1", choices=["1", "2", "3", "4", "all", "supp"])
     parser.add_argument("--max_parallel", type=int, default=32)
     parser.add_argument("--total_steps", type=int, default=50000)
     parser.add_argument("--dry_run", action="store_true", help="Print jobs without running")

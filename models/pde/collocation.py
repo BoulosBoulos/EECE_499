@@ -8,6 +8,7 @@ are recomputed after jitter to maintain physical consistency.
 from __future__ import annotations
 import torch
 import numpy as np
+from models.pde.dynamics import _smooth_clamp_nonneg
 from models.pde.state_builder import (
     XI_DIM, N_AGENT_FEAT, N_AGENTS_PDE,
     IDX_V, IDX_A, IDX_PSI_DOT, IDX_D_STOP, IDX_D_CZ, IDX_D_EXIT,
@@ -73,7 +74,7 @@ def _recompute_agent_derived(xi: torch.Tensor, eps: float = 1e-6, d_safe: float 
         py_cpa = dy + t_cpa * dvy
         d_cpa = torch.sqrt(px_cpa ** 2 + py_cpa ** 2 + eps)
         dv_norm = torch.sqrt(dv_sq)
-        ttc_i = torch.clamp(d_cpa - d_safe, min=0.0) / dv_norm
+        ttc_i = _smooth_clamp_nonneg(d_cpa - d_safe) / dv_norm
 
         xi[:, start + 11] = t_cpa
         xi[:, start + 12] = d_cpa

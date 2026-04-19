@@ -49,6 +49,7 @@ class EikonalAuxAgent:
         hidden_dim: int = 128,
         device: str = "cpu",
         w_coll: float = -20.0,
+        w_fail: float = 50.0,
         v_min: float = 0.5,
         reward_kwargs: dict | None = None,
     ):
@@ -66,6 +67,7 @@ class EikonalAuxAgent:
         self.collocation_ratio = collocation_ratio
         self.device = device
         self.w_coll = w_coll
+        self.w_fail = w_fail
         self.v_min = v_min
         self.reward_kwargs = reward_kwargs or {}
 
@@ -145,7 +147,17 @@ class EikonalAuxAgent:
             L_eik = (rho ** 2).mean()
 
             U_rollout = self.aux_critic(xi_t)
-            L_anchor = F.mse_loss(U_rollout, returns_t[:len(U_rollout)])
+            if "collision_terminal" in extra:
+                coll_mask = torch.BoolTensor(extra["collision_terminal"]).to(self.device)
+                non_coll = ~coll_mask[:len(U_rollout)]
+                U_for_anchor = U_rollout[non_coll]
+                returns_for_anchor = returns_t[:len(U_rollout)][non_coll]
+                if len(U_for_anchor) > 0:
+                    L_anchor = F.mse_loss(U_for_anchor, returns_for_anchor)
+                else:
+                    L_anchor = torch.tensor(0.0, device=self.device)
+            else:
+                L_anchor = F.mse_loss(U_rollout, returns_t[:len(U_rollout)])
 
             L_bc = torch.tensor(0.0, device=self.device)
             if "success_terminal" in extra:
@@ -159,7 +171,7 @@ class EikonalAuxAgent:
                 if coll.any():
                     coll_xi = xi_t[coll[:len(xi_t)]]
                     if len(coll_xi) > 0:
-                        L_bc = L_bc + ((self.aux_critic(coll_xi) - self.w_coll) ** 2).mean()
+                        L_bc = L_bc + ((self.aux_critic(coll_xi) - self.w_fail) ** 2).mean()
 
             aux_loss = (self.lambda_anchor * L_anchor +
                         self.lambda_eik * L_eik +
@@ -213,6 +225,7 @@ class EikonalAuxAgent:
                 "lambda_bc": self.lambda_bc,
                 "lambda_distill": self.lambda_distill,
                 "v_min": self.v_min,
+                "w_fail": self.w_fail,
                 "gamma": self.gamma,
             },
         )

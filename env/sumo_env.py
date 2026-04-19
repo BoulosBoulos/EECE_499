@@ -174,6 +174,7 @@ class SumoEnv(_make_gym()):
         self._style_filter = style_filter
         self._state_ablation = state_ablation
         self._pothole_box = np.array([[-4, 4], [-2, 2]])
+        self._env_rng = np.random.default_rng()
         self._collision_flag = False
         self._ped_stopped = False
         self._ped_stop_counter = 0
@@ -182,18 +183,28 @@ class SumoEnv(_make_gym()):
 
         self._intent_predictor = None
         if use_intent:
+            from models.intent_style import IntentStylePredictor
+            import torch
+            self._intent_predictor = IntentStylePredictor(input_dim=9, hidden_dim=64).eval()
+            self._intent_device = "cuda" if torch.cuda.is_available() else "cpu"
+            self._intent_predictor.to(self._intent_device)
+            ckpt = os.path.join(base, "results", "intent_model.pt")
+            if not os.path.isfile(ckpt):
+                raise FileNotFoundError(
+                    f"Intent model checkpoint not found at {ckpt}. "
+                    "Train the intent model first (see scripts/train_intent.py) "
+                    "or set use_intent=False."
+                )
             try:
-                from models.intent_style import IntentStylePredictor
-                import torch
-                self._intent_predictor = IntentStylePredictor(input_dim=9, hidden_dim=64).eval()
-                self._intent_device = "cuda" if torch.cuda.is_available() else "cpu"
-                self._intent_predictor.to(self._intent_device)
-                ckpt = os.path.join(base, "results", "intent_model.pt")
-                if os.path.isfile(ckpt):
-                    data = torch.load(ckpt, map_location=self._intent_device)
-                    self._intent_predictor.load_state_dict(data["model"])
-            except Exception:
-                self.use_intent = False
+                data = torch.load(ckpt, map_location=self._intent_device)
+            except FileNotFoundError:
+                raise
+            if "model" not in data:
+                raise ValueError(
+                    f"Intent checkpoint at {ckpt} is missing the 'model' key. "
+                    "Expected a dict with key 'model' containing the state_dict."
+                )
+            self._intent_predictor.load_state_dict(data["model"])
 
     def _load_dims(self):
         dims_path = os.path.join(self.scenario_dir, "scenario_dims.yaml")
@@ -585,20 +596,20 @@ class SumoEnv(_make_gym()):
 
     def _randomize_pothole(self):
         """Randomize pothole size and position each episode."""
-        length = np.random.uniform(4.0, 12.0)
-        width = np.random.uniform(2.0, 4.0)
+        length = self._env_rng.uniform(4.0, 12.0)
+        width = self._env_rng.uniform(2.0, 4.0)
         half_l = length / 2
         half_w = width / 2
 
         if self._ego_start_edge == "stem_in":
-            pot_x = np.random.uniform(-2.0, 2.0)
-            pot_y = np.random.uniform(-40.0, -5.0)
+            pot_x = self._env_rng.uniform(-2.0, 2.0)
+            pot_y = self._env_rng.uniform(-40.0, -5.0)
         elif "right" in self._ego_start_edge:
-            pot_x = np.random.uniform(10.0, 40.0)
-            pot_y = np.random.uniform(-2.0, 2.0)
+            pot_x = self._env_rng.uniform(10.0, 40.0)
+            pot_y = self._env_rng.uniform(-2.0, 2.0)
         else:
-            pot_x = np.random.uniform(-40.0, -10.0)
-            pot_y = np.random.uniform(-2.0, 2.0)
+            pot_x = self._env_rng.uniform(-40.0, -10.0)
+            pot_y = self._env_rng.uniform(-2.0, 2.0)
 
         self._pothole_box = np.array([
             [pot_x - half_l, pot_x + half_l],
@@ -623,7 +634,7 @@ class SumoEnv(_make_gym()):
 
     def reset(self, *, seed=None, options=None):
         if seed is not None:
-            np.random.seed(seed)
+            self._env_rng = np.random.default_rng(seed)
             self._behavior_sampler.rng = np.random.RandomState(seed)
         self._close_sumo()
         self._start_sumo()

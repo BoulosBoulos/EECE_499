@@ -41,14 +41,18 @@ class RuleBasedTTCPolicy:
 
         # Extract min TTC across top-5 tracked agents
         # Agent block: starts at index 24, each 22 features
-        # TTC_i is at offset 13 within each block (see state/builder.py line 149)
+        # TTC_i is at offset 13 within each block (see state/builder.py)
+        # Mask is at offset 21 within each block; only consider active agents
         min_ttc = 10.0
         for i in range(5):
-            ttc_idx = 24 + i * 22 + 13
-            if ttc_idx < len(obs_arr):
-                agent_ttc = float(obs_arr[ttc_idx])
-                if 0.01 < agent_ttc < 10.0:
-                    min_ttc = min(min_ttc, agent_ttc)
+            base_idx = 24 + i * 22
+            mask_idx = base_idx + 21
+            ttc_idx = base_idx + 13
+            if mask_idx < len(obs_arr) and float(obs_arr[mask_idx]) >= 0.5:
+                if ttc_idx < len(obs_arr):
+                    agent_ttc = float(obs_arr[ttc_idx])
+                    if 0.01 < agent_ttc < 10.0:
+                        min_ttc = min(min_ttc, agent_ttc)
 
         # Rule: STOP if unsafe, GO otherwise
         if min_ttc < self.ttc_threshold:

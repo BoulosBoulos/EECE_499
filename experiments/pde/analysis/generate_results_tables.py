@@ -714,7 +714,71 @@ def main():
         f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
     print(f"Saved {out_paradigm}")
 
+    # Held-out analysis (Tier 4) — only runs if Tier 4 results exist
+    _analyze_heldout(args, df, METRICS, METRIC_LABELS, METHOD_LABELS, BASELINE)
+
     print(f"\nAll tables saved to {args.out}/")
+
+
+def _analyze_heldout(args, df, metrics, metric_labels, method_labels, baseline):
+    """Generate held-out (Tier 4) comparison tables if data exists."""
+    import glob as _glob
+
+    HO_CONFIGS = [
+        ("HO1_occ_to_noocc", "tier1", "tier4_HO1_occ_to_noocc"),
+        ("HO2_noocc_to_occ", "tier2_noocc", "tier4_HO2_noocc_to_occ"),
+        ("HO3_full_to_adversarial", "tier1", "tier4_HO3_full_to_adversarial"),
+        ("HO4_nominal_to_adversarial", "tier3_behav", "tier4_HO4_nominal_to_adversarial"),
+        ("HO5_vis_to_novis", "tier1", "tier4_HO5_vis_to_novis"),
+    ]
+
+    base = os.path.dirname(args.eval_dir) if args.eval_dir else "results/ablation"
+    summary_rows = []
+    methods = list(method_labels.keys())
+
+    for ho_name, source_dir_name, ho_dir_name in HO_CONFIGS:
+        source_path = os.path.join(base, source_dir_name)
+        ho_path = os.path.join(base, ho_dir_name)
+        if not os.path.isdir(source_path) or not os.path.isdir(ho_path):
+            continue
+
+        source_csvs = _glob.glob(os.path.join(source_path, "**", "eval_*.csv"), recursive=True)
+        ho_csvs = _glob.glob(os.path.join(ho_path, "**", "eval_*.csv"), recursive=True)
+        if not source_csvs or not ho_csvs:
+            continue
+
+        for method in methods:
+            method_src = [f for f in source_csvs if f"eval_{method}_" in f]
+            method_ho = [f for f in ho_csvs if f"eval_{method}_" in f]
+            for metric in metrics:
+                try:
+                    if pd is None:
+                        continue
+                    src_dfs = [pd.read_csv(f) for f in method_src]
+                    ho_dfs = [pd.read_csv(f) for f in method_ho]
+                    src_vals = pd.concat(src_dfs)[metric].dropna().values if src_dfs else np.array([])
+                    ho_vals = pd.concat(ho_dfs)[metric].dropna().values if ho_dfs else np.array([])
+                    if len(src_vals) < 2 or len(ho_vals) < 2:
+                        continue
+                    summary_rows.append({
+                        "ho_name": ho_name, "method": method, "metric": metric,
+                        "source_mean": float(np.mean(src_vals)),
+                        "ho_mean": float(np.mean(ho_vals)),
+                        "delta": float(np.mean(ho_vals) - np.mean(src_vals)),
+                        "cohens_d": cohens_d(ho_vals, src_vals),
+                    })
+                except Exception:
+                    continue
+
+    if not summary_rows:
+        return
+
+    out_csv = os.path.join(args.out, "heldout_comparisons.csv")
+    with open(out_csv, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(summary_rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(summary_rows)
+    print(f"Saved {out_csv} ({len(summary_rows)} rows)")
 
 
 if __name__ == "__main__":

@@ -15,6 +15,11 @@ from models.pde.state_builder import (
     IDX_KAPPA, IDX_TTC_MIN, IDX_POTHOLE,
 )
 
+def _smooth_clamp_nonneg(x: torch.Tensor, eps: float = 0.1) -> torch.Tensor:
+    """Smooth approximation of torch.clamp(x, min=0). Has non-zero gradient everywhere."""
+    return 0.5 * (x + torch.sqrt(x ** 2 + eps ** 2)) - eps / 2
+
+
 NOMINAL_ACCEL = {
     0: "stop",
     1: "creep",
@@ -76,16 +81,16 @@ class BehavioralDynamics:
 
         xi_next[:, IDX_V] = v_new
         xi_next[:, IDX_A] = a_nom
-        xi_next[:, IDX_D_STOP] = torch.clamp(xi[:, IDX_D_STOP] - delta_s, min=0.0)
-        xi_next[:, IDX_D_CZ] = torch.clamp(xi[:, IDX_D_CZ] - delta_s, min=0.0)
-        xi_next[:, IDX_D_EXIT] = torch.clamp(xi[:, IDX_D_EXIT] - delta_s, min=0.0)
+        xi_next[:, IDX_D_STOP] = _smooth_clamp_nonneg(xi[:, IDX_D_STOP] - delta_s)
+        xi_next[:, IDX_D_CZ] = _smooth_clamp_nonneg(xi[:, IDX_D_CZ] - delta_s)
+        xi_next[:, IDX_D_EXIT] = _smooth_clamp_nonneg(xi[:, IDX_D_EXIT] - delta_s)
 
         kappa = xi[:, IDX_KAPPA]
         delta_nom = torch.atan(self.L * kappa)
         psi_dot_new = (v_new / self.L) * torch.tan(delta_nom.clamp(-0.5, 0.5))
         xi_next[:, IDX_PSI_DOT] = psi_dot_new
 
-        xi_next[:, IDX_POTHOLE] = torch.clamp(xi[:, IDX_POTHOLE] - delta_s, min=0.0)
+        xi_next[:, IDX_POTHOLE] = _smooth_clamp_nonneg(xi[:, IDX_POTHOLE] - delta_s)
 
         ttc_min_new = torch.full((B,), 10.0, device=xi.device, dtype=xi.dtype)
         for ag_idx in range(N_AGENTS_PDE):
@@ -104,8 +109,8 @@ class BehavioralDynamics:
 
             dx_new = dx + dvx * self.dt
             dy_new = dy + dvy * self.dt
-            d_cz_i_new = torch.clamp(d_cz_i - v_i * self.dt, min=0.0)
-            d_exit_i_new = torch.clamp(d_exit_i - v_i * self.dt, min=0.0)
+            d_cz_i_new = _smooth_clamp_nonneg(d_cz_i - v_i * self.dt)
+            d_exit_i_new = _smooth_clamp_nonneg(d_exit_i - v_i * self.dt)
 
             xi_next[:, start + 0] = dx_new
             xi_next[:, start + 1] = dy_new
@@ -123,7 +128,7 @@ class BehavioralDynamics:
             py_cpa = dy_new + t_cpa * dvy
             d_cpa = torch.sqrt(px_cpa ** 2 + py_cpa ** 2 + self.eps)
             dv_norm = torch.sqrt(dv_sq)
-            ttc_i = torch.clamp(d_cpa - self.d_safe, min=0.0) / dv_norm
+            ttc_i = _smooth_clamp_nonneg(d_cpa - self.d_safe) / dv_norm
 
             xi_next[:, start + 11] = t_cpa
             xi_next[:, start + 12] = d_cpa

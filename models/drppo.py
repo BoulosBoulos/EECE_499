@@ -106,6 +106,10 @@ class DRPPO:
         use_pinn: bool | None = None,
         **_kwargs,
     ):
+        self.obs_dim = obs_dim
+        self.hidden_dim = hidden_dim
+        self.n_actions = n_actions
+        self.lr = lr
         self.gamma = gamma
         self.gae_lambda = gae_lambda
         self.clip_range = clip_range
@@ -184,10 +188,44 @@ class DRPPO:
         }
 
     def save(self, path: str):
-        torch.save({"policy": self.policy.state_dict(), "optimizer": self.optimizer.state_dict()}, path)
+        torch.save({
+            "family": "drppo",
+            "config": {
+                "obs_dim": self.obs_dim,
+                "hidden_dim": self.hidden_dim,
+                "n_actions": self.n_actions,
+                "lr": self.lr,
+                "gamma": self.gamma,
+                "gae_lambda": self.gae_lambda,
+                "clip_range": self.clip_range,
+                "ent_coef": self.ent_coef,
+                "vf_coef": self.vf_coef,
+                "max_grad_norm": self.max_grad_norm,
+            },
+            "policy": self.policy.state_dict(),
+            "optimizer": self.optimizer.state_dict(),
+        }, path)
 
     def load(self, path: str):
         data = torch.load(path, map_location=self.device, weights_only=False)
+        # Backward compatibility: old checkpoints lack "family" / "config"
+        if "policy" not in data:
+            raise ValueError(
+                f"Checkpoint at {path} is missing the 'policy' key. "
+                "Cannot load model weights."
+            )
+        if "family" in data and data["family"] != "drppo":
+            raise ValueError(
+                f"Checkpoint family is '{data['family']}', expected 'drppo'. "
+                "Are you loading the wrong model type?"
+            )
+        if "config" in data:
+            saved_obs = data["config"].get("obs_dim")
+            if saved_obs is not None and saved_obs != self.obs_dim:
+                raise ValueError(
+                    f"obs_dim mismatch: checkpoint has {saved_obs}, "
+                    f"but model was created with {self.obs_dim}."
+                )
         self.policy.load_state_dict(data["policy"])
         if "optimizer" in data:
             self.optimizer.load_state_dict(data["optimizer"])
