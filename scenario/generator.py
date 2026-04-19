@@ -12,11 +12,25 @@ from __future__ import annotations
 import os
 import subprocess
 import shutil
+import xml.etree.ElementTree as ET
 
 try:
     import yaml
 except ImportError:
     yaml = None
+
+
+def _parse_net_offset(net_xml_path: str) -> tuple[float, float]:
+    """Parse netOffset='X,Y' from the <location> element of a SUMO .net.xml."""
+    try:
+        tree = ET.parse(net_xml_path)
+        loc = tree.getroot().find("location")
+        if loc is not None and "netOffset" in loc.attrib:
+            xs, ys = loc.attrib["netOffset"].split(",")
+            return float(xs), float(ys)
+    except Exception:
+        pass
+    return 0.0, 0.0
 
 SCENARIO_SPEC = {
     "1a": (True, False, False, False),
@@ -164,15 +178,23 @@ class ScenarioGenerator:
             add_parts.append(os.path.basename(poly_path))
 
         # Building polygons — visual representation of occlusion geometry
+        # Apply netOffset from the generated .net.xml so polygons render correctly
+        ox, oy = _parse_net_offset(net_path)
+        nw_corners = [(-3.5 + ox, 3.5 + oy), (-30.0 + ox, 3.5 + oy),
+                      (-30.0 + ox, 20.0 + oy), (-3.5 + ox, 20.0 + oy)]
+        ne_corners = [(3.5 + ox, 3.5 + oy), (30.0 + ox, 3.5 + oy),
+                      (30.0 + ox, 20.0 + oy), (3.5 + ox, 20.0 + oy)]
+        nw_shape = " ".join(f"{x:.2f},{y:.2f}" for x, y in nw_corners)
+        ne_shape = " ".join(f"{x:.2f},{y:.2f}" for x, y in ne_corners)
         buildings_path = os.path.join(output_dir, "t_buildings.poly.xml")
         with open(buildings_path, "w") as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n<additional>\n')
-            f.write('  <poly id="building_NW" type="building" '
-                    'color="0.55,0.45,0.35,1" fill="1" layer="5" '
-                    'shape="-3.5,3.5 -30,3.5 -30,20 -3.5,20"/>\n')
-            f.write('  <poly id="building_NE" type="building" '
-                    'color="0.55,0.45,0.35,1" fill="1" layer="5" '
-                    'shape="3.5,3.5 30,3.5 30,20 3.5,20"/>\n')
+            f.write(f'  <poly id="building_NW" type="building" '
+                    f'color="0.55,0.45,0.35,1" fill="1" layer="5" '
+                    f'shape="{nw_shape}"/>\n')
+            f.write(f'  <poly id="building_NE" type="building" '
+                    f'color="0.55,0.45,0.35,1" fill="1" layer="5" '
+                    f'shape="{ne_shape}"/>\n')
             f.write('</additional>\n')
         add_parts.append(os.path.basename(buildings_path))
 

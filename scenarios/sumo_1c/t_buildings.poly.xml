@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<additional>
+  <poly id="building_NW" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="46.50,63.50 20.00,63.50 20.00,80.00 46.50,80.00"/>
+  <poly id="building_NE" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="53.50,63.50 80.00,63.50 80.00,80.00 53.50,80.00"/>
+</additional>

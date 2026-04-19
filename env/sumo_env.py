@@ -160,10 +160,8 @@ class SumoEnv(_make_gym()):
         self._behavior: Optional[BehaviorConfig] = None
         self._behavior_sampler = BehaviorSampler()
         self._buildings_enabled = buildings
-        if buildings:
-            self._init_occlusion_geometry()
-        else:
-            self._occlusion_polygons = []
+        self._occlusion_templates = self._build_occlusion_templates()
+        self._occlusion_polygons = []  # built in reset() after SUMO starts
         self._style_filter = style_filter
         self._state_ablation = state_ablation
         self._pothole_box = np.array([[-4, 4], [-2, 2]])
@@ -199,34 +197,50 @@ class SumoEnv(_make_gym()):
             except Exception:
                 pass
 
-    def _init_occlusion_geometry(self):
-        """Define static occlusion polygons for the T-intersection.
+    def _build_occlusion_templates(self):
+        """Return occlusion polygon templates in the (0,0)-centered scenario frame.
 
-        The T has the stem going south (negative y) and the bar going east-west.
-        The ego approaches from south on stem_in, turns right onto right_out.
-        Buildings at the NW and NE corners of the T block the ego's view
-        of traffic approaching along the bar.
-        Coordinates: junction center is at (0, 0).
+        These are NOT in SUMO coordinates. The offset is applied in
+        _init_occlusion_geometry() after SUMO starts and the junction
+        position can be queried via TraCI.
         """
+        if not self._buildings_enabled:
+            return []
+        return [
+            {
+                "name": "building_NW",
+                "corners": np.array([
+                    [-3.5, 3.5], [-30.0, 3.5], [-30.0, 20.0], [-3.5, 20.0],
+                ]),
+            },
+            {
+                "name": "building_NE",
+                "corners": np.array([
+                    [3.5, 3.5], [30.0, 3.5], [30.0, 20.0], [3.5, 20.0],
+                ]),
+            },
+        ]
+
+    def _init_occlusion_geometry(self):
+        """Build runtime occlusion polygons in SUMO frame.
+
+        MUST be called AFTER _start_sumo(). Queries junction center from
+        TraCI and offsets template corners accordingly.
+        """
+        if not self._occlusion_templates:
+            self._occlusion_polygons = []
+            return
+        try:
+            jx, jy = traci.junction.getPosition("center")
+        except Exception:
+            jx, jy = 0.0, 0.0
+        offset = np.array([jx, jy], dtype=np.float64)
         self._occlusion_polygons = [
             {
-                "corners": np.array([
-                    [-3.5, 3.5],
-                    [-30.0, 3.5],
-                    [-30.0, 20.0],
-                    [-3.5, 20.0],
-                ]),
-                "name": "building_NW",
-            },
-            {
-                "corners": np.array([
-                    [3.5, 3.5],
-                    [30.0, 3.5],
-                    [30.0, 20.0],
-                    [3.5, 20.0],
-                ]),
-                "name": "building_NE",
-            },
+                "name": tpl["name"],
+                "corners": tpl["corners"] + offset,
+            }
+            for tpl in self._occlusion_templates
         ]
 
     def _line_intersects_polygon(self, p1: np.ndarray, p2: np.ndarray, polygon: np.ndarray) -> bool:
@@ -533,6 +547,7 @@ class SumoEnv(_make_gym()):
             self._behavior_sampler.rng = np.random.RandomState(seed)
         self._close_sumo()
         self._start_sumo()
+        self._init_occlusion_geometry()
         if not self._buildings_enabled:
             try:
                 traci.polygon.remove("building_NW")
