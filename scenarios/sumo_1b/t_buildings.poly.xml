@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <additional>
-  <poly id="building_NW" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="20.00,68.00 42.00,68.00 42.00,80.00 20.00,80.00"/>
-  <poly id="building_NE" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="58.00,68.00 80.00,68.00 80.00,80.00 58.00,80.00"/>
-  <poly id="building_SW" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="20.00,40.00 42.00,40.00 42.00,52.00 20.00,52.00"/>
-  <poly id="building_SE" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="58.00,40.00 80.00,40.00 80.00,52.00 58.00,52.00"/>
+  <poly id="building_NW" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="20.00,71.00 39.00,71.00 39.00,80.00 20.00,80.00"/>
+  <poly id="building_NE" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="61.00,71.00 80.00,71.00 80.00,80.00 61.00,80.00"/>
+  <poly id="building_SW" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="20.00,40.00 39.00,40.00 39.00,49.00 20.00,49.00"/>
+  <poly id="building_SE" type="building" color="0.55,0.45,0.35,1" fill="1" layer="5" shape="61.00,40.00 80.00,40.00 80.00,49.00 61.00,49.00"/>
 </additional>

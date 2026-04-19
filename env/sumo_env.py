@@ -48,6 +48,14 @@ EGO_MANEUVERS = {
     "left_stem":  {"route": "ego_left_stem",  "start_edge": "left_in", "exit_edge": "stem_out"},
 }
 
+SCENARIOS_WITH_SIDEWALKS = frozenset({
+    "1b", "2", "3", "4", "2_dense", "3_dense", "4_dense",
+})
+INNER_MARGIN_NO_SIDEWALK = 8.0
+INNER_MARGIN_WITH_SIDEWALK = 11.0
+OUTER_EXTENT = 30.0
+FAR_EXTENT = 20.0
+
 _DEFAULT_REWARD_CONFIG = {
     "w_prog": 1.0, "w_time": -0.1, "w_risk": -3.0, "w_coll": -20.0,
     "ttc_thr": 3.0, "d_coll": 2.0, "w_pothole": -5.0,
@@ -201,29 +209,28 @@ class SumoEnv(_make_gym()):
         """Return occlusion polygon templates in the (0,0)-centered scenario frame.
 
         Four corner buildings (NW, NE, SW, SE) flanking the T-intersection.
-        Inner margin = 8.0 m (road half-width + curb buffer).
-        These are NOT in SUMO coordinates. The offset is applied in
-        _init_occlusion_geometry() after SUMO starts.
+        Inner margin is scenario-dependent: 8.0m for non-pedestrian scenarios,
+        11.0m for pedestrian scenarios (clears road + sidewalk).
         """
         if not self._buildings_enabled:
             return []
 
-        INNER = 8.0    # inner margin from junction center
-        OUTER = 30.0   # building depth from junction
-        FAR = 20.0     # building width perpendicular to road
+        inner = (INNER_MARGIN_WITH_SIDEWALK
+                 if self.scenario_name in SCENARIOS_WITH_SIDEWALKS
+                 else INNER_MARGIN_NO_SIDEWALK)
 
         return [
             {"name": "building_NW", "corners": np.array([
-                [-INNER, INNER], [-OUTER, INNER], [-OUTER, FAR], [-INNER, FAR],
+                [-inner, inner], [-OUTER_EXTENT, inner], [-OUTER_EXTENT, FAR_EXTENT], [-inner, FAR_EXTENT],
             ])},
             {"name": "building_NE", "corners": np.array([
-                [INNER, INNER], [OUTER, INNER], [OUTER, FAR], [INNER, FAR],
+                [inner, inner], [OUTER_EXTENT, inner], [OUTER_EXTENT, FAR_EXTENT], [inner, FAR_EXTENT],
             ])},
             {"name": "building_SW", "corners": np.array([
-                [-OUTER, -FAR], [-INNER, -FAR], [-INNER, -INNER], [-OUTER, -INNER],
+                [-OUTER_EXTENT, -FAR_EXTENT], [-inner, -FAR_EXTENT], [-inner, -inner], [-OUTER_EXTENT, -inner],
             ])},
             {"name": "building_SE", "corners": np.array([
-                [INNER, -FAR], [OUTER, -FAR], [OUTER, -INNER], [INNER, -INNER],
+                [inner, -FAR_EXTENT], [OUTER_EXTENT, -FAR_EXTENT], [OUTER_EXTENT, -inner], [inner, -inner],
             ])},
         ]
 
@@ -605,6 +612,12 @@ class SumoEnv(_make_gym()):
             "collision": False,
             "behavior": self._behavior,
         }
+        # Pothole position diagnostic (temporary — remove after verification)
+        if self._has_pothole and hasattr(self, '_pothole_box'):
+            box = self._pothole_box
+            print(f"[POTHOLE DIAG] scenario={self.scenario_name}, "
+                  f"box x=[{box[0, 0]:.1f}, {box[0, 1]:.1f}], y=[{box[1, 0]:.1f}, {box[1, 1]:.1f}]")
+
         return state.astype(np.float32), info
 
     def _get_ego(self) -> dict:

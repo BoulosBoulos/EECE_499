@@ -172,20 +172,22 @@ class ScenarioGenerator:
             poly_path = os.path.join(output_dir, "t_pothole.poly.xml")
             with open(poly_path, "w") as f:
                 f.write('<?xml version="1.0" encoding="UTF-8"?>\n<additional>\n')
-                f.write('  <poly id="pothole" type="pothole" color="0.2,0.15,0.1" fill="1" layer="1" '
-                        'shape="-4,-2 4,-2 4,2 -4,2" lineWidth="0.5"/>\n')
+                f.write('  <poly id="pothole" type="pothole" color="1.0,0.3,0.1" fill="1" layer="5" '
+                        'shape="-4,-2 4,-2 4,2 -4,2" lineWidth="0.3"/>\n')
                 f.write('</additional>\n')
             add_parts.append(os.path.basename(poly_path))
 
         # Building polygons — four corners flanking the T-intersection
-        # Apply netOffset from .net.xml so polygons render in correct SUMO frame
+        # Inner margin is scenario-dependent: wider for pedestrian scenarios (sidewalks)
         ox, oy = _parse_net_offset(net_path)
-        INNER, OUTER, FAR = 8.0, 30.0, 20.0
+        _ped_scenarios = {"1b", "2", "3", "4", "2_dense", "3_dense", "4_dense"}
+        inner = 11.0 if scenario_name in _ped_scenarios else 8.0
+        OUTER, FAR = 30.0, 20.0
         building_templates = {
-            "building_NW": [(-OUTER, INNER), (-INNER, INNER), (-INNER, FAR), (-OUTER, FAR)],
-            "building_NE": [(INNER, INNER), (OUTER, INNER), (OUTER, FAR), (INNER, FAR)],
-            "building_SW": [(-OUTER, -FAR), (-INNER, -FAR), (-INNER, -INNER), (-OUTER, -INNER)],
-            "building_SE": [(INNER, -FAR), (OUTER, -FAR), (OUTER, -INNER), (INNER, -INNER)],
+            "building_NW": [(-OUTER, inner), (-inner, inner), (-inner, FAR), (-OUTER, FAR)],
+            "building_NE": [(inner, inner), (OUTER, inner), (OUTER, FAR), (inner, FAR)],
+            "building_SW": [(-OUTER, -FAR), (-inner, -FAR), (-inner, -inner), (-OUTER, -inner)],
+            "building_SE": [(inner, -FAR), (OUTER, -FAR), (OUTER, -inner), (inner, -inner)],
         }
         buildings_path = os.path.join(output_dir, "t_buildings.poly.xml")
         with open(buildings_path, "w") as f:
