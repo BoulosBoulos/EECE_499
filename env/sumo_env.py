@@ -170,6 +170,7 @@ class SumoEnv(_make_gym()):
         self._buildings_enabled = buildings
         self._occlusion_templates = self._build_occlusion_templates()
         self._occlusion_polygons = []  # built in reset() after SUMO starts
+        self._junction_offset = np.array([0.0, 0.0])  # set properly in _init_occlusion_geometry()
         self._style_filter = style_filter
         self._state_ablation = state_ablation
         self._pothole_box = np.array([[-4, 4], [-2, 2]])
@@ -242,12 +243,19 @@ class SumoEnv(_make_gym()):
         """
         if not self._occlusion_templates:
             self._occlusion_polygons = []
+            # Still query junction offset for CZ sampling even without buildings
+            try:
+                jx, jy = traci.junction.getPosition("center")
+                self._junction_offset = np.array([jx, jy], dtype=np.float64)
+            except Exception:
+                self._junction_offset = np.array([0.0, 0.0])
             return
         try:
             jx, jy = traci.junction.getPosition("center")
         except Exception:
             jx, jy = 0.0, 0.0
-        offset = np.array([jx, jy], dtype=np.float64)
+        self._junction_offset = np.array([jx, jy], dtype=np.float64)
+        offset = self._junction_offset
         self._occlusion_polygons = [
             {
                 "name": tpl["name"],
@@ -829,7 +837,7 @@ class SumoEnv(_make_gym()):
         ego_pos = np.array(ego["p"])
 
         # alpha_cz: geometric visibility of the conflict zone via sampling
-        cz_center = np.array([0.0, 0.0])
+        cz_center = self._junction_offset.copy()
         cz_radius = 10.0
         n_samples = 20
         visible_count = 0
