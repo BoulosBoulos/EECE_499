@@ -29,15 +29,18 @@ TIER1_COMBOS = [
     ("4", "stem_right"), ("4", "stem_left"),
     ("3", "right_left"), ("3", "left_right"),
 ]
-TIER1_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-TIER1_SEEDS = [42, 123, 456, 789, 999]
+TIER1_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo", "rule_based"]
+TIER1_SEEDS = [42, 123, 456, 789, 999, 1111, 2222, 3333, 4444, 5555]  # 10 seeds
 TIER1_INTENTS = [False, True]
 
 # ── Tier 2: Lambda sensitivity ──────────────────────────────────────────
-TIER2_COMBOS = [("1a", "stem_right")]
+TIER2_COMBOS = [
+    ("1a", "stem_right"),
+    ("4", "stem_left"),     # hard scenario to test lambda transfer
+]
 TIER2_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux"]
 TIER2_LAMBDAS = [0.05, 0.1, 0.2, 0.5]
-TIER2_SEEDS = [42, 123, 456]
+TIER2_SEEDS = [42, 123, 456, 789, 999]  # 5 seeds
 
 # ── Tier 2: Occlusion ablation ──────────────────────────────────────────
 TIER2_OCC_COMBOS = [
@@ -45,7 +48,7 @@ TIER2_OCC_COMBOS = [
     ("2", "stem_right"), ("4", "stem_right"),
 ]
 TIER2_OCC_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-TIER2_OCC_SEEDS = [42, 123, 456]
+TIER2_OCC_SEEDS = [42, 123, 456, 789, 999]  # 5 seeds
 
 # ── Tier 3: State ablation ──────────────────────────────────────────────
 TIER3_STATE_COMBOS = [
@@ -53,7 +56,7 @@ TIER3_STATE_COMBOS = [
     ("2", "stem_right"), ("4", "stem_right"),
 ]
 TIER3_STATE_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-TIER3_STATE_SEEDS = [42, 123, 456]
+TIER3_STATE_SEEDS = [42, 123, 456, 789, 999]  # 5 seeds
 
 # ── Tier 3: Behavioral robustness ───────────────────────────────────────
 TIER3_BEHAV_COMBOS = [
@@ -61,12 +64,12 @@ TIER3_BEHAV_COMBOS = [
     ("2", "stem_right"), ("4", "stem_right"),
 ]
 TIER3_BEHAV_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-TIER3_BEHAV_SEEDS = [42, 123, 456]
+TIER3_BEHAV_SEEDS = [42, 123, 456, 789, 999]  # 5 seeds
 
 # ── Tier 3: Dense scenarios ─────────────────────────────────────────────
 TIER3_DENSE_SCENARIOS = ["2_dense", "3_dense", "4_dense"]
 TIER3_DENSE_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-TIER3_DENSE_SEEDS = [42, 123, 456]
+TIER3_DENSE_SEEDS = [42, 123, 456, 789, 999]  # 5 seeds
 
 # ── Supplementary: Full 42-combo table ──────────────────────────────────
 ALL_SCENARIOS = ["1a", "1b", "1c", "1d", "2", "3", "4"]
@@ -78,7 +81,9 @@ SUPP_SEEDS = [42, 123, 456]
 def _build_train_cmd(method, scenario, maneuver, seed, out_dir,
                      total_steps=50000, use_intent=False, lambda_aux=None,
                      no_buildings=False, style_filter=None, state_ablation=None):
-    """Build the command list for a single training run."""
+    """Build the command list for a single training run. Returns None for rule_based."""
+    if method == "rule_based":
+        return None  # no training needed
     if method == "drppo":
         script = "experiments/pde/train_drppo_baseline.py"
     else:
@@ -267,7 +272,10 @@ def main():
     if args.dry_run:
         for j in jobs:
             print(f"  {j['tag']}:")
-            print(f"    TRAIN: {' '.join(j['cmd_train'])}")
+            if j["cmd_train"] is not None:
+                print(f"    TRAIN: {' '.join(j['cmd_train'])}")
+            else:
+                print(f"    TRAIN: (none — rule-based, eval only)")
             print(f"    EVAL:  {' '.join(j['cmd_eval'])}")
         return
 
@@ -300,9 +308,13 @@ def main():
         os.makedirs(job_out_dir, exist_ok=True)
         log_path = os.path.join(job_out_dir, "stdout.log")
         # Chain train then eval in one shell command
-        train_str = " ".join(f"'{c}'" for c in job["cmd_train"])
         eval_str = " ".join(f"'{c}'" for c in job["cmd_eval"])
-        shell_cmd = f"({train_str} && echo '=== EVAL ===' && {eval_str})"
+        if job["cmd_train"] is None:
+            # Rule-based: eval only, no training
+            shell_cmd = f"({eval_str})"
+        else:
+            train_str = " ".join(f"'{c}'" for c in job["cmd_train"])
+            shell_cmd = f"({train_str} && echo '=== EVAL ===' && {eval_str})"
         log_f = open(log_path, "w")
         proc = subprocess.Popen(shell_cmd, stdout=log_f, stderr=subprocess.STDOUT, shell=True)
         active.append((proc, job["tag"], log_f))

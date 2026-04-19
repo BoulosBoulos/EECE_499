@@ -1,10 +1,14 @@
 """Generate LaTeX results tables with rigorous statistical analysis.
 
 Features:
+- Robust filename parser using known method/scenario sets for longest-match
 - Holm-Bonferroni correction for multiple comparisons (per metric family)
 - Bootstrap 95% confidence intervals
-- Cohen's d effect sizes
+- Cohen's d effect sizes with bootstrap CI
 - Mann-Whitney U as robustness secondary test
+- Paired t-test for matched-seed comparisons
+- PDE-vs-PDE head-to-head comparisons
+- Paradigm comparison (optimality-PDE vs safety-PDE)
 - Per-scenario + aggregated reporting
 
 Usage:
@@ -18,31 +22,144 @@ import csv
 import glob
 import numpy as np
 
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
+try:
+    from scipy import stats as sp_stats
+except ImportError:
+    sp_stats = None
+
+
+# ---------------------------------------------------------------------------
+# Known sets for filename parsing
+# ---------------------------------------------------------------------------
+KNOWN_METHODS = [
+    "soft_hjb_aux", "hjb_aux", "eikonal_aux", "cbf_aux", "drppo", "rule_based",
+]
+KNOWN_SCENARIOS = [
+    "1a", "1b", "1c", "1d", "2_dense", "3_dense", "4_dense", "2", "3", "4",
+]
+KNOWN_MANEUVERS = [
+    "stem_right", "stem_left", "right_left", "right_stem", "left_right", "left_stem",
+]
+
+ALL_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
+PDE_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux"]
+BASELINE = "drppo"
+
+METRICS = [
+    "mean_return", "collision_rate", "success_rate", "mean_ttc", "min_ttc",
+    "ttc_p10_mean", "action_entropy_mean", "hard_brakes_per_ep_mean",
+    "row_violations_per_ep_mean", "action_go_frac", "action_yield_frac",
+    "switching_rate_mean", "decision_latency_mean",
+]
+
+METRIC_LABELS = {
+    "mean_return": "Return",
+    "collision_rate": "Collision",
+    "success_rate": "Success",
+    "mean_ttc": "Mean TTC",
+    "min_ttc": "Min TTC",
+    "ttc_p10_mean": "TTC p10",
+    "action_entropy_mean": "Act. Entropy",
+    "hard_brakes_per_ep_mean": "Hard Brakes",
+    "row_violations_per_ep_mean": "ROW Viol.",
+    "action_go_frac": "Go Frac.",
+    "action_yield_frac": "Yield Frac.",
+    "switching_rate_mean": "Switch Rate",
+    "decision_latency_mean": "Latency",
+}
+
+METHOD_LABELS = {
+    "drppo": "DRPPO",
+    "hjb_aux": "Hard-HJB",
+    "soft_hjb_aux": "Soft-HJB",
+    "eikonal_aux": "Eikonal",
+    "cbf_aux": "CBF-PDE",
+    "rule_based": "Rule-Based",
+}
+
+
+# ---------------------------------------------------------------------------
+# Filename parser
+# ---------------------------------------------------------------------------
+def parse_eval_filename(filename):
+    """Parse an eval CSV filename using longest-match against known sets.
+
+    Expected pattern: eval_{method}_{scenario}_{maneuver}.csv
+    Returns (method, scenario, maneuver) or (None, None, None) on failure.
+    """
+    base = os.path.basename(filename)
+    if not base.startswith("eval_") or not base.endswith(".csv"):
+        return None, None, None
+    stem = base[len("eval_"):-len(".csv")]  # e.g. "soft_hjb_aux_1a_stem_right"
+
+    # Try each method (longest first, since KNOWN_METHODS is ordered that way)
+    for method in sorted(KNOWN_METHODS, key=len, reverse=True):
+        if stem.startswith(method + "_"):
+            rest = stem[len(method) + 1:]
+            # Try each scenario (longest first)
+            for scenario in sorted(KNOWN_SCENARIOS, key=len, reverse=True):
+                if rest.startswith(scenario + "_"):
+                    maneuver = rest[len(scenario) + 1:]
+                    if maneuver in KNOWN_MANEUVERS:
+                        return method, scenario, maneuver
+                elif rest == scenario:
+                    return method, scenario, None
+            # If no scenario matched, maybe rest is just maneuver
+            if rest in KNOWN_MANEUVERS:
+                return method, None, rest
+            return method, None, None
+    return None, None, None
+
+
+# ---------------------------------------------------------------------------
+# Statistical helpers
+# ---------------------------------------------------------------------------
 def compute_single_p(values_method, values_baseline):
     """Welch's t-test p-value only (corrected later in batch)."""
-    try:
-        from scipy import stats
-    except ImportError:
+    if sp_stats is None:
         return float("nan")
     if len(values_method) < 2 or len(values_baseline) < 2:
         return float("nan")
-    _, p_val = stats.ttest_ind(values_method, values_baseline, equal_var=False)
+    _, p_val = sp_stats.ttest_ind(values_method, values_baseline, equal_var=False)
     return float(p_val)
 
 
 def compute_mannwhitney_p(x, y):
     """Mann-Whitney U two-sided p-value."""
-    try:
-        from scipy import stats
-    except ImportError:
+    if sp_stats is None:
         return float("nan")
     x = [v for v in x if v == v]
     y = [v for v in y if v == v]
     if len(x) < 2 or len(y) < 2:
         return float("nan")
     try:
-        _, p_val = stats.mannwhitneyu(x, y, alternative="two-sided")
+        _, p_val = sp_stats.mannwhitneyu(x, y, alternative="two-sided")
+        return float(p_val)
+    except Exception:
+        return float("nan")
+
+
+def compute_paired_p(x, y):
+    """Paired t-test p-value for matched-seed comparisons.
+
+    Uses scipy.stats.ttest_rel. Requires equal-length, matched arrays.
+    """
+    if sp_stats is None:
+        return float("nan")
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    # Drop pairs where either is NaN
+    valid = ~(np.isnan(x) | np.isnan(y))
+    x, y = x[valid], y[valid]
+    if len(x) < 2:
+        return float("nan")
+    try:
+        _, p_val = sp_stats.ttest_rel(x, y)
         return float(p_val)
     except Exception:
         return float("nan")
@@ -109,8 +226,9 @@ def bootstrap_ci(values, n_resamples=10000, confidence=0.95, seed=42):
     rng = np.random.default_rng(seed)
     boots = [np.mean(rng.choice(vals, size=len(vals), replace=True))
              for _ in range(n_resamples)]
-    alpha = (1 - confidence) / 2
-    return float(np.percentile(boots, 100 * alpha)), float(np.percentile(boots, 100 * (1 - alpha)))
+    alpha_half = (1 - confidence) / 2
+    return (float(np.percentile(boots, 100 * alpha_half)),
+            float(np.percentile(boots, 100 * (1 - alpha_half))))
 
 
 def cohens_d(x, y):
@@ -129,6 +247,32 @@ def cohens_d(x, y):
     return float((np.mean(x) - np.mean(y)) / pooled_std)
 
 
+def cohens_d_ci(x, y, n_resamples=5000, confidence=0.95, seed=42):
+    """Bootstrap CI for Cohen's d effect size."""
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    x = x[~np.isnan(x)]
+    y = y[~np.isnan(y)]
+    if len(x) < 2 or len(y) < 2:
+        return float("nan"), float("nan")
+    rng = np.random.default_rng(seed)
+    ds = []
+    for _ in range(n_resamples):
+        bx = rng.choice(x, size=len(x), replace=True)
+        by = rng.choice(y, size=len(y), replace=True)
+        d = cohens_d(bx, by)
+        if d == d:  # not NaN
+            ds.append(d)
+    if len(ds) < 10:
+        return float("nan"), float("nan")
+    alpha_half = (1 - confidence) / 2
+    return (float(np.percentile(ds, 100 * alpha_half)),
+            float(np.percentile(ds, 100 * (1 - alpha_half))))
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--eval_dir", required=True)
@@ -136,15 +280,15 @@ def main():
     parser.add_argument("--alpha", type=float, default=0.05)
     args = parser.parse_args()
 
-    try:
-        import pandas as pd
-    except ImportError:
+    if pd is None:
         print("pandas required: pip install pandas")
         return
 
     os.makedirs(args.out, exist_ok=True)
 
+    # ------------------------------------------------------------------
     # Load eval CSVs
+    # ------------------------------------------------------------------
     pattern = os.path.join(args.eval_dir, "**", "eval_*.csv")
     csv_files = glob.glob(pattern, recursive=True)
     if not csv_files:
@@ -157,7 +301,15 @@ def main():
     dfs = []
     for f in csv_files:
         try:
-            dfs.append(pd.read_csv(f))
+            tmp = pd.read_csv(f)
+            method, scenario, maneuver = parse_eval_filename(f)
+            if method:
+                tmp["_parsed_method"] = method
+            if scenario:
+                tmp["_parsed_scenario"] = scenario
+            if maneuver:
+                tmp["_parsed_maneuver"] = maneuver
+            dfs.append(tmp)
         except Exception:
             continue
     if not dfs:
@@ -167,57 +319,149 @@ def main():
     df = pd.concat(dfs, ignore_index=True)
     print(f"Loaded {len(df)} rows from {len(dfs)} eval files")
 
-    methods = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-    pde_methods = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux"]
-    baseline = "drppo"
-    metrics = ["mean_return", "collision_rate", "success_rate", "mean_ttc", "min_ttc"]
-    metric_labels = {"mean_return": "Return", "collision_rate": "Collision",
-                     "success_rate": "Success", "mean_ttc": "Mean TTC", "min_ttc": "Min TTC"}
-    method_labels = {"drppo": "DRPPO", "hjb_aux": "Hard-HJB", "soft_hjb_aux": "Soft-HJB",
-                     "eikonal_aux": "Eikonal", "cbf_aux": "CBF-PDE"}
-
     # Determine method column
-    method_col = "variant" if "variant" in df.columns else "method" if "method" in df.columns else None
+    if "_parsed_method" in df.columns and df["_parsed_method"].notna().any():
+        method_col = "_parsed_method"
+    elif "variant" in df.columns:
+        method_col = "variant"
+    elif "method" in df.columns:
+        method_col = "method"
+    else:
+        method_col = None
 
-    # PASS 1: collect all comparisons
+    # Scenario / maneuver columns
+    scen_col = "_parsed_scenario" if "_parsed_scenario" in df.columns else (
+        "scenario" if "scenario" in df.columns else None)
+    man_col = "_parsed_maneuver" if "_parsed_maneuver" in df.columns else (
+        "ego_maneuver" if "ego_maneuver" in df.columns else None)
+
+    # Enumerate unique (scenario, maneuver) combos present
+    if scen_col and man_col:
+        combos = df.groupby([scen_col, man_col]).size().reset_index()[[scen_col, man_col]]
+        combos = list(zip(combos[scen_col], combos[man_col]))
+    elif scen_col:
+        combos = [(s, None) for s in df[scen_col].dropna().unique()]
+    else:
+        combos = [(None, None)]
+
+    # Filter to available metrics
+    available_metrics = [m for m in METRICS if m in df.columns]
+    if not available_metrics:
+        print("No recognized metrics found in data columns:", list(df.columns))
+        return
+
+    # ------------------------------------------------------------------
+    # PASS 1: collect all comparisons (scenario, maneuver, method, metric)
+    # ------------------------------------------------------------------
     results = []
-    for metric in metrics:
-        if metric not in df.columns:
-            continue
-        for method in pde_methods:
-            if method_col:
-                m_vals = df[df[method_col] == method][metric].dropna().values
-                b_vals = df[df[method_col] == baseline][metric].dropna().values
-            else:
-                m_vals = np.array([])
-                b_vals = np.array([])
-            p_welch = compute_single_p(m_vals, b_vals)
-            p_mwu = compute_mannwhitney_p(m_vals, b_vals)
-            d = cohens_d(m_vals, b_vals)
-            m_mean = float(np.mean(m_vals)) if len(m_vals) > 0 else float("nan")
-            ci_lo, ci_hi = bootstrap_ci(m_vals)
-            results.append({
-                "method": method, "metric": metric,
-                "n_method": len(m_vals), "n_baseline": len(b_vals),
-                "mean": m_mean, "ci_low": ci_lo, "ci_high": ci_hi,
-                "cohens_d": d, "raw_p_welch": p_welch, "raw_p_mwu": p_mwu,
-            })
+    for scenario, maneuver in combos:
+        for metric in available_metrics:
+            for method in PDE_METHODS:
+                if method_col is None:
+                    m_vals = np.array([])
+                    b_vals = np.array([])
+                else:
+                    mask_m = df[method_col] == method
+                    mask_b = df[method_col] == BASELINE
+                    if scen_col and scenario is not None:
+                        mask_m = mask_m & (df[scen_col] == scenario)
+                        mask_b = mask_b & (df[scen_col] == scenario)
+                    if man_col and maneuver is not None:
+                        mask_m = mask_m & (df[man_col] == maneuver)
+                        mask_b = mask_b & (df[man_col] == maneuver)
+                    m_vals = df.loc[mask_m, metric].dropna().values
+                    b_vals = df.loc[mask_b, metric].dropna().values
 
-    # PASS 2: Holm-Bonferroni per metric
-    for metric in metrics:
+                p_welch = compute_single_p(m_vals, b_vals)
+                p_mwu = compute_mannwhitney_p(m_vals, b_vals)
+
+                # Paired test: match by seed+eval_mode if available
+                p_paired = float("nan")
+                if "seed" in df.columns and "eval_mode" in df.columns and method_col:
+                    mask_m_base = df[method_col] == method
+                    mask_b_base = df[method_col] == BASELINE
+                    if scen_col and scenario is not None:
+                        mask_m_base = mask_m_base & (df[scen_col] == scenario)
+                        mask_b_base = mask_b_base & (df[scen_col] == scenario)
+                    if man_col and maneuver is not None:
+                        mask_m_base = mask_m_base & (df[man_col] == maneuver)
+                        mask_b_base = mask_b_base & (df[man_col] == maneuver)
+                    df_m = df.loc[mask_m_base].set_index(["seed", "eval_mode"])
+                    df_b = df.loc[mask_b_base].set_index(["seed", "eval_mode"])
+                    common = df_m.index.intersection(df_b.index)
+                    if len(common) >= 2:
+                        paired_m = df_m.loc[common, metric].dropna()
+                        paired_b = df_b.loc[common, metric].dropna()
+                        shared = paired_m.index.intersection(paired_b.index)
+                        if len(shared) >= 2:
+                            p_paired = compute_paired_p(
+                                paired_m.loc[shared].values,
+                                paired_b.loc[shared].values)
+
+                d = cohens_d(m_vals, b_vals)
+                d_ci_lo, d_ci_hi = cohens_d_ci(m_vals, b_vals)
+                m_mean = float(np.mean(m_vals)) if len(m_vals) > 0 else float("nan")
+                ci_lo, ci_hi = bootstrap_ci(m_vals)
+
+                results.append({
+                    "scenario": scenario if scenario else "all",
+                    "maneuver": maneuver if maneuver else "all",
+                    "method": method,
+                    "metric": metric,
+                    "n_method": len(m_vals),
+                    "n_baseline": len(b_vals),
+                    "mean": m_mean,
+                    "ci_low": ci_lo,
+                    "ci_high": ci_hi,
+                    "cohens_d": d,
+                    "cohens_d_ci_low": d_ci_lo,
+                    "cohens_d_ci_high": d_ci_hi,
+                    "raw_p_welch": p_welch,
+                    "raw_p_mwu": p_mwu,
+                    "raw_p_paired": p_paired,
+                })
+
+    # ------------------------------------------------------------------
+    # PASS 2: Holm-Bonferroni per metric across ALL (scenario, maneuver, method)
+    #         Family size = n_combos x n_pde_methods
+    #         Apply separately to Welch, MWU, and paired p-values
+    # ------------------------------------------------------------------
+    for metric in available_metrics:
         metric_results = [r for r in results if r["metric"] == metric]
-        ps = [r["raw_p_welch"] for r in metric_results]
-        corrected = holm_bonferroni(ps, alpha=args.alpha)
-        for r, (raw, corr, sig) in zip(metric_results, corrected):
-            r["corrected_p"] = corr
-            r["significant"] = sig
-            r["marker"] = significance_marker(corr)
+        # Welch
+        ps_welch = [r["raw_p_welch"] for r in metric_results]
+        corrected_welch = holm_bonferroni(ps_welch, alpha=args.alpha)
+        # MWU
+        ps_mwu = [r["raw_p_mwu"] for r in metric_results]
+        corrected_mwu = holm_bonferroni(ps_mwu, alpha=args.alpha)
+        # Paired
+        ps_paired = [r["raw_p_paired"] for r in metric_results]
+        corrected_paired = holm_bonferroni(ps_paired, alpha=args.alpha)
 
-    # Save all_comparisons.csv
+        for r, (_, cw, sw), (_, cm, sm), (_, cp, sp) in zip(
+                metric_results, corrected_welch, corrected_mwu, corrected_paired):
+            r["corrected_p_welch"] = cw
+            r["significant_welch"] = sw
+            r["marker_welch"] = significance_marker(cw)
+            r["corrected_p_mwu"] = cm
+            r["significant_mwu"] = sm
+            r["marker_mwu"] = significance_marker(cm)
+            r["corrected_p_paired"] = cp
+            r["significant_paired"] = sp
+            r["marker_paired"] = significance_marker(cp)
+
+    # ------------------------------------------------------------------
+    # Output: all_comparisons.csv
+    # ------------------------------------------------------------------
     out_csv = os.path.join(args.out, "all_comparisons.csv")
-    fieldnames = ["metric", "method", "n_method", "n_baseline",
-                  "mean", "ci_low", "ci_high", "cohens_d",
-                  "raw_p_welch", "raw_p_mwu", "corrected_p", "significant", "marker"]
+    fieldnames = [
+        "scenario", "maneuver", "metric", "method",
+        "n_method", "n_baseline", "mean", "ci_low", "ci_high",
+        "cohens_d", "cohens_d_ci_low", "cohens_d_ci_high",
+        "raw_p_welch", "corrected_p_welch", "significant_welch", "marker_welch",
+        "raw_p_mwu", "corrected_p_mwu", "significant_mwu", "marker_mwu",
+        "raw_p_paired", "corrected_p_paired", "significant_paired", "marker_paired",
+    ]
     with open(out_csv, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -225,21 +469,25 @@ def main():
             writer.writerow({k: r.get(k, "") for k in fieldnames})
     print(f"Saved {out_csv} ({len(results)} rows)")
 
-    # Main results LaTeX table
+    # ------------------------------------------------------------------
+    # Output: main_results.tex
+    # ------------------------------------------------------------------
     out_tex = os.path.join(args.out, "main_results.tex")
     with open(out_tex, "w") as f:
-        f.write("% Main results: mean [95% bootstrap CI] with Holm-Bonferroni significance vs DRPPO\n")
+        f.write("% Main results: mean [95\\% bootstrap CI] "
+                "with Holm-Bonferroni significance vs DRPPO\n")
         f.write("\\begin{table*}[ht]\n\\centering\n")
-        f.write("\\caption{Main comparison. Significance vs.\\ DRPPO with Holm-Bonferroni correction.}\n")
+        f.write("\\caption{Main comparison. Significance vs.\\ "
+                "DRPPO with Holm-Bonferroni correction.}\n")
         f.write("\\label{tab:main_results}\n")
-        f.write("\\begin{tabular}{l" + "c" * len(metrics) + "}\n\\toprule\n")
-        f.write("Method & " + " & ".join(metric_labels.get(m, m) for m in metrics) + " \\\\\n\\midrule\n")
+        f.write("\\begin{tabular}{l" + "c" * len(available_metrics) + "}\n\\toprule\n")
+        f.write("Method & " + " & ".join(
+            METRIC_LABELS.get(m, m) for m in available_metrics) + " \\\\\n\\midrule\n")
 
-        for method in methods:
-            row = method_labels.get(method, method)
-            for metric in metrics:
-                if method == baseline:
-                    # Baseline: just show mean [CI]
+        for method in ALL_METHODS:
+            row = METHOD_LABELS.get(method, method)
+            for metric in available_metrics:
+                if method == BASELINE:
                     if method_col:
                         vals = df[df[method_col] == method][metric].dropna().values
                     else:
@@ -251,11 +499,14 @@ def main():
                     else:
                         row += " & --"
                 else:
-                    matching = [r for r in results if r["method"] == method and r["metric"] == metric]
+                    matching = [r for r in results if r["method"] == method
+                                and r["metric"] == metric]
                     if matching:
-                        r = matching[0]
-                        marker = r.get("marker", "")
-                        row += f" & ${r['mean']:.2f}$ [${r['ci_low']:.2f}, {r['ci_high']:.2f}$] {marker}"
+                        # Aggregate across scenarios: use first or average
+                        r0 = matching[0]
+                        marker = r0.get("marker_welch", "")
+                        row += (f" & ${r0['mean']:.2f}$ "
+                                f"[${r0['ci_low']:.2f}, {r0['ci_high']:.2f}$] {marker}")
                     else:
                         row += " & --"
             row += " \\\\\n"
@@ -264,33 +515,204 @@ def main():
         f.write("\\bottomrule\n\\end{tabular}\n\\end{table*}\n")
     print(f"Saved {out_tex}")
 
-    # Effect sizes table
+    # ------------------------------------------------------------------
+    # Output: effect_sizes.tex (with Cohen's d CI)
+    # ------------------------------------------------------------------
     out_effects = os.path.join(args.out, "effect_sizes.tex")
     with open(out_effects, "w") as f:
-        f.write("% Cohen's d effect sizes: PDE methods vs DRPPO\n")
+        f.write("% Cohen's d effect sizes with bootstrap CI: PDE methods vs DRPPO\n")
         f.write("\\begin{table}[ht]\n\\centering\n")
-        f.write("\\caption{Effect sizes (Cohen's $d$) vs.\\ DRPPO.}\n")
+        f.write("\\caption{Effect sizes (Cohen's $d$) vs.\\ DRPPO "
+                "with 95\\% bootstrap CI.}\n")
         f.write("\\label{tab:effect_sizes}\n")
-        f.write("\\begin{tabular}{l" + "c" * len(pde_methods) + "}\n\\toprule\n")
-        f.write("Metric & " + " & ".join(method_labels.get(m, m) for m in pde_methods) + " \\\\\n\\midrule\n")
-        for metric in metrics:
-            row = metric_labels.get(metric, metric)
-            for method in pde_methods:
-                matching = [r for r in results if r["method"] == method and r["metric"] == metric]
+        f.write("\\begin{tabular}{l" + "c" * len(PDE_METHODS) + "}\n\\toprule\n")
+        f.write("Metric & " + " & ".join(
+            METHOD_LABELS.get(m, m) for m in PDE_METHODS) + " \\\\\n\\midrule\n")
+        for metric in available_metrics:
+            row = METRIC_LABELS.get(metric, metric)
+            for method in PDE_METHODS:
+                matching = [r for r in results
+                            if r["method"] == method and r["metric"] == metric]
                 if matching and not np.isnan(matching[0]["cohens_d"]):
-                    d = matching[0]["cohens_d"]
+                    r0 = matching[0]
+                    d = r0["cohens_d"]
+                    d_lo = r0["cohens_d_ci_low"]
+                    d_hi = r0["cohens_d_ci_high"]
                     tag = ""
-                    if abs(d) < 0.2: tag = ""
-                    elif abs(d) < 0.5: tag = " (S)"
-                    elif abs(d) < 0.8: tag = " (M)"
-                    else: tag = " (L)"
-                    row += f" & ${d:+.2f}${tag}"
+                    if abs(d) < 0.2:
+                        tag = ""
+                    elif abs(d) < 0.5:
+                        tag = " (S)"
+                    elif abs(d) < 0.8:
+                        tag = " (M)"
+                    else:
+                        tag = " (L)"
+                    if np.isnan(d_lo) or np.isnan(d_hi):
+                        row += f" & ${d:+.2f}${tag}"
+                    else:
+                        row += f" & ${d:+.2f}$ [{d_lo:+.2f}, {d_hi:+.2f}]{tag}"
                 else:
                     row += " & --"
             row += " \\\\\n"
             f.write(row)
         f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
     print(f"Saved {out_effects}")
+
+    # ------------------------------------------------------------------
+    # Output: per_scenario_{metric}.tex for each metric
+    # ------------------------------------------------------------------
+    for metric in available_metrics:
+        out_per = os.path.join(args.out, f"per_scenario_{metric}.tex")
+        metric_results = [r for r in results if r["metric"] == metric]
+        if not metric_results:
+            continue
+        # Collect unique (scenario, maneuver) tuples
+        sm_pairs = sorted(set((r["scenario"], r["maneuver"]) for r in metric_results))
+        with open(out_per, "w") as f:
+            f.write(f"% Per-scenario breakdown: {METRIC_LABELS.get(metric, metric)}\n")
+            f.write("\\begin{table*}[ht]\n\\centering\n")
+            f.write(f"\\caption{{Per-scenario {METRIC_LABELS.get(metric, metric)} "
+                    f"vs.\\ DRPPO.}}\n")
+            f.write(f"\\label{{tab:per_scenario_{metric}}}\n")
+            f.write("\\begin{tabular}{ll" + "c" * len(PDE_METHODS) + "}\n\\toprule\n")
+            f.write("Scenario & Maneuver & " + " & ".join(
+                METHOD_LABELS.get(m, m) for m in PDE_METHODS) + " \\\\\n\\midrule\n")
+            for scen, man in sm_pairs:
+                row = f"{scen} & {man}"
+                for method in PDE_METHODS:
+                    match = [r for r in metric_results
+                             if r["method"] == method
+                             and r["scenario"] == scen
+                             and r["maneuver"] == man]
+                    if match:
+                        r0 = match[0]
+                        marker = r0.get("marker_welch", "")
+                        row += (f" & ${r0['mean']:.2f}$ "
+                                f"[${r0['ci_low']:.2f}, {r0['ci_high']:.2f}$] {marker}")
+                    else:
+                        row += " & --"
+                row += " \\\\\n"
+                f.write(row)
+            f.write("\\bottomrule\n\\end{tabular}\n\\end{table*}\n")
+        print(f"Saved {out_per}")
+
+    # ------------------------------------------------------------------
+    # PDE-vs-PDE comparisons: all 6 ordered pairs
+    # ------------------------------------------------------------------
+    pde_vs_pde = []
+    for metric in available_metrics:
+        for i, ma in enumerate(PDE_METHODS):
+            for j, mb in enumerate(PDE_METHODS):
+                if i == j:
+                    continue
+                for scenario, maneuver in combos:
+                    if method_col is None:
+                        va = np.array([])
+                        vb = np.array([])
+                    else:
+                        mask_a = df[method_col] == ma
+                        mask_b = df[method_col] == mb
+                        if scen_col and scenario is not None:
+                            mask_a = mask_a & (df[scen_col] == scenario)
+                            mask_b = mask_b & (df[scen_col] == scenario)
+                        if man_col and maneuver is not None:
+                            mask_a = mask_a & (df[man_col] == maneuver)
+                            mask_b = mask_b & (df[man_col] == maneuver)
+                        va = df.loc[mask_a, metric].dropna().values
+                        vb = df.loc[mask_b, metric].dropna().values
+
+                    p_pair = float("nan")
+                    if "seed" in df.columns and "eval_mode" in df.columns and method_col:
+                        mask_a2 = df[method_col] == ma
+                        mask_b2 = df[method_col] == mb
+                        if scen_col and scenario is not None:
+                            mask_a2 = mask_a2 & (df[scen_col] == scenario)
+                            mask_b2 = mask_b2 & (df[scen_col] == scenario)
+                        if man_col and maneuver is not None:
+                            mask_a2 = mask_a2 & (df[man_col] == maneuver)
+                            mask_b2 = mask_b2 & (df[man_col] == maneuver)
+                        dfa = df.loc[mask_a2].set_index(["seed", "eval_mode"])
+                        dfb = df.loc[mask_b2].set_index(["seed", "eval_mode"])
+                        common = dfa.index.intersection(dfb.index)
+                        if len(common) >= 2 and metric in dfa.columns and metric in dfb.columns:
+                            pa = dfa.loc[common, metric].dropna()
+                            pb = dfb.loc[common, metric].dropna()
+                            shared = pa.index.intersection(pb.index)
+                            if len(shared) >= 2:
+                                p_pair = compute_paired_p(
+                                    pa.loc[shared].values, pb.loc[shared].values)
+
+                    d_val = cohens_d(va, vb)
+
+                    pde_vs_pde.append({
+                        "scenario": scenario if scenario else "all",
+                        "maneuver": maneuver if maneuver else "all",
+                        "metric": metric,
+                        "method_a": ma,
+                        "method_b": mb,
+                        "raw_p_paired": p_pair,
+                        "cohens_d": d_val,
+                    })
+
+    # Apply Holm correction per metric across all PDE-vs-PDE tests
+    for metric in available_metrics:
+        subset = [r for r in pde_vs_pde if r["metric"] == metric]
+        ps = [r["raw_p_paired"] for r in subset]
+        corrected = holm_bonferroni(ps, alpha=args.alpha)
+        for r, (_, cp, sig) in zip(subset, corrected):
+            r["corrected_p_paired"] = cp
+            r["significant_paired"] = sig
+            r["marker_paired"] = significance_marker(cp)
+
+    out_pvp = os.path.join(args.out, "pde_vs_pde_comparisons.csv")
+    pvp_fields = [
+        "scenario", "maneuver", "metric", "method_a", "method_b",
+        "raw_p_paired", "corrected_p_paired", "significant_paired",
+        "marker_paired", "cohens_d",
+    ]
+    with open(out_pvp, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=pvp_fields)
+        writer.writeheader()
+        for r in pde_vs_pde:
+            writer.writerow({k: r.get(k, "") for k in pvp_fields})
+    print(f"Saved {out_pvp} ({len(pde_vs_pde)} rows)")
+
+    # ------------------------------------------------------------------
+    # Paradigm comparison: optimality-PDE vs safety-PDE
+    # ------------------------------------------------------------------
+    optimality_methods = ["hjb_aux", "soft_hjb_aux"]
+    safety_methods = ["eikonal_aux", "cbf_aux"]
+    out_paradigm = os.path.join(args.out, "paradigm_comparison.tex")
+    with open(out_paradigm, "w") as f:
+        f.write("% Paradigm comparison: Optimality-PDE "
+                "(Hard-HJB + Soft-HJB) vs Safety-PDE (Eikonal + CBF)\n")
+        f.write("\\begin{table}[ht]\n\\centering\n")
+        f.write("\\caption{Paradigm comparison: pooled optimality-PDE "
+                "vs.\\ safety-PDE.}\n")
+        f.write("\\label{tab:paradigm_comparison}\n")
+        f.write("\\begin{tabular}{lccccc}\n\\toprule\n")
+        f.write("Metric & Opt.~mean & Safety~mean & Cohen's $d$ & "
+                "$p_{\\mathrm{Welch}}$ & Sig. \\\\\n\\midrule\n")
+        for metric in available_metrics:
+            if method_col is None:
+                opt_vals = np.array([])
+                saf_vals = np.array([])
+            else:
+                opt_vals = df[df[method_col].isin(optimality_methods)][metric].dropna().values
+                saf_vals = df[df[method_col].isin(safety_methods)][metric].dropna().values
+            if len(opt_vals) < 2 or len(saf_vals) < 2:
+                f.write(f"{METRIC_LABELS.get(metric, metric)} & -- & -- & -- & -- & -- \\\\\n")
+                continue
+            opt_mean = float(np.mean(opt_vals))
+            saf_mean = float(np.mean(saf_vals))
+            d_val = cohens_d(opt_vals, saf_vals)
+            p_val = compute_single_p(opt_vals, saf_vals)
+            sig = significance_marker(p_val) if p_val == p_val else "n/a"
+            f.write(f"{METRIC_LABELS.get(metric, metric)} & "
+                    f"${opt_mean:.3f}$ & ${saf_mean:.3f}$ & "
+                    f"${d_val:+.2f}$ & ${p_val:.4f}$ & {sig} \\\\\n")
+        f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
+    print(f"Saved {out_paradigm}")
 
     print(f"\nAll tables saved to {args.out}/")
 

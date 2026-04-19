@@ -19,6 +19,9 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
     returns, coll_eps, success_eps, pothole_hits = [], [], [], []
     ttc_means, ttc_mins, ttc_p10s = [], [], []
     action_entropies, hard_brake_counts, row_violation_counts = [], [], []
+    action_counts_all = np.zeros(5, dtype=int)
+    switching_rates = []
+    decision_latencies = []
     failure_count = 0
 
     for ep in range(n_episodes):
@@ -32,6 +35,10 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
         hard_brakes = 0
         prev_ego_v = None
         row_violations = 0
+        prev_action = None
+        switches_this_ep = 0
+        zone_entry_step = None
+        first_go_step = None
 
         for step_i in range(500):
             a, _, _, _ = policy.get_action(obs, deterministic=deterministic)
@@ -50,6 +57,19 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
             nearest = info.get("nearest_agent_dist", 1e9)
             if nearest < 10.0 and a in (1, 3):
                 row_violations += 1
+
+            # Action switching
+            if prev_action is not None and a != prev_action:
+                switches_this_ep += 1
+            prev_action = a
+
+            # Decision latency: track when ego enters conflict zone and
+            # when it first chooses GO (action==3) after zone entry
+            d_cz = float(info.get("built", {}).get("s_geom", np.zeros(12))[1])
+            if zone_entry_step is None and d_cz < 1.0:
+                zone_entry_step = step_i
+            if zone_entry_step is not None and first_go_step is None and int(a) == 3:
+                first_go_step = step_i
 
             if save_failures:
                 ego = info.get("raw_obs", {}).get("ego", {})
@@ -108,6 +128,32 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
         hard_brake_counts.append(hard_brakes)
         row_violation_counts.append(row_violations)
 
+        # Accumulate action counts
+        for act in actions_this_ep:
+            if 0 <= act < 5:
+                action_counts_all[act] += 1
+
+        # Switching rate for this episode
+        n_steps_ep = len(actions_this_ep)
+        if n_steps_ep > 1:
+            switching_rates.append(switches_this_ep / (n_steps_ep - 1))
+        else:
+            switching_rates.append(0.0)
+
+        # Decision latency for this episode
+        if zone_entry_step is not None and first_go_step is not None:
+            decision_latencies.append(float(first_go_step - zone_entry_step))
+        else:
+            decision_latencies.append(float("nan"))
+
+    total_actions = int(action_counts_all.sum())
+    if total_actions > 0:
+        action_fracs = action_counts_all / total_actions
+    else:
+        action_fracs = np.zeros(5)
+
+    valid_latencies = [v for v in decision_latencies if v == v]
+
     return {
         "mean_return": float(np.mean(returns)),
         "std_return": float(np.std(returns)),
@@ -120,6 +166,14 @@ def eval_model(env, policy, n_episodes: int, deterministic: bool, seed: int,
         "action_entropy_mean": float(np.mean(action_entropies)),
         "hard_brakes_per_ep_mean": float(np.mean(hard_brake_counts)),
         "row_violations_per_ep_mean": float(np.mean(row_violation_counts)),
+        "action_stop_frac": float(action_fracs[0]),
+        "action_creep_frac": float(action_fracs[1]),
+        "action_yield_frac": float(action_fracs[2]),
+        "action_go_frac": float(action_fracs[3]),
+        "action_abort_frac": float(action_fracs[4]),
+        "switching_rate_mean": float(np.mean(switching_rates)),
+        "decision_latency_mean": float(np.mean(valid_latencies)) if valid_latencies else float("nan"),
+        "decision_latency_frac_defined": float(len(valid_latencies) / max(len(decision_latencies), 1)),
     }
 
 
@@ -127,9 +181,11 @@ def main():
     eval_start_time = time.time()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--checkpoint", required=True)
+    parser.add_argument("--checkpoint", default=None,
+                        help="Path to model checkpoint (not required for rule_based)")
     parser.add_argument("--method", required=True,
-                        choices=["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"])
+                        choices=["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux",
+                                 "drppo", "rule_based"])
     parser.add_argument("--episodes", type=int, default=100,
                         help="Eval episodes per seed per mode (3 seeds x 100 eps x 2 modes = 600 total)")
     parser.add_argument("--out_dir", default="results/pde")
@@ -164,22 +220,28 @@ def main():
                   state_ablation=args.state_ablation)
     obs_dim = int(env.observation_space.shape[0])
 
-    if args.method == "hjb_aux":
-        from models.pde.hjb_aux_agent import HJBAuxAgent
-        policy = HJBAuxAgent(obs_dim=obs_dim, device=device)
-    elif args.method == "soft_hjb_aux":
-        from models.pde.soft_hjb_aux_agent import SoftHJBAuxAgent
-        policy = SoftHJBAuxAgent(obs_dim=obs_dim, device=device)
-    elif args.method == "eikonal_aux":
-        from models.pde.eikonal_aux_agent import EikonalAuxAgent
-        policy = EikonalAuxAgent(obs_dim=obs_dim, device=device)
-    elif args.method == "cbf_aux":
-        from models.pde.cbf_aux_agent import CBFAuxAgent
-        policy = CBFAuxAgent(obs_dim=obs_dim, device=device)
-    elif args.method == "drppo":
-        from models.drppo import DRPPO
-        policy = DRPPO(obs_dim=obs_dim, device=device)
-    policy.load(args.checkpoint)
+    if args.method == "rule_based":
+        from models.rule_based_policy import RuleBasedTTCPolicy
+        policy = RuleBasedTTCPolicy(obs_dim=obs_dim, device=device)
+    else:
+        if args.checkpoint is None:
+            parser.error(f"--checkpoint is required for method '{args.method}'")
+        if args.method == "hjb_aux":
+            from models.pde.hjb_aux_agent import HJBAuxAgent
+            policy = HJBAuxAgent(obs_dim=obs_dim, device=device)
+        elif args.method == "soft_hjb_aux":
+            from models.pde.soft_hjb_aux_agent import SoftHJBAuxAgent
+            policy = SoftHJBAuxAgent(obs_dim=obs_dim, device=device)
+        elif args.method == "eikonal_aux":
+            from models.pde.eikonal_aux_agent import EikonalAuxAgent
+            policy = EikonalAuxAgent(obs_dim=obs_dim, device=device)
+        elif args.method == "cbf_aux":
+            from models.pde.cbf_aux_agent import CBFAuxAgent
+            policy = CBFAuxAgent(obs_dim=obs_dim, device=device)
+        elif args.method == "drppo":
+            from models.drppo import DRPPO
+            policy = DRPPO(obs_dim=obs_dim, device=device)
+        policy.load(args.checkpoint)
 
     os.makedirs(args.out_dir, exist_ok=True)
     fail_dir = os.path.join(args.out_dir, "failures") if args.save_failures else None
@@ -203,7 +265,11 @@ def main():
               "collision_rate", "success_rate", "pothole_hits_mean",
               "mean_ttc", "min_ttc", "ttc_p10_mean",
               "action_entropy_mean", "hard_brakes_per_ep_mean",
-              "row_violations_per_ep_mean"]
+              "row_violations_per_ep_mean",
+              "action_stop_frac", "action_creep_frac", "action_yield_frac",
+              "action_go_frac", "action_abort_frac",
+              "switching_rate_mean", "decision_latency_mean",
+              "decision_latency_frac_defined"]
     with open(csv_path, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(header)
@@ -214,7 +280,7 @@ def main():
     # Eval provenance metadata
     eval_meta = {
         "method": args.method,
-        "checkpoint_path": args.checkpoint,
+        "checkpoint_path": args.checkpoint if args.checkpoint else "N/A (rule_based)",
         "scenario": args.scenario,
         "ego_maneuver": args.ego_maneuver,
         "no_buildings": args.no_buildings,

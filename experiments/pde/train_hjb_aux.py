@@ -129,6 +129,10 @@ def main():
     step = 0
     ep_returns = []
     next_log_step = 0
+    ckpt_frac = [0.5, 0.75, 1.0]
+    ckpt_steps = [int(args.total_steps * f) for f in ckpt_frac]
+    next_ckpt_idx = 0
+    intermediate_ckpts = {}
 
     while step < args.total_steps:
         t_iter_start = time.time()
@@ -152,6 +156,14 @@ def main():
                 )
 
         train_time = time.time() - t_iter_start
+
+        while next_ckpt_idx < len(ckpt_steps) and step >= ckpt_steps[next_ckpt_idx]:
+            ck_step = ckpt_steps[next_ckpt_idx]
+            ck_path = os.path.join(args.out_dir,
+                f"model_hjb_aux_{args.scenario}_{args.ego_maneuver}_step{ck_step}.pt")
+            policy.save(ck_path)
+            intermediate_ckpts[ck_step] = ck_path
+            next_ckpt_idx += 1
 
         if step >= next_log_step:
             eval_returns = []
@@ -202,6 +214,52 @@ def main():
     policy.save(ckpt_path)
     print(f"Saved hjb_aux to {ckpt_path}")
 
+    intermediate_ckpts["final"] = ckpt_path
+
+    if args.total_steps >= 50_000 and len(intermediate_ckpts) > 1:
+        import shutil
+        print("\nRunning post-training checkpoint selection (30 eps each)...")
+        best_score = -np.inf
+        best_ckpt = ckpt_path
+        best_step = "final"
+        final_score_val = None
+        for ck_step, ck_path_i in intermediate_ckpts.items():
+            tmp_policy = type(policy)(obs_dim=obs_dim, device=device)
+            tmp_policy.load(ck_path_i)
+            ck_returns = []
+            ck_colls = 0
+            for ep in range(30):
+                eval_seed_ck = (args.seed or 0) + 100_000 + ep
+                obs_c, _ = eval_env.reset(seed=eval_seed_ck)
+                tmp_policy.reset_hidden()
+                ep_r, ep_c = 0.0, 0
+                for _ in range(500):
+                    a_c, _, _, _ = tmp_policy.get_action(obs_c, deterministic=True)
+                    obs_c, r_c, term_c, trunc_c, info_c = eval_env.step(a_c)
+                    ep_r += r_c
+                    if info_c.get("collision", False):
+                        ep_c = 1; break
+                    if term_c or trunc_c: break
+                ck_returns.append(ep_r)
+                ck_colls += ep_c
+            mean_r = np.mean(ck_returns)
+            coll_rate = ck_colls / 30
+            score = -coll_rate * 100 + mean_r
+            print(f"  step={ck_step}: return={mean_r:+.2f}, coll={coll_rate:.2f}, score={score:.2f}")
+            if ck_step == "final":
+                final_score_val = score
+            if score > best_score:
+                best_score = score
+                best_ckpt = ck_path_i
+                best_step = ck_step
+
+        SWAP_MARGIN = 1.0
+        if best_ckpt != ckpt_path and final_score_val is not None and (best_score - final_score_val) > SWAP_MARGIN:
+            shutil.copy(best_ckpt, ckpt_path)
+            print(f"  Best: step={best_step} (margin={best_score - final_score_val:.2f}). Copied to {ckpt_path}")
+        else:
+            print(f"  Keeping final checkpoint (best_step={best_step}, margin={best_score - (final_score_val or best_score):.2f})")
+
     # Provenance metadata
     meta = {
         "method": "hjb_aux",
@@ -220,6 +278,8 @@ def main():
         "start_time": start_time_iso,
         "wall_time_seconds": time.time() - script_start_time,
     }
+    meta["best_checkpoint_step"] = best_step if args.total_steps >= 50_000 else "final"
+    meta["best_checkpoint_score"] = float(best_score) if args.total_steps >= 50_000 else float("nan")
     try:
         meta["git_hash"] = subprocess.check_output(
             ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL
