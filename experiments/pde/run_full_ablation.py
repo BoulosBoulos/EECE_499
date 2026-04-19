@@ -395,8 +395,14 @@ def main():
                     print(f"  [FAIL] {tag} (exit {ret})")
             active = still_active
 
-        out_dir_idx = job["cmd_train"].index("--out_dir") + 1
-        job_out_dir = job["cmd_train"][out_dir_idx]
+        # Resolve out_dir from the correct command (cmd_train is None for
+        # eval-only jobs: rule_based and Tier 4 held-out evaluations)
+        if job["cmd_train"] is None:
+            out_dir_idx = job["cmd_eval"].index("--out_dir") + 1
+            job_out_dir = job["cmd_eval"][out_dir_idx]
+        else:
+            out_dir_idx = job["cmd_train"].index("--out_dir") + 1
+            job_out_dir = job["cmd_train"][out_dir_idx]
         os.makedirs(job_out_dir, exist_ok=True)
         log_path = os.path.join(job_out_dir, "stdout.log")
         # Chain train then eval in one shell command
