@@ -147,11 +147,11 @@ class SumoEnv(_make_gym()):
         self._stem_len, self._bar_len = 60.0, 50.0
         self._load_dims()
 
-        self._state_dim = 6 + 12 + 6 + 5 * 22
+        # Always include pothole slot (+1) so obs_dim is invariant across scenarios.
+        # Sentinel=100.0 in non-pothole scenarios (matches PDE state convention).
+        self._state_dim = 6 + 12 + 6 + 5 * 22 + 1  # = 135
         if use_intent:
-            self._state_dim += 5 * 6
-        if self._has_pothole:
-            self._state_dim += 1
+            self._state_dim += 5 * 6  # = 165 with intent
         if spaces:
             self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(self._state_dim,), dtype=np.float32)
         else:
@@ -991,6 +991,8 @@ class SumoEnv(_make_gym()):
         if self._has_pothole:
             raw["d_pothole"] = self._dist_to_pothole(ego["p"])
             raw["in_pothole"] = self._in_pothole(ego["p"])
+        else:
+            raw["d_pothole"] = 100.0  # sentinel for non-pothole scenarios
         return raw
 
     def _update_agent_history(self, raw: dict, built: dict):
@@ -1073,8 +1075,9 @@ class SumoEnv(_make_gym()):
         extras = []
         if self.use_intent:
             extras.append(self._get_intent_features(built, raw))
-        if self._has_pothole:
-            extras.append(np.array([raw.get("d_pothole", 100.0)], dtype=np.float32))
+        # Always append d_pothole (sentinel=100.0 in non-pothole scenarios)
+        # for cross-scenario obs_dim invariance.
+        extras.append(np.array([raw.get("d_pothole", 100.0)], dtype=np.float32))
         if extras:
             state = np.concatenate([state] + extras)
         return state
