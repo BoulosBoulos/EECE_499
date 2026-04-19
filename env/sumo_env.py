@@ -458,7 +458,7 @@ class SumoEnv(_make_gym()):
                 except Exception:
                     pass
 
-        # Dense: spawn second car
+        # Insurance car (always spawned when available)
         if bcfg.car2 and self._has_car:
             cb2 = bcfg.car2
             route_id = self._ensure_route(f"car2_{cb2.maneuver}", cb2.route_edges)
@@ -478,7 +478,7 @@ class SumoEnv(_make_gym()):
             except Exception:
                 pass
 
-        # Dense: spawn second pedestrian
+        # Insurance pedestrian (always spawned when available)
         if bcfg.pedestrian2 and self._has_ped:
             pb2 = bcfg.pedestrian2
             try:
@@ -494,6 +494,65 @@ class SumoEnv(_make_gym()):
                 traci.person.add("ped1", from_edge2, pos=dep_pos2, depart=pb2.depart_time)
                 traci.person.appendWalkingStage("ped1", [from_edge2, to_edge2], arrivalPos=-1)
                 traci.person.setSpeed("ped1", pb2.ped_speed)
+            except Exception:
+                pass
+
+        # Third car (dense only)
+        if getattr(bcfg, 'car3', None) and self._has_car:
+            cb3 = bcfg.car3
+            route_id = self._ensure_route(f"car3_{cb3.maneuver}", cb3.route_edges)
+            first_edge = cb3.route_edges.split()[0]
+            dep_pos_str = _clamp_depart_pos(
+                cb3.depart_pos if cb3.depart_pos is not None else 0.0,
+                first_edge, self._bar_len - 2.0,
+            )
+            traci.vehicle.add("other3", route_id, depart=str(cb3.depart_time),
+                              typeID="CarOther", departPos=dep_pos_str)
+            try:
+                traci.vehicle.setMaxSpeed("other3", cb3.max_speed)
+                traci.vehicle.setAccel("other3", cb3.accel)
+                traci.vehicle.setDecel("other3", cb3.decel)
+                traci.vehicle.setTau("other3", cb3.tau)
+                traci.vehicle.setImperfection("other3", cb3.sigma)
+            except Exception:
+                pass
+
+        # Third pedestrian (dense only)
+        if getattr(bcfg, 'pedestrian3', None) and self._has_ped:
+            pb3 = bcfg.pedestrian3
+            try:
+                edges3 = pb3.route_edges.split()
+                from_edge3 = edges3[0] if edges3 else "left_in"
+                to_edge3 = edges3[-1] if len(edges3) > 1 else "right_out"
+                dep_pos3 = pb3.depart_pos if pb3.depart_pos is not None else 0.0
+                try:
+                    edge_len = traci.lane.getLength(f"{from_edge3}_0")
+                    dep_pos3 = float(np.clip(dep_pos3, 0.0, max(0.0, edge_len - 1.0)))
+                except Exception:
+                    dep_pos3 = float(np.clip(dep_pos3, 0.0, max(0.0, self._bar_len - 2.0)))
+                traci.person.add("ped2", from_edge3, pos=dep_pos3, depart=pb3.depart_time)
+                traci.person.appendWalkingStage("ped2", [from_edge3, to_edge3], arrivalPos=-1)
+                traci.person.setSpeed("ped2", pb3.ped_speed)
+            except Exception:
+                pass
+
+        # Insurance motorcycle
+        if getattr(bcfg, 'motorcycle2', None) and self._has_moto:
+            mb2 = bcfg.motorcycle2
+            route_id = self._ensure_route(f"moto2_{mb2.maneuver}", mb2.route_edges)
+            first_edge = mb2.route_edges.split()[0]
+            dep_pos_str = _clamp_depart_pos(
+                mb2.depart_pos if mb2.depart_pos is not None else 0.0,
+                first_edge, self._bar_len - 2.0,
+            )
+            traci.vehicle.add("motorcyclist2", route_id, depart=str(mb2.depart_time),
+                              typeID="Motorcycle", departPos=dep_pos_str)
+            try:
+                traci.vehicle.setMaxSpeed("motorcyclist2", mb2.max_speed)
+                traci.vehicle.setAccel("motorcyclist2", mb2.accel)
+                traci.vehicle.setDecel("motorcyclist2", mb2.decel)
+                traci.vehicle.setTau("motorcyclist2", mb2.tau)
+                traci.vehicle.setImperfection("motorcyclist2", mb2.sigma)
             except Exception:
                 pass
 

@@ -97,9 +97,12 @@ class BehaviorConfig:
     """Full per-episode behavior configuration."""
     car: Optional[ActorBehavior] = None
     car2: Optional[ActorBehavior] = None
+    car3: Optional[ActorBehavior] = None
     pedestrian: Optional[ActorBehavior] = None
     pedestrian2: Optional[ActorBehavior] = None
+    pedestrian3: Optional[ActorBehavior] = None
     motorcycle: Optional[ActorBehavior] = None
+    motorcycle2: Optional[ActorBehavior] = None
     pothole: Optional[PotholeConfig] = None
     # Ground-truth labels for intent model training
     car_intent_label: int = 0       # 0=yield/stop, 1=proceed, 2=turn
@@ -215,10 +218,9 @@ class BehaviorSampler:
         Returns (depart_time, depart_pos) for the other agent.
         """
         ego_eta = ego_approach_dist / max(ego_approach_speed, 1.0)
-        # Agent arrives within [-2s, +3s] of ego:
-        #   negative = agent arrives before ego (ego must yield)
-        #   positive = agent arrives after ego (ego can go)
-        conflict_offset = self.rng.uniform(-2.0, 3.0)
+        # Primary agent: tight window around competent ego arrival.
+        # Insurance agent (separate method) covers slower ego speeds.
+        conflict_offset = self.rng.uniform(-1.5, 1.5)
         agent_eta = ego_eta + conflict_offset
 
         depart_time = 0.5 + self.rng.uniform(0, 1.0)
@@ -227,6 +229,29 @@ class BehaviorSampler:
         depart_pos = max(0, bar_len - travel_dist - 5.0)
         depart_pos = float(np.clip(depart_pos, 0.0, bar_len - 5.0))
 
+        return depart_time, depart_pos
+
+    def _compute_insurance_spawn(
+        self,
+        ego_approach_dist: float,
+        ego_approach_speed: float,
+        agent_approach_dist: float,
+        agent_speed: float,
+        bar_len: float,
+    ) -> tuple[float, float]:
+        """Compute depart_time/depart_pos for the INSURANCE agent.
+
+        Timed for a slower ego (~1/3 competent speed) to catch episodes
+        where the ego policy is early in training and moves at ~2 m/s.
+        """
+        slow_ego_eta = ego_approach_dist / max(ego_approach_speed / 3.0, 1.0)
+        insurance_offset = self.rng.uniform(-2.0, 2.0)
+        agent_eta = slow_ego_eta + insurance_offset
+        depart_time = 2.0 + self.rng.uniform(0, 1.5)
+        travel_time_needed = max(0.5, agent_eta - depart_time)
+        travel_dist = agent_speed * travel_time_needed
+        depart_pos = max(0, bar_len - travel_dist - 5.0)
+        depart_pos = float(np.clip(depart_pos, 0.0, bar_len - 5.0))
         return depart_time, depart_pos
 
     def _conflicting_agent_routes(self, ego_maneuver: str) -> dict:
@@ -298,8 +323,8 @@ class BehaviorSampler:
             moto_style_pool = MOTO_STYLES
 
         if has_car:
-            # 70% conflict route, 30% any route
-            if self.rng.uniform() < 0.7 and conflict_routes.get("car"):
+            # 90% conflict route for higher interaction density
+            if self.rng.uniform() < 0.9 and conflict_routes.get("car"):
                 maneuver = self.rng.choice(conflict_routes["car"])
             else:
                 maneuver = self.rng.choice(CAR_MANEUVERS)
@@ -329,29 +354,55 @@ class BehaviorSampler:
             cfg.car_intent_label = CAR_INTENT_LABELS.get(maneuver, 1)
             cfg.car_style_label = CAR_STYLE_LABELS.get(style, 1)
 
-            # Dense: spawn second car on a different conflict route
-            if dense and len(conflict_routes.get("car", [])) > 1:
+            # ALWAYS spawn insurance car (car2) — catches slow-ego episodes
+            if len(conflict_routes.get("car", [])) > 1:
                 man2_choices = [m for m in conflict_routes["car"] if m != maneuver]
                 man2 = self.rng.choice(man2_choices) if man2_choices else self.rng.choice(CAR_MANEUVERS)
-                style2 = self.rng.choice(car_style_pool)
-                sp2 = CAR_STYLE_PARAMS[style2]
-                dep2, dpos2 = self._compute_conflict_spawn(
+            else:
+                man2 = maneuver
+            style2 = self.rng.choice(car_style_pool)
+            sp2 = CAR_STYLE_PARAMS[style2]
+            dep2, dpos2 = self._compute_insurance_spawn(
+                ego_approach_dist=ego_approach_dist,
+                ego_approach_speed=ego_approach_speed,
+                agent_approach_dist=bar_len - 5.0,
+                agent_speed=sp2["max_speed"],
+                bar_len=bar_len,
+            )
+            cfg.car2 = ActorBehavior(
+                maneuver=man2, style=style2,
+                route_edges=CAR_ROUTES[man2],
+                depart_time=dep2,
+                depart_pos=dpos2,
+                max_speed=sp2["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
+                accel=sp2["accel"], decel=sp2["decel"],
+                sigma=sp2["sigma"], tau=sp2["tau"],
+                jm_ignore=jm_ignore_fixed if jm_ignore_fixed is not None else sp2["jm"],
+                color="0.8,0,0",
+            )
+
+            # Dense: third car at medium-speed timing
+            if dense:
+                man3 = self.rng.choice(conflict_routes.get("car", CAR_MANEUVERS))
+                style3 = self.rng.choice(car_style_pool)
+                sp3 = CAR_STYLE_PARAMS[style3]
+                dep3, dpos3 = self._compute_conflict_spawn(
                     ego_approach_dist=ego_approach_dist,
-                    ego_approach_speed=ego_approach_speed,
+                    ego_approach_speed=ego_approach_speed * 0.6,
                     agent_approach_dist=bar_len - 5.0,
-                    agent_speed=sp2["max_speed"],
+                    agent_speed=sp3["max_speed"],
                     bar_len=bar_len,
                 )
-                cfg.car2 = ActorBehavior(
-                    maneuver=man2, style=style2,
-                    route_edges=CAR_ROUTES[man2],
-                    depart_time=dep2 + 1.0,  # offset to avoid overlap
-                    depart_pos=dpos2,
-                    max_speed=sp2["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
-                    accel=sp2["accel"], decel=sp2["decel"],
-                    sigma=sp2["sigma"], tau=sp2["tau"],
-                    jm_ignore=jm_ignore_fixed if jm_ignore_fixed is not None else sp2["jm"],
-                    color="0.8,0,0",
+                cfg.car3 = ActorBehavior(
+                    maneuver=man3, style=style3,
+                    route_edges=CAR_ROUTES[man3],
+                    depart_time=dep3 + 0.5,
+                    depart_pos=dpos3,
+                    max_speed=sp3["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
+                    accel=sp3["accel"], decel=sp3["decel"],
+                    sigma=sp3["sigma"], tau=sp3["tau"],
+                    jm_ignore=jm_ignore_fixed if jm_ignore_fixed is not None else sp3["jm"],
+                    color="0.6,0,0",
                 )
 
         if has_ped:
@@ -383,32 +434,54 @@ class BehaviorSampler:
             cfg.ped_intent_label = PED_INTENT_LABELS.get(maneuver, 1)
             cfg.ped_style_label = PED_STYLE_LABELS.get(style, 1)
 
-            # Dense: spawn second pedestrian from opposite direction
+            # ALWAYS spawn insurance pedestrian (ped2) from opposite direction
+            man2 = "cross_right_left" if maneuver == "cross_left_right" else "cross_left_right"
+            style2 = self.rng.choice(ped_style_pool)
+            sp2 = PED_STYLE_PARAMS[style2]
+            # Insurance ped: timed for slower ego (~1/3 speed)
+            slow_ego_eta = (ego_approach_dist - self.rng.uniform(5.0, 15.0)) / max(ego_approach_speed / 3.0, 1.0)
+            dep_time2 = 2.0 + self.rng.uniform(0, 1.0)
+            trav_time2 = max(0.5, slow_ego_eta - dep_time2)
+            trav_dist2 = sp2["speed"] * trav_time2
+            dep_pos2 = max(0, safe_len - trav_dist2 - 3.0)
+            dep_pos2 = float(np.clip(dep_pos2, 0.0, safe_len - 2.0))
+            cfg.pedestrian2 = ActorBehavior(
+                maneuver=man2, style=style2,
+                route_edges=f"{'left_in' if 'left_right' in man2 else 'right_out'} {'right_out' if 'left_right' in man2 else 'left_in'}",
+                depart_time=dep_time2,
+                depart_pos=dep_pos2,
+                ped_speed=sp2["speed"],
+                stop_midway=sp2["stop_midway"],
+                stop_duration=self.rng.uniform(2, 5) if sp2["stop_midway"] else 0,
+                hesitant=sp2["hesitant"],
+                color="0,0.7,0",
+            )
+
+            # Dense: third pedestrian at medium timing
             if dense:
-                man2 = "cross_right_left" if maneuver == "cross_left_right" else "cross_left_right"
-                style2 = self.rng.choice(ped_style_pool)
-                sp2 = PED_STYLE_PARAMS[style2]
-                ego_close_dist2 = self.rng.uniform(5.0, 15.0)
-                ego_eta2 = (ego_approach_dist - ego_close_dist2) / max(ego_approach_speed, 1.0)
-                dep_time2 = 0.5 + self.rng.uniform(0, 0.5)
-                trav_time2 = max(0.5, ego_eta2 - dep_time2)
-                trav_dist2 = sp2["speed"] * trav_time2
-                dep_pos2 = max(0, safe_len - trav_dist2 - 3.0)
-                dep_pos2 = float(np.clip(dep_pos2, 0.0, safe_len - 2.0))
-                cfg.pedestrian2 = ActorBehavior(
-                    maneuver=man2, style=style2,
-                    route_edges=f"{'left_in' if 'left_right' in man2 else 'right_out'} {'right_out' if 'left_right' in man2 else 'left_in'}",
-                    depart_time=dep_time2 + 1.0,
-                    depart_pos=dep_pos2,
-                    ped_speed=sp2["speed"],
-                    stop_midway=sp2["stop_midway"],
-                    stop_duration=self.rng.uniform(2, 5) if sp2["stop_midway"] else 0,
-                    hesitant=sp2["hesitant"],
-                    color="0,0.7,0",
+                man3 = self.rng.choice(PED_MANEUVERS)
+                style3 = self.rng.choice(ped_style_pool)
+                sp3 = PED_STYLE_PARAMS[style3]
+                mid_ego_eta = (ego_approach_dist - self.rng.uniform(5.0, 15.0)) / max(ego_approach_speed * 0.6, 1.0)
+                dep_time3 = 1.0 + self.rng.uniform(0, 1.0)
+                trav_time3 = max(0.5, mid_ego_eta - dep_time3)
+                trav_dist3 = sp3["speed"] * trav_time3
+                dep_pos3 = max(0, safe_len - trav_dist3 - 3.0)
+                dep_pos3 = float(np.clip(dep_pos3, 0.0, safe_len - 2.0))
+                cfg.pedestrian3 = ActorBehavior(
+                    maneuver=man3, style=style3,
+                    route_edges=f"{'left_in' if 'left_right' in man3 else 'right_out'} {'right_out' if 'left_right' in man3 else 'left_in'}",
+                    depart_time=dep_time3,
+                    depart_pos=dep_pos3,
+                    ped_speed=sp3["speed"],
+                    stop_midway=sp3["stop_midway"],
+                    stop_duration=self.rng.uniform(2, 5) if sp3["stop_midway"] else 0,
+                    hesitant=sp3["hesitant"],
+                    color="0,0.5,0",
                 )
 
         if has_moto:
-            if self.rng.uniform() < 0.7 and conflict_routes.get("moto"):
+            if self.rng.uniform() < 0.9 and conflict_routes.get("moto"):
                 maneuver = self.rng.choice(conflict_routes["moto"])
             else:
                 maneuver = self.rng.choice(MOTO_MANEUVERS)
@@ -437,6 +510,29 @@ class BehaviorSampler:
             )
             cfg.moto_intent_label = MOTO_INTENT_LABELS.get(maneuver, 1)
             cfg.moto_style_label = MOTO_STYLE_LABELS.get(style, 1)
+
+            # ALWAYS spawn insurance motorcycle (moto2)
+            man2_m = self.rng.choice(conflict_routes.get("moto", MOTO_MANEUVERS))
+            style2_m = self.rng.choice(moto_style_pool)
+            sp2_m = MOTO_STYLE_PARAMS[style2_m]
+            dep2_m, dpos2_m = self._compute_insurance_spawn(
+                ego_approach_dist=ego_approach_dist,
+                ego_approach_speed=ego_approach_speed,
+                agent_approach_dist=bar_len - 5.0,
+                agent_speed=sp2_m["max_speed"],
+                bar_len=bar_len,
+            )
+            cfg.motorcycle2 = ActorBehavior(
+                maneuver=man2_m, style=style2_m,
+                route_edges=MOTO_ROUTES[man2_m],
+                depart_time=dep2_m,
+                depart_pos=dpos2_m,
+                max_speed=sp2_m["max_speed"] * (0.9 + self.rng.uniform(0, 0.2)),
+                accel=sp2_m["accel"], decel=sp2_m["decel"],
+                sigma=sp2_m["sigma"], tau=sp2_m["tau"],
+                jm_ignore=jm_ignore_fixed if jm_ignore_fixed is not None else sp2_m["jm"],
+                color="0.8,0.4,0",
+            )
 
         if has_pothole:
             cx = self.rng.uniform(-2, 5)
