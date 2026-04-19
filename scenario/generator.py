@@ -168,18 +168,23 @@ class ScenarioGenerator:
             f.write('</additional>\n')
 
         add_parts = [os.path.basename(ground_path)]
+        ox, oy = _parse_net_offset(net_path)
+
         if has_pothole:
+            # Apply netOffset so the pothole renders in correct SUMO frame
+            pot_corners = [(-4 + ox, -2 + oy), (4 + ox, -2 + oy),
+                           (4 + ox, 2 + oy), (-4 + ox, 2 + oy)]
+            pot_shape = " ".join(f"{x:.2f},{y:.2f}" for x, y in pot_corners)
             poly_path = os.path.join(output_dir, "t_pothole.poly.xml")
             with open(poly_path, "w") as f:
                 f.write('<?xml version="1.0" encoding="UTF-8"?>\n<additional>\n')
-                f.write('  <poly id="pothole" type="pothole" color="1.0,0.3,0.1" fill="1" layer="5" '
-                        'shape="-4,-2 4,-2 4,2 -4,2" lineWidth="0.3"/>\n')
+                f.write(f'  <poly id="pothole" type="pothole" color="1.0,0.3,0.1" fill="1" layer="5" '
+                        f'shape="{pot_shape}" lineWidth="0.3"/>\n')
                 f.write('</additional>\n')
             add_parts.append(os.path.basename(poly_path))
 
         # Building polygons — four corners flanking the T-intersection
         # Inner margin is scenario-dependent: wider for pedestrian scenarios (sidewalks)
-        ox, oy = _parse_net_offset(net_path)
         _ped_scenarios = {"1b", "2", "3", "4", "2_dense", "3_dense", "4_dense"}
         inner = 11.0 if scenario_name in _ped_scenarios else 8.0
         OUTER, FAR = 30.0, 20.0
