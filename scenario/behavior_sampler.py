@@ -255,15 +255,21 @@ class BehaviorSampler:
         return depart_time, depart_pos
 
     def _conflicting_agent_routes(self, ego_maneuver: str) -> dict:
-        """Return agent route keys that create meaningful conflict with the ego."""
+        """Return agent route keys that create meaningful conflict with the ego.
+
+        For stem maneuvers, moto conflict routes include turn_into_stem
+        (right_in -> stem_out) as a "linger" route — the moto turns into
+        the stem and stays near the ego's path, instead of zooming straight
+        through. Without it, 1c interaction rates fall to ~40%.
+        """
         conflicts = {
             "stem_right": {
                 "car": ["straight_left_right", "straight_right_left", "turn_left"],
-                "moto": ["straight_right_left", "straight_left_right"],
+                "moto": ["straight_right_left", "straight_left_right", "turn_into_stem"],
             },
             "stem_left": {
                 "car": ["straight_right_left", "straight_left_right", "turn_right"],
-                "moto": ["straight_right_left", "straight_left_right"],
+                "moto": ["straight_right_left", "straight_left_right", "turn_into_stem"],
             },
             "right_left": {
                 "car": ["turn_left", "turn_right"],
@@ -511,8 +517,16 @@ class BehaviorSampler:
             cfg.moto_intent_label = MOTO_INTENT_LABELS.get(maneuver, 1)
             cfg.moto_style_label = MOTO_STYLE_LABELS.get(style, 1)
 
-            # ALWAYS spawn insurance motorcycle (moto2)
-            man2_m = self.rng.choice(conflict_routes.get("moto", MOTO_MANEUVERS))
+            # ALWAYS spawn insurance motorcycle (moto2) on a DIFFERENT conflict
+            # route than the primary. Without this exclusion, 50% of episodes
+            # have both motos on the same route (convoy, not conflict) and the
+            # interaction rate ceilings at ~53%.
+            moto_conflict = conflict_routes.get("moto", [])
+            if len(moto_conflict) > 1:
+                man2_choices = [m for m in moto_conflict if m != maneuver]
+                man2_m = self.rng.choice(man2_choices) if man2_choices else self.rng.choice(MOTO_MANEUVERS)
+            else:
+                man2_m = maneuver if moto_conflict else self.rng.choice(MOTO_MANEUVERS)
             style2_m = self.rng.choice(moto_style_pool)
             sp2_m = MOTO_STYLE_PARAMS[style2_m]
             dep2_m, dpos2_m = self._compute_insurance_spawn(
