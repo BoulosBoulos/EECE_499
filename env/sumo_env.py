@@ -200,25 +200,31 @@ class SumoEnv(_make_gym()):
     def _build_occlusion_templates(self):
         """Return occlusion polygon templates in the (0,0)-centered scenario frame.
 
+        Four corner buildings (NW, NE, SW, SE) flanking the T-intersection.
+        Inner margin = 8.0 m (road half-width + curb buffer).
         These are NOT in SUMO coordinates. The offset is applied in
-        _init_occlusion_geometry() after SUMO starts and the junction
-        position can be queried via TraCI.
+        _init_occlusion_geometry() after SUMO starts.
         """
         if not self._buildings_enabled:
             return []
+
+        INNER = 8.0    # inner margin from junction center
+        OUTER = 30.0   # building depth from junction
+        FAR = 20.0     # building width perpendicular to road
+
         return [
-            {
-                "name": "building_NW",
-                "corners": np.array([
-                    [-3.5, 3.5], [-30.0, 3.5], [-30.0, 20.0], [-3.5, 20.0],
-                ]),
-            },
-            {
-                "name": "building_NE",
-                "corners": np.array([
-                    [3.5, 3.5], [30.0, 3.5], [30.0, 20.0], [3.5, 20.0],
-                ]),
-            },
+            {"name": "building_NW", "corners": np.array([
+                [-INNER, INNER], [-OUTER, INNER], [-OUTER, FAR], [-INNER, FAR],
+            ])},
+            {"name": "building_NE", "corners": np.array([
+                [INNER, INNER], [OUTER, INNER], [OUTER, FAR], [INNER, FAR],
+            ])},
+            {"name": "building_SW", "corners": np.array([
+                [-OUTER, -FAR], [-INNER, -FAR], [-INNER, -INNER], [-OUTER, -INNER],
+            ])},
+            {"name": "building_SE", "corners": np.array([
+                [INNER, -FAR], [OUTER, -FAR], [OUTER, -INNER], [INNER, -INNER],
+            ])},
         ]
 
     def _init_occlusion_geometry(self):
@@ -549,11 +555,11 @@ class SumoEnv(_make_gym()):
         self._start_sumo()
         self._init_occlusion_geometry()
         if not self._buildings_enabled:
-            try:
-                traci.polygon.remove("building_NW")
-                traci.polygon.remove("building_NE")
-            except Exception:
-                pass
+            for bname in ("building_NW", "building_NE", "building_SW", "building_SE"):
+                try:
+                    traci.polygon.remove(bname)
+                except Exception:
+                    pass
         self._load_dims()
         self._step_count = 0
         self._agent_history = {}

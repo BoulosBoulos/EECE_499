@@ -177,24 +177,25 @@ class ScenarioGenerator:
                 f.write('</additional>\n')
             add_parts.append(os.path.basename(poly_path))
 
-        # Building polygons — visual representation of occlusion geometry
-        # Apply netOffset from the generated .net.xml so polygons render correctly
+        # Building polygons — four corners flanking the T-intersection
+        # Apply netOffset from .net.xml so polygons render in correct SUMO frame
         ox, oy = _parse_net_offset(net_path)
-        nw_corners = [(-3.5 + ox, 3.5 + oy), (-30.0 + ox, 3.5 + oy),
-                      (-30.0 + ox, 20.0 + oy), (-3.5 + ox, 20.0 + oy)]
-        ne_corners = [(3.5 + ox, 3.5 + oy), (30.0 + ox, 3.5 + oy),
-                      (30.0 + ox, 20.0 + oy), (3.5 + ox, 20.0 + oy)]
-        nw_shape = " ".join(f"{x:.2f},{y:.2f}" for x, y in nw_corners)
-        ne_shape = " ".join(f"{x:.2f},{y:.2f}" for x, y in ne_corners)
+        INNER, OUTER, FAR = 8.0, 30.0, 20.0
+        building_templates = {
+            "building_NW": [(-OUTER, INNER), (-INNER, INNER), (-INNER, FAR), (-OUTER, FAR)],
+            "building_NE": [(INNER, INNER), (OUTER, INNER), (OUTER, FAR), (INNER, FAR)],
+            "building_SW": [(-OUTER, -FAR), (-INNER, -FAR), (-INNER, -INNER), (-OUTER, -INNER)],
+            "building_SE": [(INNER, -FAR), (OUTER, -FAR), (OUTER, -INNER), (INNER, -INNER)],
+        }
         buildings_path = os.path.join(output_dir, "t_buildings.poly.xml")
         with open(buildings_path, "w") as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n<additional>\n')
-            f.write(f'  <poly id="building_NW" type="building" '
-                    f'color="0.55,0.45,0.35,1" fill="1" layer="5" '
-                    f'shape="{nw_shape}"/>\n')
-            f.write(f'  <poly id="building_NE" type="building" '
-                    f'color="0.55,0.45,0.35,1" fill="1" layer="5" '
-                    f'shape="{ne_shape}"/>\n')
+            for bname, corners in building_templates.items():
+                shifted = [(x + ox, y + oy) for x, y in corners]
+                shape_str = " ".join(f"{x:.2f},{y:.2f}" for x, y in shifted)
+                f.write(f'  <poly id="{bname}" type="building" '
+                        f'color="0.55,0.45,0.35,1" fill="1" layer="5" '
+                        f'shape="{shape_str}"/>\n')
             f.write('</additional>\n')
         add_parts.append(os.path.basename(buildings_path))
 
