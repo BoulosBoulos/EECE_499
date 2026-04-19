@@ -755,6 +755,11 @@ class SumoEnv(_make_gym()):
 
             nu_i = self._compute_los(ego_pos, np.array(pos, dtype=float), vid)
 
+            # State ablation: override per-agent visibility
+            if self._state_ablation == "no_visibility":
+                nu_i = 1.0
+                sigma_i = 0.0
+
             agents.append({
                 "id": vid, "p": np.array(pos, dtype=float),
                 "psi": np.radians(angle), "v": speed, "a": accel,
@@ -784,6 +789,11 @@ class SumoEnv(_make_gym()):
             # Pedestrian ROW: absolute priority when in crosswalk
             in_crosswalk = abs(ped_pos[0]) < 8.0 and abs(ped_pos[1]) < 10.0
             pi_row_ped = 1.0 if in_crosswalk else 0.5
+
+            # State ablation: override per-agent visibility
+            if self._state_ablation == "no_visibility":
+                nu_i = 1.0
+                sigma_i = 0.0
 
             agents.append({
                 "id": pid, "p": ped_pos,
