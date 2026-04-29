@@ -1,0 +1,16 @@
+{
+  "method": "rule_based",
+  "checkpoint_path": "verification/smoke_rb/dummy.pt",
+  "scenario": "1a",
+  "ego_maneuver": "stem_right",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 1,
+  "eval_seeds": [
+    42
+  ],
+  "episodes_per_seed": 3,
+  "total_eval_episodes": 6,
+  "eval_wall_time_seconds": 9.342836618423462
+}

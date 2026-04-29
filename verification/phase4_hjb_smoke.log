@@ -1,0 +1,17 @@
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[hjb_aux] step=4096 ret=-120.62 coll=0 ttc=11.23 hjb_res=0.9058
+Saved hjb_aux to verification/smoke_hjb/model_hjb_aux_1a_stem_right.pt
+Training complete. Metrics in verification/smoke_hjb/train_hjb_aux_1a_stem_right.csv

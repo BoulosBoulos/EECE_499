@@ -1,0 +1,48 @@
+{
+  "results": [
+    {
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "near_miss_rate": 0.8666666666666667,
+      "conflict_rate": 0.9666666666666667,
+      "n_episodes": 30
+    },
+    {
+      "scenario": "1a",
+      "maneuver": "stem_left",
+      "near_miss_rate": 0.9333333333333333,
+      "conflict_rate": 1.0,
+      "n_episodes": 30
+    },
+    {
+      "scenario": "1b",
+      "maneuver": "stem_right",
+      "near_miss_rate": 1.0,
+      "conflict_rate": 1.0,
+      "n_episodes": 30
+    },
+    {
+      "scenario": "1b",
+      "maneuver": "stem_left",
+      "near_miss_rate": 1.0,
+      "conflict_rate": 1.0,
+      "n_episodes": 30
+    },
+    {
+      "scenario": "2",
+      "maneuver": "stem_right",
+      "near_miss_rate": 1.0,
+      "conflict_rate": 1.0,
+      "n_episodes": 30
+    },
+    {
+      "scenario": "2",
+      "maneuver": "stem_left",
+      "near_miss_rate": 1.0,
+      "conflict_rate": 1.0,
+      "n_episodes": 30
+    }
+  ],
+  "min_rate": 0.9666666666666667,
+  "pass": true
+}

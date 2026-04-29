@@ -1,0 +1,12 @@
+{
+  "phase": "2.5",
+  "pass": true,
+  "max_agents_per_scenario": {
+    "2": 4,
+    "2_dense": 6,
+    "3": 6,
+    "3_dense": 8,
+    "4": 6,
+    "4_dense": 8
+  }
+}

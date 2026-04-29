@@ -1,0 +1,585 @@
+{
+  "phases": {
+    "phase0_env": {
+      "phase": "0.1",
+      "pass": true,
+      "checks": {
+        "sumo_resolves": {
+          "pass": true,
+          "actual": "/usr/bin/sumo"
+        },
+        "sumo_version": {
+          "pass": true,
+          "actual": "Eclipse SUMO sumo Version 1.18.0"
+        },
+        "SUMO_HOME": {
+          "pass": true,
+          "actual": "/usr/share/sumo"
+        },
+        "python_3_10_or_newer": {
+          "pass": true,
+          "actual": "Python 3.12.3"
+        },
+        "torch_importable": {
+          "pass": true,
+          "actual": "torch 2.11.0+cu130"
+        },
+        "core_deps_importable": {
+          "pass": true,
+          "actual": "numpy/scipy/pandas/matplotlib/yaml/gymnasium import OK"
+        }
+      },
+      "venv": "/home/boulosboulos/.venvs/eece499",
+      "notes": "Installed Python deps from requirements.txt + scipy into venv. SUMO 1.18.0 from apt at /usr/share/sumo."
+    },
+    "phase0_fingerprint": {
+      "phase": "0.2",
+      "checks": [
+        {
+          "name": "XI_DIM == 79",
+          "pass": true
+        },
+        {
+          "name": "Occlusion fix uses traci.junction.getPosition",
+          "pass": true
+        },
+        {
+          "name": "_init_occlusion_geometry called from reset",
+          "pass": true
+        },
+        {
+          "name": "_env_rng isolated",
+          "pass": true
+        },
+        {
+          "name": "Orchestrator handles cmd_train=None (path resolution)",
+          "pass": true
+        },
+        {
+          "name": "Orchestrator handles cmd_train=None (subprocess build)",
+          "pass": true
+        },
+        {
+          "name": "CBF offset = 10.0",
+          "pass": true
+        },
+        {
+          "name": "Eikonal v_eff dynamics-derived",
+          "pass": true
+        },
+        {
+          "name": "Eikonal w_fail = 50",
+          "pass": true
+        },
+        {
+          "name": "_smooth_clamp_nonneg defined",
+          "pass": true
+        },
+        {
+          "name": "Rule-based TTC index = 13",
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    "phase1_imports": {
+      "phase": "1.4",
+      "pass": true,
+      "failed": []
+    },
+    "phase1_residuals": {
+      "phase": "1.2",
+      "residuals": {
+        "hjb": {
+          "pass": true,
+          "rho_min": -5281.9228515625,
+          "rho_max": 722.107666015625,
+          "rho_mean": -240.31539916992188,
+          "gnorm": 203893526.8305006
+        },
+        "soft_hjb": {
+          "pass": true,
+          "rho_min": -5281.80908203125,
+          "rho_max": 722.1856079101562,
+          "rho_mean": -240.20584106445312,
+          "gnorm": 203962885.32829857
+        },
+        "eikonal": {
+          "pass": true,
+          "rho_min": -3.99771785736084,
+          "rho_max": -0.2029334306716919,
+          "rho_mean": -3.6420035362243652,
+          "gnorm": 1.0466127842664719
+        },
+        "cbf": {
+          "pass": true,
+          "rho_min": 0.0,
+          "rho_max": 5320.29541015625,
+          "rho_mean": 364.4723205566406,
+          "gnorm": 205502921.4446411
+        }
+      },
+      "pass": true
+    },
+    "phase1_smooth_clamp": {
+      "phase": "1.3",
+      "inputs": [
+        -0.5,
+        -0.05000000074505806,
+        0.0,
+        0.05000000074505806,
+        0.5
+      ],
+      "grads": [
+        0.009709656238555908,
+        0.27639317512512207,
+        0.5,
+        0.7236068248748779,
+        0.9902903437614441
+      ],
+      "pass": true
+    },
+    "phase1_syntax": {
+      "phase": "1.1",
+      "pass": true
+    },
+    "phase2_regen": {
+      "phase": "2.0",
+      "pass": true,
+      "all_files_present": true,
+      "no_ERROR_lines": true,
+      "errors": []
+    },
+    "phase2_step10_style": {
+      "phase": "2.6",
+      "pass": true,
+      "styles_seen": {
+        "all": [
+          "aggressive",
+          "distracted",
+          "drunk",
+          "nominal",
+          "rule_violating",
+          "timid"
+        ],
+        "nominal": [
+          "nominal",
+          "timid"
+        ],
+        "adversarial": [
+          "aggressive",
+          "distracted",
+          "drunk",
+          "erratic"
+        ]
+      }
+    },
+    "phase2_step11_state": {
+      "phase": "2.7",
+      "pass": true,
+      "values": {
+        "normal": {
+          "alpha_cz": 0.3,
+          "d_occ": 200.0,
+          "dt_seen": 0.0,
+          "sigma_percep": 0.05
+        },
+        "no_visibility": {
+          "alpha_cz": 1.0,
+          "d_occ": 200.0,
+          "dt_seen": 0.0,
+          "sigma_percep": 0.05
+        }
+      }
+    },
+    "phase2_step12_obsdim": {
+      "phase": "2.8",
+      "pass": true,
+      "unique_dims": [
+        135
+      ],
+      "configs": [
+        {
+          "scen": "1a",
+          "man": "stem_right",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "1a",
+          "man": "stem_left",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "1a",
+          "man": "right_left",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "1a",
+          "man": "left_stem",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "1b",
+          "man": "stem_right",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "2",
+          "man": "stem_right",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "2_dense",
+          "man": "stem_right",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "4",
+          "man": "stem_right",
+          "extra": {},
+          "obs_dim": 135
+        },
+        {
+          "scen": "1a",
+          "man": "stem_right",
+          "extra": {
+            "buildings": false
+          },
+          "obs_dim": 135
+        },
+        {
+          "scen": "1a",
+          "man": "stem_right",
+          "extra": {
+            "state_ablation": "no_visibility"
+          },
+          "obs_dim": 135
+        },
+        {
+          "scen": "1a",
+          "man": "stem_right",
+          "extra": {
+            "style_filter": "nominal"
+          },
+          "obs_dim": 135
+        }
+      ]
+    },
+    "phase2_step5_occlusion": {
+      "phase": "2.1",
+      "pass": true,
+      "alpha_min": 0.05,
+      "alpha_max": 1.0,
+      "d_cz_at_min_alpha": 45.705,
+      "d_cz_at_max_alpha": 1.0274999999999963,
+      "min_d_cz_reached": 0.0,
+      "n_steps": 128,
+      "terminated_at_step": 127
+    },
+    "phase2_step6_buildings": {
+      "phase": "2.2",
+      "pass": true,
+      "mean_alpha_buildings_on": 0.31333333333333335,
+      "mean_alpha_buildings_off": 1.0,
+      "diff": 0.6866666666666666
+    },
+    "phase2_step7_pothole": {
+      "phase": "2.3",
+      "pass": true,
+      "n_unique_positions": 8,
+      "positions": [
+        [
+          [
+            -6.383952653541039,
+            2.711740845030596
+          ],
+          [
+            -40.691319470265356,
+            -38.151746042737614
+          ]
+        ],
+        [
+          [
+            -5.4706480479224915,
+            2.623924949679562
+          ],
+          [
+            -8.7477330465224,
+            -4.846805653870531
+          ]
+        ],
+        [
+          [
+            -1.7895455746201443,
+            4.303351499374386
+          ],
+          [
+            -38.081433168685734,
+            -35.484450881857484
+          ]
+        ],
+        [
+          [
+            -1.1374988077489099,
+            3.547694529400085
+          ],
+          [
+            -20.861139244343228,
+            -18.387518231151027
+          ]
+        ],
+        [
+          [
+            -3.867249599458654,
+            7.677199245120287
+          ],
+          [
+            -38.682066716468285,
+            -35.659411610839555
+          ]
+        ],
+        [
+          [
+            -5.158709450812953,
+            5.281313939150088
+          ],
+          [
+            -31.80489248665154,
+            -28.18901090717855
+          ]
+        ],
+        [
+          [
+            -4.67638844670626,
+            3.628926365069286
+          ],
+          [
+            -28.235884074237454,
+            -25.549342334610778
+          ]
+        ],
+        [
+          [
+            -3.3976391054378934,
+            5.603124627399442
+          ],
+          [
+            -34.01496215129886,
+            -30.220534549359712
+          ]
+        ]
+      ]
+    },
+    "phase2_step8_conflicts": {
+      "results": [
+        {
+          "scenario": "1a",
+          "maneuver": "stem_right",
+          "near_miss_rate": 0.8666666666666667,
+          "conflict_rate": 0.9666666666666667,
+          "n_episodes": 30
+        },
+        {
+          "scenario": "1a",
+          "maneuver": "stem_left",
+          "near_miss_rate": 0.9333333333333333,
+          "conflict_rate": 1.0,
+          "n_episodes": 30
+        },
+        {
+          "scenario": "1b",
+          "maneuver": "stem_right",
+          "near_miss_rate": 1.0,
+          "conflict_rate": 1.0,
+          "n_episodes": 30
+        },
+        {
+          "scenario": "1b",
+          "maneuver": "stem_left",
+          "near_miss_rate": 1.0,
+          "conflict_rate": 1.0,
+          "n_episodes": 30
+        },
+        {
+          "scenario": "2",
+          "maneuver": "stem_right",
+          "near_miss_rate": 1.0,
+          "conflict_rate": 1.0,
+          "n_episodes": 30
+        },
+        {
+          "scenario": "2",
+          "maneuver": "stem_left",
+          "near_miss_rate": 1.0,
+          "conflict_rate": 1.0,
+          "n_episodes": 30
+        }
+      ],
+      "min_rate": 0.9666666666666667,
+      "pass": true
+    },
+    "phase2_step9_dense": {
+      "phase": "2.5",
+      "pass": true,
+      "max_agents_per_scenario": {
+        "2": 4,
+        "2_dense": 6,
+        "3": 6,
+        "3_dense": 8,
+        "4": 6,
+        "4_dense": 8
+      }
+    },
+    "phase3_orchestrator": {
+      "phase": "3.2",
+      "pass": true,
+      "result": "5/5 tests passed; ALL TESTS PASSED \u2014 orchestrator handles cmd_train=None correctly",
+      "subtests": [
+        "tier1_rule_based",
+        "tier1_count",
+        "train_none_annotation",
+        "tier4_no_crash",
+        "all_tiers_ok"
+      ],
+      "preflight_step13_patched": true,
+      "preflight_path": "/home/boulosboulos/Desktop/PREFLIGHT_VERIFICATION.sh"
+    },
+    "phase4_hjb_validation": {
+      "phase": "4.3",
+      "pass": true,
+      "csv_rows": 1,
+      "csv_cols": [
+        "step",
+        "episode_return",
+        "episode_len",
+        "actor_loss",
+        "vf_loss",
+        "collision_count",
+        "collision_rate",
+        "mean_ttc",
+        "min_ttc",
+        "entropy",
+        "hjb_residual_mean",
+        "anchor_loss",
+        "bc_loss",
+        "distill_loss",
+        "distill_gap",
+        "train_time_per_iter"
+      ],
+      "meta": {
+        "method": "hjb_aux",
+        "scenario": "1a",
+        "ego_maneuver": "stem_right",
+        "seed": 42,
+        "use_intent": false,
+        "total_steps": 4000,
+        "config_file": "configs/pde/hjb_aux.yaml",
+        "algo_config_file": "configs/algo/default.yaml",
+        "pde_config": {
+          "lambda_anchor": 1.0,
+          "lambda_hjb": 0.2,
+          "lambda_bc": 0.5,
+          "lambda_distill": 0.25,
+          "aux_hidden_dim": 256,
+          "aux_lr": "1e-3",
+          "collocation_ratio": 0.7,
+          "w_success": 10.0
+        },
+        "algo_config": {
+          "use_pinn": true,
+          "lr": "3e-4",
+          "gamma": 0.99,
+          "gae_lambda": 0.95,
+          "clip_range": 0.2,
+          "ent_coef": 0.01,
+          "vf_coef": 0.5,
+          "n_steps": 4096,
+          "batch_size": 128,
+          "n_epochs": 8,
+          "gru_hidden": 128,
+          "gru_layers": 1
+        },
+        "device": "cpu",
+        "lambda_aux_override": null,
+        "lambda_hjb_effective": 0.2,
+        "start_time": "2026-04-29T03:21:03",
+        "wall_time_seconds": 38.112075090408325,
+        "best_checkpoint_step": "final",
+        "best_checkpoint_score": NaN,
+        "git_hash": "unknown"
+      },
+      "missing_files": [],
+      "missing_cols": [],
+      "missing_meta": []
+    },
+    "phase4_makefile": {
+      "phase": "4.1",
+      "pass": true,
+      "make_n_default": "python3 experiments/pde/run_calibration.py --scenarios 1a 4_dense --ego_maneuvers stem_right stem_right --seeds 42 123 456 --steps 50000 --out_dir results/calibration --max_parallel 5",
+      "override_check": "STEPS=4000 SEEDS=42 propagates correctly into the printed command",
+      "notes": "Default STEPS in Makefile is 50000 (preserves existing variable); spec's calibration command requires --steps 200000, which is provided explicitly via the spec's calibration command, not via the Makefile default."
+    },
+    "phase4_rb_validation": {
+      "phase": "4.2",
+      "pass": true,
+      "n_rows": 2,
+      "modes_present": [
+        "deterministic",
+        "stochastic"
+      ],
+      "required_cols_present": true,
+      "values_sane": true
+    },
+    "phase4_residual_sanity": {
+      "phase": "4.4",
+      "pass": true,
+      "rows": 1,
+      "columns_seen": [
+        "step",
+        "episode_return",
+        "episode_len",
+        "actor_loss",
+        "vf_loss",
+        "collision_count",
+        "collision_rate",
+        "mean_ttc",
+        "min_ttc",
+        "entropy",
+        "hjb_residual_mean",
+        "anchor_loss",
+        "bc_loss",
+        "distill_loss",
+        "distill_gap",
+        "train_time_per_iter"
+      ],
+      "note": "Informational only; pass-by-default if no NaN/Inf in residual columns",
+      "hjb_residual_mean": {
+        "first50_mean": 0.9058417677879332,
+        "last50_mean": 0.9058417677879332,
+        "ratio": 1.0,
+        "all_finite": true
+      }
+    },
+    "phase5_intent_validation": {
+      "phase": "5",
+      "pass": true,
+      "checkpoint_exists": true,
+      "has_model_key": true,
+      "load_ok": true
+    },
+    "phase5_use_intent": {
+      "phase": "5.4",
+      "pass": true,
+      "error": null
+    }
+  },
+  "ALL_PASS": true
+}

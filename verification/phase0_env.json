@@ -1,0 +1,14 @@
+{
+  "phase": "0.1",
+  "pass": true,
+  "checks": {
+    "sumo_resolves":         {"pass": true, "actual": "/usr/bin/sumo"},
+    "sumo_version":          {"pass": true, "actual": "Eclipse SUMO sumo Version 1.18.0"},
+    "SUMO_HOME":             {"pass": true, "actual": "/usr/share/sumo"},
+    "python_3_10_or_newer":  {"pass": true, "actual": "Python 3.12.3"},
+    "torch_importable":      {"pass": true, "actual": "torch 2.11.0+cu130"},
+    "core_deps_importable":  {"pass": true, "actual": "numpy/scipy/pandas/matplotlib/yaml/gymnasium import OK"}
+  },
+  "venv": "/home/boulosboulos/.venvs/eece499",
+  "notes": "Installed Python deps from requirements.txt + scipy into venv. SUMO 1.18.0 from apt at /usr/share/sumo."
+}

@@ -1,0 +1,30 @@
+{
+  "phase": "4.4",
+  "pass": true,
+  "rows": 1,
+  "columns_seen": [
+    "step",
+    "episode_return",
+    "episode_len",
+    "actor_loss",
+    "vf_loss",
+    "collision_count",
+    "collision_rate",
+    "mean_ttc",
+    "min_ttc",
+    "entropy",
+    "hjb_residual_mean",
+    "anchor_loss",
+    "bc_loss",
+    "distill_loss",
+    "distill_gap",
+    "train_time_per_iter"
+  ],
+  "note": "Informational only; pass-by-default if no NaN/Inf in residual columns",
+  "hjb_residual_mean": {
+    "first50_mean": 0.9058417677879332,
+    "last50_mean": 0.9058417677879332,
+    "ratio": 1.0,
+    "all_finite": true
+  }
+}
