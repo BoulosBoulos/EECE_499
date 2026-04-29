@@ -10,6 +10,11 @@ SEED ?= 42
 PARALLEL ?= 32
 METHOD ?= hjb_aux
 
+SCENARIOS    ?= 1a 4_dense
+MANEUVERS    ?= stem_right stem_right
+SEEDS        ?= 42 123 456
+MAX_PARALLEL ?= 5
+
 setup:
 	pip install -r requirements.txt --break-system-packages
 	@echo "Set SUMO_HOME and PYTHONPATH before running experiments."
@@ -73,7 +78,13 @@ plot-pde:
 # ── Calibration ────────────────────────────────────────────────────
 
 calibrate:
-	$(PYTHON) experiments/pde/run_calibration.py --scenario $(SCENARIO) --ego_maneuver $(MANEUVER) --steps 200000 --seed $(SEED)
+	$(PYTHON) experiments/pde/run_calibration.py \
+	    --scenarios $(SCENARIOS) \
+	    --ego_maneuvers $(MANEUVERS) \
+	    --seeds $(SEEDS) \
+	    --steps $(STEPS) \
+	    --out_dir results/calibration \
+	    --max_parallel $(MAX_PARALLEL)
 
 calibrate-analyze:
 	$(PYTHON) experiments/pde/run_calibration.py --scenario $(SCENARIO) --ego_maneuver $(MANEUVER) --analyze_only

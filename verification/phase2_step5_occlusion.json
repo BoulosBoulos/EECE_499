@@ -1,0 +1,11 @@
+{
+  "phase": "2.1",
+  "pass": true,
+  "alpha_min": 0.05,
+  "alpha_max": 1.0,
+  "d_cz_at_min_alpha": 45.705,
+  "d_cz_at_max_alpha": 1.0274999999999963,
+  "min_d_cz_reached": 0.0,
+  "n_steps": 128,
+  "terminated_at_step": 127
+}

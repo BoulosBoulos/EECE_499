@@ -1,0 +1,42 @@
+{
+  "method": "hjb_aux",
+  "scenario": "1a",
+  "ego_maneuver": "stem_right",
+  "seed": 42,
+  "use_intent": false,
+  "total_steps": 4000,
+  "config_file": "configs/pde/hjb_aux.yaml",
+  "algo_config_file": "configs/algo/default.yaml",
+  "pde_config": {
+    "lambda_anchor": 1.0,
+    "lambda_hjb": 0.2,
+    "lambda_bc": 0.5,
+    "lambda_distill": 0.25,
+    "aux_hidden_dim": 256,
+    "aux_lr": "1e-3",
+    "collocation_ratio": 0.7,
+    "w_success": 10.0
+  },
+  "algo_config": {
+    "use_pinn": true,
+    "lr": "3e-4",
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.01,
+    "vf_coef": 0.5,
+    "n_steps": 4096,
+    "batch_size": 128,
+    "n_epochs": 8,
+    "gru_hidden": 128,
+    "gru_layers": 1
+  },
+  "device": "cpu",
+  "lambda_aux_override": null,
+  "lambda_hjb_effective": 0.2,
+  "start_time": "2026-04-29T03:21:03",
+  "wall_time_seconds": 38.112075090408325,
+  "best_checkpoint_step": "final",
+  "best_checkpoint_score": NaN,
+  "git_hash": "unknown"
+}

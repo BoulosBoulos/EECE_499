@@ -1,0 +1,7 @@
+{
+  "phase": "2.2",
+  "pass": true,
+  "mean_alpha_buildings_on": 0.31333333333333335,
+  "mean_alpha_buildings_off": 1.0,
+  "diff": 0.6866666666666666
+}
