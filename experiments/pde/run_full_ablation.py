@@ -185,6 +185,28 @@ def generate_tier4_jobs(total_steps: int = 50000) -> list[dict]:
     return jobs
 
 
+def manifest_sort_key(job: dict) -> tuple:
+    """Deterministic sort key for the multi-machine Tier 1 launch.
+
+    Imported by experiments/pde/preview_tier_1_split.py — both scripts MUST
+    use the same key so slice boundaries on different machines correspond
+    to identical job sets. Changing the key ordering breaks reproducibility
+    across rentals.
+
+    Tuple shape: (method, scenario, ego_maneuver, seed, intent_on, tier_label).
+    `tier_label` is derived as `tier_<tier>` (matches the post-run annotation
+    written into meta.json by `_annotate_meta_with_tier`).
+    """
+    return (
+        str(job.get("method", "")),
+        str(job.get("scenario", "")),
+        str(job.get("ego_maneuver", "")),
+        int(job.get("seed", 0) or 0),
+        bool(job.get("intent_on", False)),
+        f"tier_{job.get('tier', '')}",
+    )
+
+
 def _annotate_meta_with_tier(out_dir: str, tier_label: str) -> None:
     """Post-run annotation: write tier_label into the per-job meta.json.
 
@@ -637,7 +659,36 @@ def main():
     parser.add_argument("--output_root", type=str, default=None,
                         help="Override base output dir (default: results/ablation). Phase 2 smoke tests "
                         "use /tmp/phase2_smoke for transient outputs.")
+    # ── Multi-machine Tier 1 launch (SPEC_TIER_1_MULTI_MACHINE_LAUNCH) ───
+    # Each rental runs a deterministic slice of the full sorted manifest.
+    # job_index_start/end indices are computed locally via
+    # `experiments/pde/preview_tier_1_split.py` using the SAME sort key
+    # (manifest_sort_key) — diverging keys would mean different machines
+    # produce overlapping or gap-bearing slices.
+    parser.add_argument(
+        "--job_index_start", type=int, default=0,
+        help="Start index (inclusive) into the sorted manifest. "
+             "Default 0 (run from the beginning).",
+    )
+    parser.add_argument(
+        "--job_index_end", type=int, default=None,
+        help="End index (exclusive) into the sorted manifest. "
+             "Default: len(manifest) after filtering.",
+    )
+    parser.add_argument(
+        "--machine_id", type=str, default="local",
+        help="Tag results under results/tier_1_machine_<id>/ when not "
+             "'local'. Used during multi-machine Tier 1 to isolate per-"
+             "rental outputs prior to aggregate_tier_1_results.py merge.",
+    )
     args = parser.parse_args()
+
+    # Multi-machine: when machine_id is set and the user did not explicitly
+    # override --output_root, write to results/tier_1_machine_<id>/ so each
+    # rental's outputs land in a non-colliding subtree. The job_dir paths
+    # are constructed downstream by joining base_dir with `tier1/<tag>`.
+    if args.machine_id != "local" and args.output_root is None:
+        args.output_root = f"results/tier_1_machine_{args.machine_id}"
 
     if args.subgrid is not None and args.tier not in ("2", "all"):
         parser.error("--subgrid requires --tier 2 (or --tier all).")
@@ -666,6 +717,34 @@ def main():
               f"(seeds={args.seeds}, methods={args.methods}, "
               f"scenarios={args.scenarios}, maneuvers={args.maneuvers}, "
               f"intents={args.intents}, include_rule_based={args.include_rule_based})")
+
+    # Multi-machine: deterministically sort the filtered manifest before
+    # slicing so [job_index_start, job_index_end) corresponds to identical
+    # jobs across machines. The same key is exported as `manifest_sort_key`
+    # and reused by `preview_tier_1_split.py`.
+    jobs = sorted(jobs, key=manifest_sort_key)
+
+    total_after_filter = len(jobs)
+    slice_start = max(0, int(args.job_index_start))
+    slice_end = total_after_filter if args.job_index_end is None else min(
+        int(args.job_index_end), total_after_filter,
+    )
+    if slice_end < slice_start:
+        parser.error(
+            f"--job_index_end ({slice_end}) must be >= --job_index_start "
+            f"({slice_start})"
+        )
+    if slice_start != 0 or slice_end != total_after_filter:
+        jobs = jobs[slice_start:slice_end]
+        print(
+            f"[machine={args.machine_id}] running jobs [{slice_start}:{slice_end}]"
+            f" of {total_after_filter} total ({len(jobs)} jobs in slice)"
+        )
+    else:
+        print(
+            f"[machine={args.machine_id}] running full manifest "
+            f"({total_after_filter} jobs)"
+        )
 
     # Print tier breakdown
     tier_counts = {}
