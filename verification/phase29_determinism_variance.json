@@ -1,0 +1,130 @@
+{
+  "phase": "29-determinism-variance",
+  "n_runs": 5,
+  "per_run": [
+    {
+      "run_idx": 1,
+      "n_iterations": 2,
+      "n_collisions_sum": 0,
+      "n_successes_sum": 0,
+      "n_episodes_sum": 16,
+      "final_collision_rate": 0.0,
+      "final_success_rate": 0.0,
+      "final_mean_reward": -7893.1181640625
+    },
+    {
+      "run_idx": 2,
+      "n_iterations": 2,
+      "n_collisions_sum": 0,
+      "n_successes_sum": 0,
+      "n_episodes_sum": 16,
+      "final_collision_rate": 0.0,
+      "final_success_rate": 0.0,
+      "final_mean_reward": -6780.1533203125
+    },
+    {
+      "run_idx": 3,
+      "n_iterations": 2,
+      "n_collisions_sum": 0,
+      "n_successes_sum": 0,
+      "n_episodes_sum": 16,
+      "final_collision_rate": 0.0,
+      "final_success_rate": 0.0,
+      "final_mean_reward": -7079.84716796875
+    },
+    {
+      "run_idx": 4,
+      "n_iterations": 2,
+      "n_collisions_sum": 0,
+      "n_successes_sum": 0,
+      "n_episodes_sum": 16,
+      "final_collision_rate": 0.0,
+      "final_success_rate": 0.0,
+      "final_mean_reward": -7755.26806640625
+    },
+    {
+      "run_idx": 5,
+      "n_iterations": 2,
+      "n_collisions_sum": 0,
+      "n_successes_sum": 0,
+      "n_episodes_sum": 16,
+      "final_collision_rate": 0.0,
+      "final_success_rate": 0.0,
+      "final_mean_reward": -8125.61083984375
+    }
+  ],
+  "summary": {
+    "final_collision_rate": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "final_success_rate": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "final_mean_reward": {
+      "mean": -7526.79951171875,
+      "std": 570.5719005856841,
+      "min": -8125.61083984375,
+      "max": -6780.1533203125,
+      "values": [
+        -7893.1181640625,
+        -6780.1533203125,
+        -7079.84716796875,
+        -7755.26806640625,
+        -8125.61083984375
+      ]
+    },
+    "n_collisions_sum": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "n_successes_sum": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "tolerance_3sigma": {
+    "final_collision_rate": 0.0,
+    "final_success_rate": 0.0,
+    "final_mean_reward": 1711.7157017570526,
+    "n_collisions_sum": 0.0,
+    "n_successes_sum": 0.0
+  }
+}

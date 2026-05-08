@@ -1,0 +1,71 @@
+{
+  "phase": 28,
+  "name": "config_freeze",
+  "tests": [
+    {
+      "name": "28.1 yaml_valid",
+      "ok": true,
+      "detail": "version=v1, top-level keys=['analysis', 'architecture', 'description', 'env', 'intent_encoder', 'methods', 'ppo', 'supplementary', 'tier1', 'tier2', 'tier3', 'tier4', 'training', 'version']"
+    },
+    {
+      "name": "28.2 lock_matches",
+      "ok": true,
+      "detail": "hash=337cc19b82009bf9..."
+    },
+    {
+      "name": "28.3 required_keys",
+      "ok": true,
+      "detail": "all required sub-keys present"
+    },
+    {
+      "name": "28.4 method_coverage",
+      "ok": true,
+      "detail": "methods=['cbf_aux', 'drppo', 'eikonal_aux', 'fusion_aux', 'hjb_aux', 'rule_based', 'soft_hjb_aux']"
+    },
+    {
+      "name": "28.5 tier1_count",
+      "ok": true,
+      "detail": "Generated 1680 jobs"
+    },
+    {
+      "name": "28.6 tier2_count",
+      "ok": true,
+      "detail": "1160 = 600 + 400 + 160"
+    },
+    {
+      "name": "28.7 cli_defaults_match_yaml",
+      "ok": true,
+      "detail": "verified 18 core + 5 PDE methods"
+    },
+    {
+      "name": "28.8 cli_override_wins",
+      "ok": true,
+      "detail": "override propagated: lambda_residual=0.5"
+    },
+    {
+      "name": "28.9 lock_warns_on_tamper",
+      "ok": true,
+      "detail": "tamper detected, revert restored match"
+    },
+    {
+      "name": "28.10 analysis_reads_yaml",
+      "ok": true,
+      "detail": "8 analysis constants verified"
+    },
+    {
+      "name": "28.11 smoke_runs",
+      "ok": true,
+      "detail": "drppo + hjb_aux produced valid output"
+    },
+    {
+      "name": "28.12 prior_phases_pass",
+      "ok": true,
+      "detail": "aggregator ran without crashing (see output for details)"
+    }
+  ],
+  "n_pass": 12,
+  "n_total": 12,
+  "pass": true,
+  "all_pass": true,
+  "elapsed_seconds": 155.89466834068298
+}

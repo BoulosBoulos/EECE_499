@@ -1,0 +1,164 @@
+{
+  "phase": "pre_tier1_micro_launch_verification",
+  "name": "End-to-end orchestrator-path verification on a 12-job 5k-step micro-test before committing to full Tier 1",
+  "verdict": "issue_found_blocking",
+  "recommended_action": "issue_found_block_tier_1_launch_until_4_blockers_addressed",
+  "summary_one_line": "Training plumbing OK; eval plumbing fails for intent=ON (50% of Tier 1); meta.json schema and Fusion-fix CSV propagation missing.",
+  "compute_used": {
+    "wall_clock_minutes": 18.4,
+    "max_parallel": 12,
+    "total_steps_per_job": 5000,
+    "policy": "killed orchestrator at 18:25 elapsed (under 30-min budget) once intent-eval failure was decisive; nointent eval was ~95% complete on 6 jobs",
+    "actual_steps_per_job": 8192,
+    "convergence_reason_in_meta": "max_steps_reached (n_steps=4096 forces overshoot — first multiple of 4096 >= 5000)"
+  },
+  "manifest_subsetting_approach": {
+    "spec_text": "Modify run_full_ablation.py temporarily — OR use a CLI flag if --max_jobs or --dry_run already exists",
+    "approach_used": "Used existing CLI filter flags --scenarios 1a --maneuvers stem_right --seeds 42 (no manifest modification)",
+    "rationale": "run_full_ablation.py already implements --seeds, --methods, --scenarios, --maneuvers, --intents filters at lines 539-558 (Phase 2 / Step 2). No file edit needed; --include_rule_based defaults to False, dropping rule_based from training jobs.",
+    "filter_dry_run_count": 12,
+    "command_used": "PATH=/home/boulosboulos/.venvs/eece499/bin:$PATH PYTHONPATH=/home/boulosboulos/Desktop/EECE_499-main nohup setsid python3 -u experiments/pde/run_full_ablation.py --tier 1 --scenarios 1a --maneuvers stem_right --seeds 42 --total_steps 5000 --max_parallel 12 --output_root /tmp/pre_tier1_micro"
+  },
+  "checks": {
+    "C1_orchestrator_detached_via_nohup_setsid": {
+      "result": "pass",
+      "detail": "Orchestrator launched with `nohup setsid ...`; orchestrator's PPID after launch was 1 (init) per ps; child shells (12) reparented to orchestrator's session via setsid. Survives parent terminal close."
+    },
+    "C2_parallel_sumo_processes_observed": {
+      "result": "pass",
+      "detail": "At ~15s elapsed: 12 distinct python3 train_*.py subprocesses running concurrently (CPU 89-95% per proc); 12 GPU processes in nvidia-smi (218-554 MiB each, total 4.6 GB / 20 GB); GPU utilization 98%; 13 SUMO-related processes total. Confirmed parallel via htop equivalent (ps -ef | grep -E '(train_|eval.py)' showed 12 train procs + their shell wrappers)."
+    },
+    "C3_metrics_csv_present_per_job": {
+      "result": "pass",
+      "detail": "All 12 jobs produced metrics.csv with header + 2 iter rows (5000 -> 8192 actual). Header == METRICS_COLUMNS exactly (25 cols)."
+    },
+    "C4_eval_metrics_csv_present_per_job": {
+      "result": "fail",
+      "detail": "Per nointent (6 jobs): 224-292 episode rows out of 300 expected (eval was ~95% complete when killed; full completion was projected ~25 min total wall-clock). Per intent (6 jobs): 1 row (header only) — eval.py CRASHED at startup before logging any episode (see C7 root cause).",
+      "nointent_eval_rows": [285, 285, 224, 288, 289, 292],
+      "intent_eval_rows": [1, 1, 1, 1, 1, 1]
+    },
+    "C5_meta_json_has_criterion_version": {
+      "result": "fail",
+      "blocker": true,
+      "detail": "0/12 meta.json files contain `criterion_version`. `experiments/pde/run_metadata.py:write_meta_start` does NOT write this field. The post-run annotation function `verification/phase3F_step11_orchestrator.py:append_criterion_version_to_metas` (lines 124-139) is what added it during Step 11, but `run_full_ablation.py` does NOT call any equivalent — Tier 1 launches via this orchestrator would never annotate.",
+      "remediation_options": [
+        "A. Add `criterion_version: 'v2_sr_primary_post_stage3'` to the meta dict in run_metadata.py:write_meta_start (sourced from config_frozen_v1.yaml::calibration.criterion_version)",
+        "B. Wrap run_full_ablation.py with a post-run annotation step analogous to verification/phase3F_step11_orchestrator.py",
+        "C. Have analysis pipeline read criterion_version from config_frozen_v1.yaml at analysis time rather than from per-job meta.json"
+      ]
+    },
+    "C6_meta_json_has_tier_label": {
+      "result": "fail",
+      "blocker": true,
+      "detail": "0/12 meta.json files contain `tier_label` or `tier`. `experiments/pde/run_metadata.py:write_meta_start` does NOT accept or write a tier field. The job dict in run_full_ablation.py:generate_jobs has `tier: 1` (line 436) but it is never propagated to per-job meta.json — train_*.py scripts are unaware of which tier they belong to.",
+      "remediation_options": [
+        "A. Pass tier as a CLI flag from run_full_ablation.py to each train_*.py invocation (would require add_common_cli_args change + write_meta_start signature change)",
+        "B. Annotate post-run (write tier into meta.json by orchestrator after subprocess completion)",
+        "C. Have analysis pipeline derive tier from output_dir path (e.g., `tier1` segment) rather than from meta.json"
+      ]
+    },
+    "C7_intent_eval_input_dim_mismatch": {
+      "result": "fail",
+      "blocker": true,
+      "severity": "critical",
+      "detail": "All 6 intent-ON jobs FAIL at eval-phase startup with `RuntimeError: input.size(-1) must be equal to input_size. Expected 165, got 135`. Trained intent policy expects obs_dim=165 (135 base + 30 intent block); eval feeds obs_dim=135 because eval was launched without `--use_intent`.",
+      "root_cause": "experiments/pde/run_full_ablation.py:_build_eval_cmd (lines 216-239) does NOT take a use_intent parameter and does NOT pass `--use_intent` to eval.py. The Tier 1 generator at line 432-434 calls _build_eval_cmd without any intent forwarding, even though the same loop iterates over intent values.",
+      "evidence": {
+        "eval_py_supports_use_intent": "experiments/pde/eval.py:343 has `parser.add_argument(\"--use_intent\", action=\"store_true\")`",
+        "train_passes_use_intent_correctly": "experiments/pde/run_full_ablation.py:_build_train_cmd line 203-204 appends `--use_intent` when use_intent=True",
+        "eval_does_NOT_pass_use_intent": "experiments/pde/run_full_ablation.py:_build_eval_cmd has NO use_intent parameter and never appends --use_intent"
+      },
+      "production_impact": "50% of Tier 1 jobs (every intent=true cell, 720 of 1,440 trainable jobs, or 840 of 1,680 with rule_based) would fail at eval phase. Tier 1 eval data would be missing for the entire intent-ON half of the grid. Tier 4 held-out eval (which calls _build_eval_cmd similarly) is also affected for any intent-trained source checkpoints.",
+      "minimal_fix_proposal": "1) Add `use_intent: bool = False` parameter to _build_eval_cmd. 2) After existing flag handling, if use_intent: cmd.append('--use_intent'). 3) At line 434 call site: `cmd_eval=_build_eval_cmd(method, scen, man, seed, out_dir, use_intent=intent)`."
+    },
+    "C8_fusion_metrics_csv_has_new_columns": {
+      "result": "fail",
+      "blocker": true,
+      "detail": "Both fusion_aux jobs' metrics.csv have header == METRICS_COLUMNS (25 fields) — the new diagnostic columns `distill_loss_optimality_component` and `distill_loss_safety_component` are NOT in metrics.csv. The fusion fix (verified-applied to models/pde/fusion_aux_agent.py) added these to the train_step() return dict, but train_fusion_aux.py never extracts them and the canonical METRICS_COLUMNS in run_metadata.py was not extended.",
+      "remediation_options": [
+        "A. Add the two columns to METRICS_COLUMNS in run_metadata.py and update train_fusion_aux.py to write metrics.get('distill_loss_optimality_component', 0) / ('distill_loss_safety_component', 0). Note: this would change the canonical schema for ALL methods — non-fusion methods would write 0 (or nulls) for these columns. Acceptable per the existing schema pattern that already does this for several PDE-method-specific fields.",
+        "B. Use a fusion-specific auxiliary CSV (e.g., extend the legacy train_fusion_aux_<scen>_<man>.csv at lines 162-174 to include the new columns) and have analysis read from that file for fusion jobs only.",
+        "C. Drop the requirement — verify the fix architecturally via code inspection (already done in verification/fusion_fix_verification.json) and rely on overall L_residual_safety being non-zero as the runtime sanity check."
+      ]
+    },
+    "C9_no_nan_inf_in_metrics": {
+      "result": "pass",
+      "detail": "0/12 jobs had any NaN or inf in any numeric column of metrics.csv (header + 2 data rows × 24 numeric columns × 12 jobs = 576 cells scanned)."
+    },
+    "C10_fusion_L_residual_safety_nonzero": {
+      "result": "partial_pass",
+      "detail": "Both fusion_aux jobs have at least one iteration with L_residual_safety > 0, confirming the U_safety gradient path is live. But values are sporadic at 5k on sparse 1a (one iter zero, one iter ~0.04). Consistent with prior 50k smoke verification result of 0.427 on 2_dense (denser scenario, longer horizon).",
+      "fusion_intent": {"L_residual_safety_iter1": 0.04879, "L_residual_safety_iter2": 0.0, "n_nonzero": "1/2"},
+      "fusion_nointent": {"L_residual_safety_iter1": 0.0, "L_residual_safety_iter2": 0.03924, "n_nonzero": "1/2"},
+      "interpretation": "Gradient path structurally correct per code inspection + non-zero observation. The intermittent zeros are likely scenario-driven (1a is sparse with few near-collisions per rollout) rather than implementation-driven."
+    },
+    "C11_config_lock_hash_drift_check": {
+      "result": "pass",
+      "detail": "All 8 hashes in config_lock.json match disk SHA256 verbatim: config_frozen_v1.yaml, configs/pde/{eikonal_aux,hjb_aux,soft_hjb_aux,cbf_aux}.yaml, configs/reward/default.yaml, env/sumo_env.py:lines_50_100, env/sumo_env.py:lines_1380_1430. No drift since Step 12 close.",
+      "verified_hashes": {
+        "config_frozen_v1.yaml": "17e61a5f780e5b82dfdf71a8a7ddae66be54da3d9a45283e4c541fd04a3f66fe",
+        "configs/pde/eikonal_aux.yaml": "b5f4ce66ac47ae5bf514e94dfb5d11c591910583f70ce252d813e22a0687817c",
+        "configs/pde/hjb_aux.yaml": "e1867fa7597d4a9c6c35b579009f9fe7c6f6d1eabab066e27c84d8e6ce4925a2",
+        "configs/pde/soft_hjb_aux.yaml": "6d4c2d46be60a770422e73984f769cb731765e2b3dd3eaf3a038f8720488aa9e",
+        "configs/pde/cbf_aux.yaml": "c3e0792647f6a2830180854181764a3051c0431a8b22b016443a16ce505d6963",
+        "configs/reward/default.yaml": "ac35d776723a048cde81d8cbc39ff83de7efc05277b8d3351ddcf8e972ba71f7",
+        "env/sumo_env.py:DEFAULT_REWARD_CONFIG_lines_50_100": "7fae865de9f425fc2b613d8f27d3fbfe96ca7d9d919057023819139676c6f24a",
+        "env/sumo_env.py:reward_compute_lines_1380_1430": "d0f952b1ae583242627750374edb5c6ba7399f22bc74057f07acdcf889f7a089"
+      }
+    },
+    "C12_evaluate_convergence_v2_canonical_struct": {
+      "result": "pass",
+      "detail": "12/12 jobs: evaluate_convergence_v2(metrics_df) returned the canonical struct without crashing. All show converged=False, t_first=None (5k is far below convergence horizon as expected). Each struct contains the criterion_version field with value 'v2_sr_primary_post_stage3'. t_first=None handled correctly (not crash on missing data).",
+      "canonical_struct_keys": ["converged", "t_first", "t_last", "n_satisfied_evals", "mean_SR_post_first", "criterion_version"],
+      "criterion_version_value": "v2_sr_primary_post_stage3"
+    },
+    "C13_full_tier1_dry_run_count": {
+      "result": "pass_with_count_clarification",
+      "detail": "`run_full_ablation.py --tier 1 --dry_run` produces 1,680 jobs raw → 1,440 after default filter (rule_based excluded by default). With `--include_rule_based`: 1,680 raw, no further filtering. PromptA stated 'Restore the run_full_ablation.py manifest to the full Tier 1 setup (12 combos × 6 methods × 10 seeds × 2 intents = 1,680 jobs)' — but 12×6×10×2 = 1,440, not 1,680. The 1,680 figure in PromptA assumes 7 methods (including rule_based); the 6-method count gives 1,440. NO MANIFEST WAS MODIFIED in this verification (CLI filters used instead), so 'restoration' was a no-op.",
+      "default_dry_run_count": 1440,
+      "include_rule_based_dry_run_count": 1680,
+      "promptA_arithmetic_inconsistency": "12*6*10*2 = 1440 (not 1680 as stated). Either '6 methods' or '1,680' is a typo. Neither reading is blocking; the user should clarify whether Tier 1 is intended to include rule_based (1,680) or be PDE-trainable-only (1,440)."
+    }
+  },
+  "blocker_summary": {
+    "n_blockers": 4,
+    "blockers": [
+      "C5: criterion_version not auto-written to meta.json (would require code change to run_metadata.py OR a post-run annotation step)",
+      "C6: tier_label/tier not auto-written to meta.json (would require similar code change)",
+      "C7: CRITICAL — intent-ON eval fails because run_full_ablation.py:_build_eval_cmd does not propagate --use_intent flag (one-line bug; affects 50% of Tier 1)",
+      "C8: Fusion-fix new diagnostic columns (distill_loss_optimality_component / distill_loss_safety_component) not propagated to metrics.csv (affects only fusion_aux; partially mitigated by L_residual_safety being non-zero per C10)"
+    ]
+  },
+  "non_blocking_observations": {
+    "repo_not_git_repo": "EECE_499-main is not a git repository. _git_info() in run_metadata.py falls back to placeholder values: git_commit='00000000', git_branch='unknown', git_dirty=true. All 12 meta.json files have these placeholder values. Not blocking but reproducibility/provenance is weakened — every run looks identical from a git perspective. Recommend: git init + commit at the v2_phase_3F_step_12 lock point so future runs record real provenance.",
+    "promptA_arithmetic": "PromptA states 12×6×10×2=1,680. This is internally inconsistent (=1,440). User should clarify intended interpretation before launch.",
+    "fusion_L_residual_safety_sparseness": "1a × 5k smoke shows L_residual_safety nonzero in 1/2 iters per fusion job. Prior 50k smoke verification on 2_dense had 0.427 (denser scenario, longer horizon). This is consistent with 1a being a sparse/easy cell where CBF residuals near zero are expected when no near-collisions occur. Not a fix bug."
+  },
+  "files_inspected_read_only": [
+    "experiments/pde/run_full_ablation.py",
+    "experiments/pde/run_metadata.py",
+    "experiments/pde/eval.py (lines 343, 373)",
+    "experiments/pde/train_fusion_aux.py (lines 160-360)",
+    "config_frozen_v1.yaml",
+    "config_lock.json",
+    "analysis/calibration_analysis.py:142 (evaluate_convergence_v2)",
+    "verification/phase3F_step11_orchestrator.py (compare-against; the post-annotate function lives here)"
+  ],
+  "files_modified": [],
+  "code_changes_made": "none — verification only, per PromptA §7 'do not auto-fix, document the issue and let me decide'",
+  "outputs_written": [
+    "verification/pre_tier1_micro_launch_status.json (this file)"
+  ],
+  "scratch_outputs_under_tmp": [
+    "/tmp/pre_tier1_micro/tier1/<12 job dirs>/{metrics.csv, meta.json, eval_metrics.csv (partial or header-only), stdout.log}",
+    "/tmp/pre_tier1_micro_orchestrator.log"
+  ],
+  "tier_1_recommendation": "DO NOT LAUNCH Tier 1 until at minimum the C7 (intent eval) bug is fixed. C5/C6 (meta fields) and C8 (Fusion CSV columns) are softer blockers — depending on user preference, they could be addressed via either code changes or analysis-pipeline-side workarounds. PromptA's arithmetic ambiguity (C13) should also be reconciled before commit.",
+  "predecessor_artifacts": [
+    "verification/fusion_fix_verification.json — fusion fix smoke results (1a pass, 2_dense fail-but-applied)",
+    "verification/fusion_pre_tier1_verification.json — fusion bug verdict (verdict=bug)",
+    "verification/fusion_bug_artifact.md — fusion fix diff + smoke spec",
+    "config_lock.json — v2_phase_3F_step_12 lock"
+  ]
+}

@@ -1,0 +1,5 @@
+# State builder config per System_Architecture.txt
+top_n_agents: 5
+epsilon: 1e-6
+t_h_cpa: 3.0      # horizon for closest-approach (s)
+d_safe: 2.0       # safe distance for TTC proxy (m)

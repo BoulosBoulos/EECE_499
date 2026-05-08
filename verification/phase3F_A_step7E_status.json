@@ -1,0 +1,110 @@
+{
+  "phase": "3F-A",
+  "step": "7E",
+  "predecessor": "Step 8 (6-cell \u00d7 500k, all 4 Decision F conditions failed)",
+  "config_change": "aux_hidden_dim 256 -> 512 (eikonal critic T_phi only). All other hyperparameters frozen from Step 7D/8.",
+  "cells_run": [
+    "1a_s42",
+    "2_dense_s42"
+  ],
+  "criteria_thresholds": {
+    "rho_ratio_max": 0.4,
+    "T_succ_1a_max": 3.0,
+    "T_coll_2dense_min": 90.0,
+    "pearson_min": 0.75,
+    "a_eik_agreement_min": 0.7,
+    "kl_max": 0.4
+  },
+  "per_cell": [
+    {
+      "cell": "1a_s42",
+      "scenario": "1a",
+      "seed": 42,
+      "maneuver": "stem_right",
+      "head_rho": 1.541154146194458,
+      "tail_rho": 1.561379075050354,
+      "rho_ratio": 1.0131232355347692,
+      "L_eik_head": 5.2185139656066895,
+      "L_eik_tail": 4.803260803222656,
+      "T_succ_mean_csv": 9.186660766601562,
+      "T_coll_mean_csv": 0.0,
+      "alm_lambda_final": 164378.11108433828,
+      "alm_mu_final": 10000.0,
+      "alm_mu_hit_max": true,
+      "lambda_slope_rel_per_20k": 0.4860096945650424,
+      "lambda_growth_factor_second_half": 214.95458243532087,
+      "sigma_bc_final": 1.142966628074646,
+      "sigma_ground_final": 2.1772899627685547,
+      "n_success_buffer": 1000,
+      "n_collision_buffer": 0,
+      "n_intermediate_buffer": 1000,
+      "trajectories_n_rows": 3,
+      "checkpoint_path": "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_eikonal_aux_1a_s42/model_eikonal_aux_1a_stem_right.pt",
+      "diagnostics": {
+        "pearson": -0.3140086841061444,
+        "a_eik_agreement": 0.40110246433203633,
+        "kl": 2.541504075350354,
+        "n_pairs_pearson": 6168,
+        "n_states_a_eik": 6168,
+        "n_succ_eps": 29,
+        "n_coll_eps": 1,
+        "n_to_eps": 0
+      }
+    },
+    {
+      "cell": "2_dense_s42",
+      "scenario": "2_dense",
+      "seed": 42,
+      "maneuver": "stem_right",
+      "head_rho": 2.895862102508545,
+      "tail_rho": 2.916978359222412,
+      "rho_ratio": 1.0072918723220885,
+      "L_eik_head": 10.364287376403809,
+      "L_eik_tail": 10.337244033813477,
+      "T_succ_mean_csv": 17.49247169494629,
+      "T_coll_mean_csv": 42.386985778808594,
+      "alm_lambda_final": 328252.0709673427,
+      "alm_mu_final": 10000.0,
+      "alm_mu_hit_max": true,
+      "lambda_slope_rel_per_20k": 0.48603514756219063,
+      "lambda_growth_factor_second_half": 217.39046348937862,
+      "sigma_bc_final": 0.9000486731529236,
+      "sigma_ground_final": 0.7594102025032043,
+      "n_success_buffer": 48,
+      "n_collision_buffer": 1000,
+      "n_intermediate_buffer": 1000,
+      "trajectories_n_rows": 3,
+      "checkpoint_path": "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_eikonal_aux_2_dense_s42/model_eikonal_aux_2_dense_stem_right.pt",
+      "diagnostics": {
+        "pearson": -0.16359537995800974,
+        "a_eik_agreement": 0.21148372726147754,
+        "kl": 1.342863619905815,
+        "n_pairs_pearson": 6581,
+        "n_states_a_eik": 8081,
+        "n_succ_eps": 5,
+        "n_coll_eps": 22,
+        "n_to_eps": 3
+      }
+    }
+  ],
+  "criteria_results": {
+    "1a_s42": {
+      "crit1_rho_ratio_lt_0p4": false,
+      "crit2_terminal_anchor": false,
+      "crit3_pearson_gt_0p75": false,
+      "crit4_a_eik_agree_gt_70": false,
+      "crit5_kl_lt_0p4": false,
+      "all_pass": false
+    },
+    "2_dense_s42": {
+      "crit1_rho_ratio_lt_0p4": false,
+      "crit2_terminal_anchor": false,
+      "crit3_pearson_gt_0p75": false,
+      "crit4_a_eik_agree_gt_70": false,
+      "crit5_kl_lt_0p4": false,
+      "all_pass": false
+    }
+  },
+  "outcome_classification": "outcome_2_close_with_structural_limitation",
+  "outcome_text": "At least one criterion failed on at least one cell. Phase 3F-A closes with documented structural limitation; Eikonal proceeds to Tier 1 with hidden_dim 256 and paper-honest framing."
+}

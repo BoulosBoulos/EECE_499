@@ -1,0 +1,146 @@
+{
+  "phase": "24",
+  "tests": {
+    "24.1_cli_args_present": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "help_returncode_zero": true,
+          "missing_core": [],
+          "missing_arch": [],
+          "missing_train_ctrl": [],
+          "missing_pde_common": [],
+          "unexpectedly_present_pde": []
+        },
+        {
+          "method": "hjb_aux",
+          "help_returncode_zero": true,
+          "missing_core": [],
+          "missing_arch": [],
+          "missing_train_ctrl": [],
+          "missing_pde_common": [],
+          "unexpectedly_present_pde": []
+        },
+        {
+          "method": "soft_hjb_aux",
+          "help_returncode_zero": true,
+          "missing_core": [],
+          "missing_arch": [],
+          "missing_train_ctrl": [],
+          "missing_pde_common": [],
+          "unexpectedly_present_pde": []
+        },
+        {
+          "method": "eikonal_aux",
+          "help_returncode_zero": true,
+          "missing_core": [],
+          "missing_arch": [],
+          "missing_train_ctrl": [],
+          "missing_pde_common": [],
+          "unexpectedly_present_pde": []
+        },
+        {
+          "method": "cbf_aux",
+          "help_returncode_zero": true,
+          "missing_core": [],
+          "missing_arch": [],
+          "missing_train_ctrl": [],
+          "missing_pde_common": [],
+          "unexpectedly_present_pde": []
+        }
+      ]
+    },
+    "24.2_uniform_config_schema": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "smoke_ok": true,
+          "n_issues": 0,
+          "issues": [],
+          "n_config_keys": 22
+        },
+        {
+          "method": "hjb_aux",
+          "smoke_ok": true,
+          "n_issues": 0,
+          "issues": [],
+          "n_config_keys": 22
+        },
+        {
+          "method": "soft_hjb_aux",
+          "smoke_ok": true,
+          "n_issues": 0,
+          "issues": [],
+          "n_config_keys": 22
+        },
+        {
+          "method": "eikonal_aux",
+          "smoke_ok": true,
+          "n_issues": 0,
+          "issues": [],
+          "n_config_keys": 22
+        },
+        {
+          "method": "cbf_aux",
+          "smoke_ok": true,
+          "n_issues": 0,
+          "issues": [],
+          "n_config_keys": 22
+        }
+      ]
+    },
+    "24.3_cli_propagation": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "hjb_aux",
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "soft_hjb_aux",
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "eikonal_aux",
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "cbf_aux",
+          "n_issues": 0,
+          "issues": []
+        }
+      ]
+    },
+    "24.4_use_intent_flag": {
+      "pass": true,
+      "issues": []
+    },
+    "24.5_git_provenance": {
+      "pass": true,
+      "issues": [],
+      "in_repo": {
+        "git_commit": "885cf77b",
+        "git_branch": "master",
+        "git_dirty": false
+      },
+      "no_repo": {
+        "git_commit": "00000000",
+        "git_branch": "unknown",
+        "git_dirty": true
+      }
+    },
+    "24.6_existing_suite": {
+      "pass": true,
+      "n_phases": 26,
+      "all_pass": true,
+      "failed_phases": [],
+      "load_failures": []
+    }
+  },
+  "pass": true
+}

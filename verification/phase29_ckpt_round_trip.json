@@ -1,0 +1,144 @@
+{
+  "phase": "29.7",
+  "pass": true,
+  "per_method": [
+    {
+      "method": "drppo",
+      "eval_csv": "/tmp/phase2_ckpt_round_trip/drppo/eval_metrics.csv",
+      "eval_csv_n_rows": 10,
+      "eval_csv_columns": [
+        "ego_maneuver",
+        "ego_max_speed",
+        "episode_length",
+        "eval_episode_idx",
+        "iteration",
+        "mean_ttc",
+        "min_distance_to_collision",
+        "min_ttc",
+        "n_action_changes",
+        "return_total",
+        "scenario",
+        "seed",
+        "terminal_state"
+      ],
+      "schema_match": true,
+      "no_nan_in_core_metrics": true,
+      "eval_ok": true
+    },
+    {
+      "method": "hjb_aux",
+      "eval_csv": "/tmp/phase2_ckpt_round_trip/hjb_aux/eval_metrics.csv",
+      "eval_csv_n_rows": 10,
+      "eval_csv_columns": [
+        "ego_maneuver",
+        "ego_max_speed",
+        "episode_length",
+        "eval_episode_idx",
+        "iteration",
+        "mean_ttc",
+        "min_distance_to_collision",
+        "min_ttc",
+        "n_action_changes",
+        "return_total",
+        "scenario",
+        "seed",
+        "terminal_state"
+      ],
+      "schema_match": true,
+      "no_nan_in_core_metrics": true,
+      "eval_ok": true
+    },
+    {
+      "method": "soft_hjb_aux",
+      "eval_csv": "/tmp/phase2_ckpt_round_trip/soft_hjb_aux/eval_metrics.csv",
+      "eval_csv_n_rows": 10,
+      "eval_csv_columns": [
+        "ego_maneuver",
+        "ego_max_speed",
+        "episode_length",
+        "eval_episode_idx",
+        "iteration",
+        "mean_ttc",
+        "min_distance_to_collision",
+        "min_ttc",
+        "n_action_changes",
+        "return_total",
+        "scenario",
+        "seed",
+        "terminal_state"
+      ],
+      "schema_match": true,
+      "no_nan_in_core_metrics": true,
+      "eval_ok": true
+    },
+    {
+      "method": "eikonal_aux",
+      "eval_csv": "/tmp/phase2_ckpt_round_trip/eikonal_aux/eval_metrics.csv",
+      "eval_csv_n_rows": 10,
+      "eval_csv_columns": [
+        "ego_maneuver",
+        "ego_max_speed",
+        "episode_length",
+        "eval_episode_idx",
+        "iteration",
+        "mean_ttc",
+        "min_distance_to_collision",
+        "min_ttc",
+        "n_action_changes",
+        "return_total",
+        "scenario",
+        "seed",
+        "terminal_state"
+      ],
+      "schema_match": true,
+      "no_nan_in_core_metrics": true,
+      "eval_ok": true
+    },
+    {
+      "method": "cbf_aux",
+      "eval_csv": "/tmp/phase2_ckpt_round_trip/cbf_aux/eval_metrics.csv",
+      "eval_csv_n_rows": 10,
+      "eval_csv_columns": [
+        "ego_maneuver",
+        "ego_max_speed",
+        "episode_length",
+        "eval_episode_idx",
+        "iteration",
+        "mean_ttc",
+        "min_distance_to_collision",
+        "min_ttc",
+        "n_action_changes",
+        "return_total",
+        "scenario",
+        "seed",
+        "terminal_state"
+      ],
+      "schema_match": true,
+      "no_nan_in_core_metrics": true,
+      "eval_ok": true
+    },
+    {
+      "method": "fusion_aux",
+      "eval_csv": "/tmp/phase2_ckpt_round_trip/fusion_aux/eval_metrics.csv",
+      "eval_csv_n_rows": 10,
+      "eval_csv_columns": [
+        "ego_maneuver",
+        "ego_max_speed",
+        "episode_length",
+        "eval_episode_idx",
+        "iteration",
+        "mean_ttc",
+        "min_distance_to_collision",
+        "min_ttc",
+        "n_action_changes",
+        "return_total",
+        "scenario",
+        "seed",
+        "terminal_state"
+      ],
+      "schema_match": true,
+      "no_nan_in_core_metrics": true,
+      "eval_ok": true
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "method": "drppo",
+  "checkpoint_path": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/drppo/model_drppo_1a_stem_right_step5000.pt",
+  "scenario": "1a",
+  "ego_maneuver": "stem_right",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 1,
+  "eval_seeds": [
+    1234
+  ],
+  "episodes_per_seed": 5,
+  "total_eval_episodes": 10,
+  "eval_wall_time_seconds": 17.565274000167847
+}

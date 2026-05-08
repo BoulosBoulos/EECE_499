@@ -1,0 +1,24 @@
+{
+  "phase": "2.6",
+  "pass": true,
+  "styles_seen": {
+    "all": [
+      "aggressive",
+      "distracted",
+      "drunk",
+      "nominal",
+      "rule_violating",
+      "timid"
+    ],
+    "nominal": [
+      "nominal",
+      "timid"
+    ],
+    "adversarial": [
+      "aggressive",
+      "distracted",
+      "drunk",
+      "erratic"
+    ]
+  }
+}

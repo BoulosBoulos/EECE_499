@@ -1,0 +1,57 @@
+{
+  "phase": "29.5",
+  "pass": true,
+  "csv_path": "/tmp/synthetic_60run_analysis/statistical_tests/tier1_family_A_final_collision_rate.csv",
+  "checks": [
+    {
+      "check": "n_rows == 5",
+      "pass": true,
+      "actual": 5
+    },
+    {
+      "check": "all required columns populated (no NaN)",
+      "pass": true
+    },
+    {
+      "check": "insufficient_n is False for all rows (n=10)",
+      "pass": true
+    },
+    {
+      "check": "hjb_aux: sig True, d~-2.4",
+      "pass": true,
+      "actual_d": -2.370659403584231,
+      "actual_sig": true,
+      "d_dev_frac": 0.01222524850657029
+    },
+    {
+      "check": "soft_hjb_aux: sig True, d~-2.6",
+      "pass": true,
+      "actual_d": -2.578013546541959,
+      "actual_sig": true,
+      "d_dev_frac": 0.008456328253092674
+    },
+    {
+      "check": "eikonal_aux: sig False, d~-0.4",
+      "pass": true,
+      "actual_d": -0.4008918628686375,
+      "actual_sig": false,
+      "d_dev_frac": 0.002229657171593652
+    },
+    {
+      "check": "cbf_aux: sig True, d~-3.9",
+      "pass": true,
+      "actual_d": -3.9361552603137477,
+      "actual_sig": true,
+      "d_dev_frac": 0.009270579567627649
+    },
+    {
+      "check": "fusion_aux: sig True, d~-4.2",
+      "pass": true,
+      "actual_d": -4.113750762119346,
+      "actual_sig": true,
+      "d_dev_frac": 0.020535532828727214
+    }
+  ],
+  "n_rows": 5,
+  "mismatches": []
+}

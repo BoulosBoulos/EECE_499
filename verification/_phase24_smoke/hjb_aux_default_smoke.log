@@ -1,0 +1,31 @@
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[hjb_aux] step=4096 ret=-302.32 coll=0 ttc=11.15 hjb_res=1730.6497
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+Saved hjb_aux to /home/boulosboulos/Desktop/EECE_499-main/verification/_phase24_smoke/hjb_aux_default/model_hjb_aux_1a_stem_right.pt
+Training complete. Metrics in /home/boulosboulos/Desktop/EECE_499-main/verification/_phase24_smoke/hjb_aux_default/train_hjb_aux_1a_stem_right.csv

@@ -1,0 +1,109 @@
+{
+  "phase": "pre_tier_1",
+  "name": "Fusion-aux dual-critic implementation verification",
+  "verdict": "bug",
+  "verdict_rationale": "U_safety is trained but never queried by the policy: the value-head distillation target (line 322-326) and the actor-KL soft policy (line 331-351) are both built from U_optimality only. Per Phase 1C Decision F as cited in the source. Effective w_distill_cbf = 0 → bug indicator §2.3 #2 fires (sum of distill weights 0.25 < 0.5). The class docstring claims U_safety constrains the policy via 'L_cbf in the total loss' which is factually incorrect from the code: L_cbf is in aux_loss_saf which only updates U_safety's parameters via aux_opt_safety, never reaching the policy. Fusion is effectively Soft-HJB-aux + a parallel-trained but unused U_safety, consistent with Step 11's finding that Fusion tracks Soft-HJB-aux's signature on both cells (1a 0.948 vs 0.953; 2_dense 0.032 vs 0.013).",
+  "code_inspection_findings": [
+    {
+      "item": "critic_separation",
+      "fusion": "Two completely independent networks (SoftHJBAuxCritic for U_optimality, CBFAuxCritic for U_safety). No shared backbone. Three optimizers (policy_optimizer, aux_opt_optimality, aux_opt_safety), each owning disjoint parameter sets.",
+      "hjb": "Single HJBAuxCritic, single aux_optimizer.",
+      "cbf": "Single CBFAuxCritic, single aux_optimizer.",
+      "concern": "None — clean separation. No gradient interference at the critic level."
+    },
+    {
+      "item": "critic_combination_at_distillation",
+      "fusion": "U_optimality only. Line 322-326: U_distill = U_optimality(xi_t).detach(); L_distill = MSE(value, U_distill). Per Phase 1C Decision F.",
+      "hjb": "Single critic distilled into V_PPO via U_aux.detach().",
+      "cbf": "Single critic distilled into V_PPO via U_aux.detach().",
+      "concern": "U_safety has zero path to influence the policy. The class docstring claims dual-critic policy influence which the code does not provide."
+    },
+    {
+      "item": "distillation_weights",
+      "fusion": "lambda_distill = 0.25 (applied to U_optimality only). w_optimality = 1.0, w_safety = 1.0 are exposed but only enter aux_loss_opt and aux_loss_saf (line 268-272, 309-313), not the policy distill target. Effective w_distill_hjb = 0.25, w_distill_cbf = 0. Sum = 0.25 < 0.5 spec floor.",
+      "hjb": "lambda_distill = 0.25.",
+      "cbf": "lambda_distill = 0.25.",
+      "concern": "FIRES bug indicator §2.3 #2: w_distill_hjb + w_distill_cbf < 0.5."
+    },
+    {
+      "item": "pde_residual_loss_combination",
+      "fusion": "L_soft and L_cbf are NOT combined. L_soft enters aux_loss_opt → aux_opt_optimality (line 268-278); L_cbf enters aux_loss_saf → aux_opt_safety (line 309-319). Each updates only its own critic's parameters.",
+      "hjb": "L_hjb in aux_loss → aux_optimizer.",
+      "cbf": "L_cbf in aux_loss → aux_optimizer.",
+      "concern": "Architecturally clean (no gradient interference between critics). But the consequence is the docstring's 'L_cbf in the total loss' claim is false: L_cbf does not enter policy_optimizer's gradient path."
+    },
+    {
+      "item": "stop_gradient_discipline",
+      "fusion": "U_optimality.detach() at line 324 before vf_loss distill. q_all.detach() at line 335 before actor-KL. U_safety never enters the policy gradient path so stop-gradient on U_safety is moot.",
+      "hjb": "U_aux.detach() before vf_loss distill (line 181).",
+      "cbf": "U_aux.detach() before vf_loss distill (line 184).",
+      "concern": "None — stop-gradient is correctly applied where applicable."
+    },
+    {
+      "item": "ppo_actor_update",
+      "fusion": "actor_loss + lambda_actor_kl * KL(actor || softmax(q_a from U_optimality / tau)). q_a comes from pde_q_values(self.U_optimality, ...), then detached. Single signal from U_optimality only, similar to Soft-HJB-aux's pattern.",
+      "hjb": "actor_loss + entropy + vf_loss(distill from U_aux). No actor-KL term.",
+      "cbf": "actor_loss + entropy + vf_loss(distill from U_aux). No actor-KL term.",
+      "concern": "Fusion's actor-KL term provides additional alignment signal but only from U_optimality. Combined with the distillation pattern, Fusion is functionally Soft-HJB-aux with an extra parallel-trained CBF critic that no consumer queries."
+    }
+  ],
+  "data_diagnostics": {
+    "F_opt_over_S_opt_ratio": {
+      "median": 0.498,
+      "min": 0.0004,
+      "max": 43.78,
+      "interpretation": "Median below 1 means Fusion's optimality residual is typically lower than standalone Soft-HJB-aux's. Wide range (0.0004-43.78) reflects heavy seed-variance; not a consistent >2x pattern → does NOT fire bug indicator §2.3 #1.",
+      "n_seeds": 6
+    },
+    "F_saf_over_C_saf_ratio": {
+      "median": 2.732,
+      "min": 0.0388,
+      "max": 12.30,
+      "interpretation": "Fusion's CBF residual is moderately elevated (median 2.7x) vs standalone CBF-aux's CBF residual. Within 5x, not catastrophic. Not a bug indicator per spec §2.3.",
+      "n_seeds": 6
+    },
+    "F_distill_over_S_distill_ratio": {
+      "median": 1.121,
+      "min": 0.814,
+      "max": 1.359,
+      "interpretation": "Fusion's distillation loss magnitude is comparable to standalone Soft-HJB-aux's (within 0.81-1.36x). Confirms that Fusion's distillation behaves like Soft-HJB-aux's, consistent with the architectural finding that only U_optimality is distilled.",
+      "n_seeds": 6
+    },
+    "distill_weights_in_config": {
+      "lambda_distill": 0.25,
+      "w_optimality": 1.0,
+      "w_safety": 1.0,
+      "effective_w_distill_hjb_into_policy": 0.25,
+      "effective_w_distill_cbf_into_policy": 0.0,
+      "sum_distill_weights_into_policy": 0.25,
+      "spec_threshold_min": 0.5,
+      "fires_bug_indicator_2": true
+    },
+    "combined_advantage_vs_standalone_ratio": "N/A — Fusion does not compute a combined advantage. The 'advantage' used in the actor-KL term is derived from U_optimality only; U_safety is never converted to an advantage signal."
+  },
+  "bug_indicators_fired": [
+    "§2.3 #2 — distillation weights silently zero or mis-scaled: effective w_distill_cbf = 0; sum (0.25) < 0.5 spec floor. Documented as Phase 1C Decision F lock; class docstring claims dual-critic policy influence that is not implemented."
+  ],
+  "finding_indicators_fired": [
+    "§2.3 finding #1 — HJB-component and CBF-component residuals within 1.5x standalone counterparts: PARTIAL (median F_opt/S_opt = 0.50 within bound; F_saf/C_saf = 2.73 outside 1.5x but within 5x; not catastrophic).",
+    "§2.3 finding #3 — Stop-gradient discipline correct: TRUE (U_optimality.detach and q_all.detach both present where applicable; U_safety stop-grad moot).",
+    "§2.3 finding #4 — Combination formula mathematically defensible: VACUOUSLY TRUE since no combination exists; this is exactly what makes the bug fire."
+  ],
+  "branch_artifact_path": "verification/fusion_bug_artifact.md",
+  "tier_1_implication": "apply_fix_then_smoke_test_then_tier_1",
+  "smoke_test_required_before_fix_application": true,
+  "smoke_test_pass_criterion": "mean_SR_post_first >= 0.3 on (2_dense, right_left, seed=42) at 50k under v2 criterion",
+  "smoke_test_compute_estimate_minutes": 30,
+  "stop_authorization_required": true,
+  "files_inspected_read_only": [
+    "models/pde/fusion_aux_agent.py",
+    "models/pde/hjb_aux_agent.py",
+    "models/pde/cbf_aux_agent.py",
+    "results/step11_calibration/STEP11_fusion_aux_*/metrics.csv (6 jobs)",
+    "results/step11_calibration/STEP11_soft_hjb_aux_*/metrics.csv (6 jobs)",
+    "results/step11_calibration/STEP11_hjb_aux_*/metrics.csv (6 jobs)",
+    "results/step11_calibration/STEP11_cbf_aux_*/metrics.csv (6 jobs)"
+  ],
+  "files_modified_during_diagnostic": [],
+  "code_changes_made": "none — read-only diagnostic per spec §5"
+}

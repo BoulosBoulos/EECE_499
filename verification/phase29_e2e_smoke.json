@@ -1,0 +1,102 @@
+{
+  "phase": "29.6",
+  "pass": true,
+  "per_method": [
+    {
+      "method": "drppo",
+      "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_drppo_nointent_s42",
+      "exists_run_dir": true,
+      "exists_metrics_csv": true,
+      "exists_meta_json": true,
+      "exists_eval_csv": true,
+      "exists_checkpoint": true,
+      "metrics_n_rows": 2,
+      "metrics_n_cols": 26,
+      "metrics_has_nan": false,
+      "meta_has_result_summary": true,
+      "meta_method": "drppo"
+    },
+    {
+      "method": "hjb_aux",
+      "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_hjb_aux_nointent_s42",
+      "exists_run_dir": true,
+      "exists_metrics_csv": true,
+      "exists_meta_json": true,
+      "exists_eval_csv": true,
+      "exists_checkpoint": true,
+      "metrics_n_rows": 2,
+      "metrics_n_cols": 26,
+      "metrics_has_nan": false,
+      "meta_has_result_summary": true,
+      "meta_method": "hjb_aux"
+    },
+    {
+      "method": "soft_hjb_aux",
+      "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_soft_hjb_aux_nointent_s42",
+      "exists_run_dir": true,
+      "exists_metrics_csv": true,
+      "exists_meta_json": true,
+      "exists_eval_csv": true,
+      "exists_checkpoint": true,
+      "metrics_n_rows": 2,
+      "metrics_n_cols": 26,
+      "metrics_has_nan": false,
+      "meta_has_result_summary": true,
+      "meta_method": "soft_hjb_aux"
+    },
+    {
+      "method": "eikonal_aux",
+      "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_eikonal_aux_nointent_s42",
+      "exists_run_dir": true,
+      "exists_metrics_csv": true,
+      "exists_meta_json": true,
+      "exists_eval_csv": true,
+      "exists_checkpoint": true,
+      "metrics_n_rows": 2,
+      "metrics_n_cols": 26,
+      "metrics_has_nan": false,
+      "meta_has_result_summary": true,
+      "meta_method": "eikonal_aux"
+    },
+    {
+      "method": "cbf_aux",
+      "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_cbf_aux_nointent_s42",
+      "exists_run_dir": true,
+      "exists_metrics_csv": true,
+      "exists_meta_json": true,
+      "exists_eval_csv": true,
+      "exists_checkpoint": true,
+      "metrics_n_rows": 2,
+      "metrics_n_cols": 26,
+      "metrics_has_nan": false,
+      "meta_has_result_summary": true,
+      "meta_method": "cbf_aux"
+    },
+    {
+      "method": "fusion_aux",
+      "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_fusion_aux_nointent_s42",
+      "exists_run_dir": true,
+      "exists_metrics_csv": true,
+      "exists_meta_json": true,
+      "exists_eval_csv": true,
+      "exists_checkpoint": true,
+      "metrics_n_rows": 2,
+      "metrics_n_cols": 26,
+      "metrics_has_nan": false,
+      "meta_has_result_summary": true,
+      "meta_method": "fusion_aux"
+    }
+  ],
+  "smoke_root": "/tmp/phase2_smoke_v2",
+  "log_size_bytes": 671,
+  "log_tail": [
+    "  [START] T1_1a_stem_right_drppo_nointent_s42 (pid 12483)",
+    "",
+    "Done: 6 completed, 0 failed, 0.4h total"
+  ],
+  "n_ok_tag_in_log": 0,
+  "n_fail_tag_in_log": 0,
+  "done_line": "Done: 6 completed, 0 failed, 0.4h total",
+  "n_jobs_completed": 6,
+  "n_jobs_failed": 0
+}

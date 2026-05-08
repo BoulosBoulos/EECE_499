@@ -1,0 +1,2 @@
+step,episode_return,episode_len,actor_loss,vf_loss,collision_count,collision_rate,mean_ttc,min_ttc,entropy,soft_residual_mean,anchor_loss,bc_loss,distill_loss,distill_gap,actor_align_kl,train_time_per_iter
+4096,-40.282249999999976,10,0.253487765789032,79.7689208984375,0,0.0,6.106224437379052,0.0,1.3465934991836548,1.0982900857925415,65.57209777832031,0.0,6.577805995941162,6.577805995941162,0.29981493949890137,17.78323197364807

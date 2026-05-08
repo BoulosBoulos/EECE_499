@@ -1,0 +1,81 @@
+{
+  "phase": "pre_tier_1_fusion_fix_smoke",
+  "name": "Fusion-aux dual-critic fix smoke-test verification",
+  "verdict": "1a_pass_2_dense_fail_reported",
+  "fix_applied_to": "models/pde/fusion_aux_agent.py",
+  "fix_stays_applied": true,
+  "fix_applied_regardless_of_smoke_outcome": true,
+  "user_directive_quoted": "The fix is to be applied regardless of smoke test outcome — the unfixed implementation contradicts the paper's 'dual-critic Fusion' contribution claim. The smoke test is a sanity check, not a gate.",
+  "diff_summary": [
+    "Replaced the U_distill block (formerly lines 322-326): now computes a convex combination of U_optimality and U_safety weighted by w_optimality and w_safety, normalized by their sum.",
+    "Replaced the actor-KL q_all block (formerly lines 331-335): now computes q_opt and q_saf separately and combines via the same convex weights.",
+    "Updated the class docstring (lines 1-28 region) to accurately describe the post-fix dual-critic distillation flow; removed the false 'L_cbf in the total loss' claim.",
+    "Added diagnostic outputs distill_loss_optimality_component and distill_loss_safety_component to train_step's return dict (not yet propagated to metrics.csv schema in train_fusion_aux.py — would require a separate edit there)."
+  ],
+  "smoke_test_1a": {
+    "cell": "1a × stem_right × seed=42",
+    "total_steps_smoke": 50000,
+    "wall_clock_status": "completed cleanly",
+    "sr_last_10k": 0.901,
+    "cr_last_10k": 0.0,
+    "ret_last_10k": 21839.67,
+    "L_distill_last_10k": 83.65,
+    "n_nan_or_inf": 0,
+    "pass_criterion": "SR last 10k > 0.7",
+    "pass_criterion_met": true,
+    "fair_comparison_pre_fix_at_50k": {
+      "sr_pre_fix_at_step_49152": 1.0,
+      "sr_post_fix_at_step_49152": 0.842,
+      "delta": -0.158,
+      "interpretation": "Slight regression at the matched 49k step but well within the >0.7 threshold; the fix's added gradient signal from U_safety creates mild perturbation early in training that resolves by the 50k window's tail. No anti-pattern."
+    }
+  },
+  "smoke_test_2_dense": {
+    "cell": "2_dense × right_left × seed=42",
+    "total_steps_smoke": 50000,
+    "wall_clock_status": "completed cleanly",
+    "sr_last_10k": 0.0,
+    "cr_last_10k": 0.0,
+    "ret_last_10k": -1270.14,
+    "L_distill_last_10k": 12.09,
+    "n_nan_or_inf": 0,
+    "pass_criterion": "SR last 10k > 0.15 AND L_cbf contribution non-trivial",
+    "pass_criterion_met": false,
+    "criterion_failed_on": "SR last 10k = 0.000 (below 0.15 threshold)",
+    "fair_comparison_pre_fix_at_50k": {
+      "sr_pre_fix_at_step_49152": 0.0,
+      "sr_post_fix_at_step_49152": 0.0,
+      "delta": 0.0,
+      "interpretation": "Pre-fix and post-fix both at SR=0 at 50k — fix did not regress 2_dense at this short horizon, but did not produce visible improvement either. Note: pre-fix Fusion eventually reached SR=0.131 at 500k (Step 11). The 50k smoke can't observe whether post-fix Fusion would similarly improve later or whether the corrected gradient path produces qualitatively different long-horizon behavior."
+    },
+    "L_cbf_gradient_path_sanity": {
+      "L_residual_safety_last_3_iters_mean": 0.427,
+      "interpretation": "Non-zero, confirms U_safety is being trained on the CBF residual + anchor + BC losses. Per-component distill contribution (distill_loss_safety_component) was added to the agent's return dict but not yet to metrics.csv schema, so cannot be tabulated here. Code inspection of patched lines 322-336 confirms U_safety enters U_distill via convex combination — gradient path is structurally correct.",
+      "explicit_acknowledgment": "Smoke spec required L_cbf contribution to be non-trivial per metrics.csv; this was not directly verified due to schema-not-extended; verified by code inspection + non-zero L_residual_safety. Fix-application is correct; smoke verification is partially inconclusive on this sub-criterion."
+    }
+  },
+  "verdict_per_user_step_4_branch": "1a_passes_2_dense_fails_loosened_criterion → REPORT_AND_STOP. Per user directive: 'The fix may not be the right combination formula or there's a deeper architectural issue. Do not proceed.'",
+  "files_modified": [
+    "models/pde/fusion_aux_agent.py (diff applied + docstring updated + diagnostic outputs added)"
+  ],
+  "files_NOT_modified_due_to_REPORT_AND_STOP_branch": [
+    "CALIBRATION_REPORT.md (§6 fix-and-smoke-test subsection NOT added; contingent on both-pass per user step 5)",
+    "config_lock.json (NOT updated with new fusion_aux_agent.py hash; contingent on both-pass per user step 5)",
+    "previous_locks under config_lock.json (NOT augmented; contingent on both-pass)"
+  ],
+  "honest_acknowledgments": [
+    "Per spec: 50k is too short to see HJB-aux-style 2_dense convergence (HJB-aux × 2_dense × s123 took 331k). The 2_dense smoke null result at 50k does NOT prove the fix is wrong; it only proves the fix's improvement (if any) is not observable within 50k. Tier 1's full 400k budget would tell the real story.",
+    "However, the user's smoke spec explicitly used a loosened criterion (SR > 0.15) precisely to detect 'any meaningful improvement'. That criterion failed (SR = 0). The fix has not produced even a small early-training shift on 2_dense at this seed × this budget.",
+    "Possible interpretations (paper-relevant): (a) the convex combination of U_optimality (Soft-HJB-shaped) and U_safety (CBF-shaped) does not produce HJB-style gradient information that 2_dense needs; the architectural fix is necessary but not sufficient to inherit HJB-aux's 2_dense advantage. (b) the smoke is a single-seed snapshot; seed-variance may be large; full multi-seed Tier 1 needed for statistical claim.",
+    "The user has explicitly deferred Option 3 (swap Soft-HJB → HJB inside Fusion's optimality critic) until Tier 1 results are in."
+  ],
+  "tier_1_implication": "fusion_proceeds_with_fix_applied_but_unverified_on_2_dense. The fix is architecturally correct and removes the docstring/code-discrepancy that would have undermined the dual-critic paper claim. Tier 1's 240 Fusion jobs will provide statistical confirmation of whether the fix yields a reproducible 2_dense improvement, or whether Fusion's combination of Soft-HJB+CBF intrinsically lacks the structural feature that gives HJB-aux its 2_dense advantage. Either outcome is paper-defensible.",
+  "next_step_options_for_user": [
+    "Option A — Authorize Tier 1 with the fix applied. Accept that the smoke didn't confirm 2_dense recovery at 50k; rely on Tier 1's longer horizon and seed count.",
+    "Option B — Keep the fix applied but defer Tier 1 until a follow-up investigation: e.g., a longer (200k) smoke test on 2_dense, or a swap of U_optimality from Soft-HJB to HJB.",
+    "Option C — Revert the fix. Not recommended (the unfixed implementation contradicts the paper's dual-critic claim regardless of empirical outcome), but available."
+  ],
+  "status_json_path": "verification/fusion_fix_verification.json",
+  "predecessor": "verification/fusion_pre_tier1_verification.json (verdict=bug)",
+  "predecessor_artifact": "verification/fusion_bug_artifact.md"
+}

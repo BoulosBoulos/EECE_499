@@ -1,0 +1,24 @@
+# SUMO + TraCI
+traci
+# traci bundled with sumo; install sumo separately (apt/yum/conda)
+
+# Config
+pyyaml>=6.0
+
+# Visualization (optional; run_visualize.py works without it but no plots)
+matplotlib>=3.5
+
+# Dashboard
+streamlit>=1.30.0
+plotly>=5.18.0
+pandas>=2.0.0
+
+# HPO
+optuna>=3.0.0
+
+# RL
+gymnasium>=0.29.0
+numpy>=1.24.0
+torch>=2.0.0
+stable-baselines3>=2.0.0
+sb3-contrib>=2.0.0

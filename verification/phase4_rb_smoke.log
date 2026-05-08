@@ -1,0 +1,11 @@
+Eval seed=42 [deterministic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=-137.56 coll=0.000 success=1.000 ttc=6.72 ent=0.67 brakes=1.0
+Eval seed=42 [stochastic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=-137.56 coll=0.000 success=1.000 ttc=6.72 ent=0.67 brakes=1.0
+Saved verification/smoke_rb/eval_rule_based_1a_stem_right.csv

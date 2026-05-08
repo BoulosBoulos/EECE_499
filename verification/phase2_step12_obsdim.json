@@ -1,0 +1,81 @@
+{
+  "phase": "2.8",
+  "pass": true,
+  "unique_dims": [
+    135
+  ],
+  "configs": [
+    {
+      "scen": "1a",
+      "man": "stem_right",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "1a",
+      "man": "stem_left",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "1a",
+      "man": "right_left",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "1a",
+      "man": "left_stem",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "1b",
+      "man": "stem_right",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "2",
+      "man": "stem_right",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "2_dense",
+      "man": "stem_right",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "4",
+      "man": "stem_right",
+      "extra": {},
+      "obs_dim": 135
+    },
+    {
+      "scen": "1a",
+      "man": "stem_right",
+      "extra": {
+        "buildings": false
+      },
+      "obs_dim": 135
+    },
+    {
+      "scen": "1a",
+      "man": "stem_right",
+      "extra": {
+        "state_ablation": "no_visibility"
+      },
+      "obs_dim": 135
+    },
+    {
+      "scen": "1a",
+      "man": "stem_right",
+      "extra": {
+        "style_filter": "nominal"
+      },
+      "obs_dim": 135
+    }
+  ]
+}

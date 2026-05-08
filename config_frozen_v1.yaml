@@ -1,0 +1,292 @@
+# config_frozen_v1.yaml
+# Canonical configuration for EECE 499 PINN-RL project.
+# Frozen on Phase 1F completion. Any change after this point requires
+# versioning to v2 (rename to config_frozen_v2.yaml + regenerate config_lock.json).
+#
+# All result-affecting hyperparameters and tier configurations live here.
+# Schema definitions (column lists, expected keys) remain in run_metadata.py /
+# analysis/config.py per Phase 1E decision #1.
+#
+# Audit anchor: every value below was verified against the codebase on Phase 1F
+# entry (no internal discrepancies found). CLI flag defaults take precedence
+# over legacy configs/pde/*.yaml in actual training -- this file mirrors the
+# CLI defaults that the orchestrator and training scripts actually use.
+
+version: "v1"
+description: "EECE 499 PINN-RL frozen configuration. See SPEC_PHASE_1F for protocol."
+
+# ─── PPO core hyperparameters (shared across all 6 trainable methods) ──────
+ppo:
+  lr: 0.0003
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_eps: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  n_epochs_per_update: 8
+  batch_size: 128
+  n_steps: 4096
+
+# ─── Policy and critic architecture ─────────────────────────────────────────
+architecture:
+  policy_hidden_size: 256
+  policy_n_layers: 3
+  gru_hidden_size: 256
+  gru_n_layers: 1
+  aux_critic_hidden_dim: 256
+  xi_dim: 79
+
+# ─── Method-specific defaults ───────────────────────────────────────────────
+# Values match the CLI defaults registered in each training script. aux_lr is
+# loaded from the legacy configs/pde/*.yaml and is not exposed via CLI; the
+# default of 0.001 is what every PDE training script actually uses.
+methods:
+  drppo:
+    # No method-specific defaults; uses only PPO + architecture
+    null_marker: true
+
+  hjb_aux:
+    lambda_residual: 0.2
+    lambda_distill: 0.25
+    collocation_size: 256
+    aux_lr: 0.001
+
+  soft_hjb_aux:
+    lambda_residual: 0.2
+    lambda_distill: 0.25
+    lambda_actor_kl: 0.1
+    tau_soft: 1.0
+    collocation_size: 256
+    aux_lr: 0.001
+
+  eikonal_aux:
+    lambda_residual: 0.2
+    lambda_distill: 0.25
+    w_fail: 50.0
+    collocation_size: 256
+    aux_lr: 0.001
+
+  cbf_aux:
+    lambda_residual: 0.2
+    lambda_distill: 0.25
+    alpha_cbf: 1.0
+    barrier_offset: 10.0
+    collocation_size: 256
+    aux_lr: 0.001
+
+  fusion_aux:
+    lambda_residual: 0.2
+    lambda_distill: 0.25
+    lambda_actor_kl: 0.1
+    tau_soft: 1.0
+    alpha_cbf: 1.0
+    barrier_offset: 10.0
+    w_optimality: 1.0
+    w_safety: 1.0
+    collocation_size: 256
+    aux_lr: 0.001
+
+  rule_based:
+    # Actual rule-based controller (models/rule_based_policy.py) uses a single
+    # TTC threshold STOP/GO heuristic (no YIELD/CREEP tiers). Codebase values:
+    ttc_threshold: 3.0    # seconds; if min_ttc < this, action = STOP
+    far_zone_dist: 5.0    # metres; geometric far-zone gate (else action = GO)
+
+# ─── Training control ───────────────────────────────────────────────────────
+training:
+  default_total_steps: 200000  # used when no per-tier override
+  eval_every_n_iter: 10
+  save_every_n_iter: 50
+  n_eval_episodes: 10
+  episode_max_steps: 500
+  smoke_test_steps: 5000  # for verification only
+
+# ─── Tier 1 configuration ───────────────────────────────────────────────────
+# Locked combos / methods / seeds match experiments/pde/run_full_ablation.py
+# at Phase 1F entry. Total: 12 × 7 × 10 × 2 = 1,680 jobs.
+tier1:
+  total_steps: 200000
+  combos:
+    # Phase 1F follow-up swap: (1c, stem_right) replaced by
+    # (2_dense, right_left) for cross-referenceability with Tier 2 sub-grids
+    # 2a/2c which use 2_dense as a primary scenario.
+    - { scenario: "1a", maneuver: "stem_right" }
+    - { scenario: "1a", maneuver: "stem_left" }
+    - { scenario: "1a", maneuver: "right_stem" }
+    - { scenario: "1b", maneuver: "stem_right" }
+    - { scenario: "1b", maneuver: "stem_left" }
+    - { scenario: "2", maneuver: "stem_right" }
+    - { scenario: "2", maneuver: "stem_left" }
+    - { scenario: "2_dense", maneuver: "right_left" }
+    - { scenario: "4", maneuver: "stem_right" }
+    - { scenario: "4", maneuver: "stem_left" }
+    - { scenario: "3", maneuver: "right_left" }
+    - { scenario: "3", maneuver: "left_right" }
+  methods:
+    - "hjb_aux"
+    - "soft_hjb_aux"
+    - "eikonal_aux"
+    - "cbf_aux"
+    - "fusion_aux"
+    - "drppo"
+    - "rule_based"
+  seeds: [42, 123, 456, 789, 999, 1111, 2222, 3333, 4444, 5555]
+  intents: [false, true]
+  # Total: 12 × 7 × 10 × 2 = 1680 jobs
+
+# ─── Tier 2 configuration ───────────────────────────────────────────────────
+# Three sub-grids: 2a lambda sweep (600), 2b occlusion sweep (400),
+# 2c fusion weight sweep (160). Total: 1,160 jobs.
+tier2:
+  total_steps: 200000
+  shared:
+    maneuvers: ["stem_right", "right_left"]
+    seeds: [42, 123, 456, 789, 7]
+    methods: ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "fusion_aux"]
+
+  sub_grid_2a:
+    description: "Lambda residual sweep"
+    scenarios: ["1a", "2_dense"]
+    lambda_values: [0.01, 0.05, 0.1, 0.2, 0.5, 1.0]
+    # Total: 5 × 2 × 2 × 5 × 6 = 600 jobs
+
+  sub_grid_2b:
+    description: "Occlusion sweep"
+    scenarios: ["1a", "1b", "3", "2_dense"]
+    occlusion_values: ["on", "off"]
+    # Total: 5 × 4 × 2 × 5 × 2 = 400 jobs
+
+  sub_grid_2c:
+    description: "Fusion weight sweep"
+    scenarios: ["1a", "2_dense"]
+    method: "fusion_aux"
+    fusion_weights:
+      - [1.0, 1.0]
+      - [0.5, 0.5]
+      - [1.0, 0.0]
+      - [0.0, 1.0]
+      - [2.0, 1.0]
+      - [1.0, 2.0]
+      - [3.0, 1.0]
+      - [1.0, 3.0]
+    # Total: 1 × 2 × 2 × 5 × 8 = 160 jobs
+
+# ─── Tier 3 configuration ───────────────────────────────────────────────────
+# Codebase has three Tier 3 sub-grids (state, behav, dense) at 100/100/75 jobs.
+# Methods exclude fusion_aux at Tier 3 in current orchestrator code.
+tier3:
+  total_steps: 200000
+  description: "State ablation, behavioral robustness, dense scenario testing"
+  state_ablation:
+    description: "Train without visibility features"
+    combos:
+      - { scenario: "1a", maneuver: "stem_right" }
+      - { scenario: "1b", maneuver: "stem_right" }
+      - { scenario: "2",  maneuver: "stem_right" }
+      - { scenario: "4",  maneuver: "stem_right" }
+    methods: ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
+    seeds: [42, 123, 456, 789, 999]
+    state_ablation_mode: "no_visibility"
+    # Total: 4 × 5 × 5 = 100 jobs
+  behavioral_robustness:
+    description: "Train on nominal styles, eval on adversarial"
+    combos:
+      - { scenario: "1a", maneuver: "stem_right" }
+      - { scenario: "1b", maneuver: "stem_right" }
+      - { scenario: "2",  maneuver: "stem_right" }
+      - { scenario: "4",  maneuver: "stem_right" }
+    methods: ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
+    seeds: [42, 123, 456, 789, 999]
+    train_style_filter: "nominal"
+    # Total: 4 × 5 × 5 = 100 jobs
+  dense_scenarios:
+    description: "Dense-traffic stress test"
+    scenarios: ["2_dense", "3_dense", "4_dense"]
+    maneuvers: ["stem_right"]
+    methods: ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
+    seeds: [42, 123, 456, 789, 999]
+    # Total: 3 × 1 × 5 × 5 = 75 jobs
+
+# ─── Tier 4 configuration ───────────────────────────────────────────────────
+# Held-out evaluation on configurations not seen during training. Tier 4 does
+# not generate new training jobs; it evaluates Tier 1 / Tier 3 checkpoints.
+tier4:
+  description: "Held-out evaluation on configurations not seen during training"
+  holdout_configs:
+    - { name: "HO1_occ_to_noocc",          source_tier: "tier1",       eval_overrides: { no_buildings: true } }
+    - { name: "HO2_noocc_to_occ",          source_tier: "tier2_noocc", eval_overrides: { no_buildings: false } }
+    - { name: "HO3_full_to_adversarial",   source_tier: "tier1",       eval_overrides: { style_filter: "adversarial" } }
+    - { name: "HO4_nominal_to_adversarial", source_tier: "tier3_behav", eval_overrides: { style_filter: "adversarial" } }
+    - { name: "HO5_vis_to_novis",          source_tier: "tier1",       eval_overrides: { state_ablation: "no_visibility" } }
+  n_eval_episodes: 100  # more episodes since no training
+  eval_seed_offsets: [1000, 2000, 3000]
+
+# ─── Supplementary tier configuration ───────────────────────────────────────
+# Best method on full 7-scenario × 6-maneuver × 3-seed grid (= 126 runs).
+supplementary:
+  description: "Best method on full 42-combo grid"
+  scenarios: ["1a", "1b", "1c", "1d", "2", "3", "4"]
+  maneuvers: ["stem_right", "stem_left", "right_left", "right_stem", "left_right", "left_stem"]
+  # Best method to be determined post-Tier-1; codebase placeholder is hjb_aux
+  method: "hjb_aux"
+  seeds: [42, 123, 456]
+  # Total: 7 × 6 × 3 = 126 jobs
+
+# ─── Analysis configuration ─────────────────────────────────────────────────
+analysis:
+  final_window_frac: 0.10  # last 10% of iterations for outcome metrics
+  alpha: 0.05               # significance level for statistical tests
+  bootstrap_n: 1000         # bootstrap resamples for CI
+  bootstrap_ci: 0.95        # confidence level for bootstrap CI
+  bootstrap_rng_seed: 12345 # for determinism
+  primary_metrics:
+    - "final_collision_rate"
+    - "final_success_rate"
+    - "final_mean_reward"
+    - "min_ttc_eval"
+    - "mean_return_eval"
+  holm_families: ["A", "B"]  # A=PDE-vs-DRPPO, B=pairwise PDE
+  failure_rate_gate: 0.05    # >5% failed runs prompts before continuing
+  effect_size_thresholds:
+    negligible: 0.2
+    small: 0.5
+    medium: 0.8
+    # values >= medium are "large"
+
+# ─── Intent encoder paths ───────────────────────────────────────────────────
+intent_encoder:
+  version: "v9"
+  ensemble_size: 3
+  member_paths:
+    - "results/intent_model_v9_member0.pt"
+    - "results/intent_model_v9_member1.pt"
+    - "results/intent_model_v9_member2.pt"
+  feature_dim: 30                  # 5 agents × 6 (3 intent + 3 style probs)
+  input_dim: 12                    # per-agent input feature dim
+  hidden_dim: 384                  # bidirectional LSTM hidden size
+  num_layers: 3
+  bidirectional: true
+  dropout: 0.2
+  expected_style_acc: 0.658        # documented performance, for sanity check
+  expected_intent_acc: 0.853       # documented performance, for sanity check
+
+# ─── Calibration (Phase 3F Step 12) ─────────────────────────────────────────
+# Added at Phase 3F Step 12 closure (post Step 11 36-job re-calibration).
+# These two fields are the only modifications to this file since Phase 1F.
+# See verification/phase3F_step11_status.json and CALIBRATION_REPORT.md for derivation.
+calibration:
+  total_steps_calibrated: 400000
+  criterion_version: "v2_sr_primary_post_stage3"
+
+# ─── Environment configuration ──────────────────────────────────────────────
+env:
+  obs_dim_base: 135                # 6 (ego) + 12 (geom) + 6 (vis) + 5*22 (agents) + 1 (pothole)
+  obs_dim_with_intent: 165         # base + 30 (intent block)
+  per_agent_feature_dim: 22
+  n_agents_tracked: 5
+  n_actions: 5
+  action_names: ["STOP", "CREEP", "YIELD", "GO", "ABORT"]
+  default_buildings_enabled: true  # i.e., occlusion on by default
+  episode_max_steps: 500
+  dt: 0.1                          # SUMO step time (seconds)

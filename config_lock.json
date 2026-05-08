@@ -1,0 +1,68 @@
+{
+  "lock_version": "v2_phase_3F_step_12",
+  "config_hash": "17e61a5f780e5b82dfdf71a8a7ddae66be54da3d9a45283e4c541fd04a3f66fe",
+  "config_file": "config_frozen_v1.yaml",
+  "created_iso": "2026-05-07T19:30:00+00:00",
+  "lock_phase": "3F-Step12",
+  "_compat_note": "config_hash + config_file at top level provided for backward compatibility with config_loader.check_config_lock(); same value as frozen_config_file.sha256 below.",
+  "criterion_version": "v2_sr_primary_post_stage3",
+  "total_steps_calibrated": 400000,
+  "calibration_rationale": "max(t_first across 19 converged Step 11 seeds) + W_steps + small buffer = 331776 + 50000 = 381776, rounded up to 400000. Override of spec's hard ceiling 300000 explicitly authorized; rationale documented in CALIBRATION_REPORT.md Section 7.",
+  "frozen_config_file": {
+    "path": "config_frozen_v1.yaml",
+    "sha256": "17e61a5f780e5b82dfdf71a8a7ddae66be54da3d9a45283e4c541fd04a3f66fe",
+    "note": "v1 retained per user directive; calibration: { total_steps_calibrated: 400000, criterion_version: v2_sr_primary_post_stage3 } added at Step 12; no other fields modified."
+  },
+  "locked_files": {
+    "configs/pde/eikonal_aux.yaml": {
+      "sha256": "b5f4ce66ac47ae5bf514e94dfb5d11c591910583f70ce252d813e22a0687817c",
+      "note": "Step 7D state per Phase 3F-A closure: aux_hidden_dim=256, ALM hybrid (lambda_init=0, mu_init=1, mu_max=10000, alpha=0.25, beta=5, update_interval=5000), Kendall sigma on L_bc/L_ground, replay buffers size 1000, w_distill=0.5, beta_KL=0.1, tau=1.0, T_max=100"
+    },
+    "configs/pde/hjb_aux.yaml": {
+      "sha256": "e1867fa7597d4a9c6c35b579009f9fe7c6f6d1eabab066e27c84d8e6ce4925a2"
+    },
+    "configs/pde/soft_hjb_aux.yaml": {
+      "sha256": "6d4c2d46be60a770422e73984f769cb731765e2b3dd3eaf3a038f8720488aa9e",
+      "note": "lambda_anchor=1.0, lambda_soft=0.2 retained; Stage 3 bug-branch rebalance NOT applied per user direction (deferred to Phase 3F-B)"
+    },
+    "configs/pde/cbf_aux.yaml": {
+      "sha256": "c3e0792647f6a2830180854181764a3051c0431a8b22b016443a16ce505d6963"
+    },
+    "configs/reward/default.yaml": {
+      "sha256": "ac35d776723a048cde81d8cbc39ff83de7efc05277b8d3351ddcf8e972ba71f7"
+    },
+    "env/sumo_env.py:DEFAULT_REWARD_CONFIG_lines_50_100": {
+      "sha256": "7fae865de9f425fc2b613d8f27d3fbfe96ca7d9d919057023819139676c6f24a",
+      "note": "Stage 1 reward state (1A+1B+1D): w_success=200, w_risk=-3 (speed-gated), w_coll=-20, gamma_shaping=1.0, w_shaping=3.0, route-distance phi via getDistanceRoad"
+    },
+    "env/sumo_env.py:reward_compute_lines_1380_1430": {
+      "sha256": "d0f952b1ae583242627750374edb5c6ba7399f22bc74057f07acdcf889f7a089",
+      "note": "Reward computation incl. speed-gated w_risk (Stage 1A), w_success terminal bonus (Stage 1B), Wiewiora finite-horizon shaping with gamma_shaping=1 telescoping (Stage 1D)"
+    }
+  },
+  "missing_on_disk": {
+    "configs/pde/fusion_aux.yaml": "fusion_aux is CLI-driven; no yaml config exists. Method defaults are baked into experiments/pde/train_fusion_aux.py and the fusion_aux entry of config_frozen_v1.yaml::methods.fusion_aux."
+  },
+  "calibration_evidence_references": {
+    "step_11_status": "verification/phase3F_step11_status.json",
+    "step_11_plots": "verification/phase3F_step11_plots/",
+    "criterion_v2_methodology": "verification/criterion_v2_methodology_note.md",
+    "phase_3F_A_closure": "verification/phase3F_A_CLOSURE.md",
+    "phase_3F_A_closure_status": "verification/phase3F_A_closure_status.json",
+    "stage_3_drift_diagnostic": "verification/phase3F_stage3_status.json",
+    "stage_3_criterion_update": "verification/phase3F_stage3_criterion_update_status.json",
+    "math_derivation_eikonal": "verification/phase3F_A_math_derivation.md",
+    "phase31_investigation_eikonal": "verification/phase31_investigation_eikonal.json"
+  },
+  "previous_locks": [
+    {
+      "lock_version": "v1_phase_1F",
+      "config_file": "config_frozen_v1.yaml",
+      "config_hash": "337cc19b82009bf99e7b497f9ee33c58a63de22bad6f286ad62e78d53bdcd8e5",
+      "created_iso": "2026-05-04T12:36:38.613885+00:00",
+      "note": "This file was generated when config_frozen_v1.yaml was frozen on Phase 1F. Hash mismatch at runtime indicates the config has been modified since freeze. If the change is intentional, regenerate this lock or version-bump the config to v2.",
+      "superseded_by": "v2_phase_3F_step_12 (this lock)",
+      "superseded_reason": "Phase 3F Step 12 added the calibration block (total_steps_calibrated, criterion_version) to config_frozen_v1.yaml. v1 file is retained per user directive; the v1 frozen-state contract is therefore relaxed at Step 12 and re-locked under this v2 lock."
+    }
+  ]
+}

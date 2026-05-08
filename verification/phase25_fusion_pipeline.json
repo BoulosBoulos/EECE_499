@@ -1,0 +1,65 @@
+{
+  "phase": "25",
+  "tests": {
+    "25.1_independent_critics": {
+      "pass": true,
+      "issues": []
+    },
+    "25.2_both_residuals_compute": {
+      "pass": true,
+      "issues": [],
+      "L_soft": 44840852.0,
+      "L_cbf_default_offset": 47102.265625,
+      "L_cbf_hostile_offset": 62927.58203125
+    },
+    "25.3_cli_propagation": {
+      "pass": true,
+      "issues": []
+    },
+    "25.4_both_residual_cols_nonzero": {
+      "pass": true,
+      "issues": []
+    },
+    "25.5_total_loss_assembly": {
+      "pass": true,
+      "issues": [],
+      "measured": {
+        "actor_loss": 0.460184782743454,
+        "vf_loss": 1.1082221269607544,
+        "entropy": 1.592184066772461,
+        "total_loss": 0.9983739852905273,
+        "soft_residual_mean": 1097.221435546875,
+        "cbf_residual_mean": 12610.3134765625,
+        "anchor_loss_optimality": 1.2885102033615112,
+        "anchor_loss_safety": 0.6813672184944153,
+        "bc_loss_optimality": 0.0,
+        "bc_loss_safety": 0.0,
+        "distill_loss": 0.04047622159123421,
+        "distill_gap": 0.04047622159123421,
+        "actor_align_kl": 0.14040307700634003
+      }
+    },
+    "25.6_backward_updates_all_three": {
+      "pass": true,
+      "issues": []
+    },
+    "25.7_smoke_run": {
+      "pass": true,
+      "issues": [],
+      "artifacts": {
+        "metrics.csv": true,
+        "meta.json": true,
+        "trajectories_dir": true,
+        "n_metrics_rows": 2
+      }
+    },
+    "25.8_existing_suite": {
+      "pass": true,
+      "n_phases": 27,
+      "all_pass": true,
+      "failed_phases": [],
+      "load_failures": []
+    }
+  },
+  "pass": true
+}

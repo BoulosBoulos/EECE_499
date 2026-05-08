@@ -1,0 +1,50 @@
+{
+  "phase": "0.2",
+  "checks": [
+    {
+      "name": "XI_DIM == 79",
+      "pass": true
+    },
+    {
+      "name": "Occlusion fix uses traci.junction.getPosition",
+      "pass": true
+    },
+    {
+      "name": "_init_occlusion_geometry called from reset",
+      "pass": true
+    },
+    {
+      "name": "_env_rng isolated",
+      "pass": true
+    },
+    {
+      "name": "Orchestrator handles cmd_train=None (path resolution)",
+      "pass": true
+    },
+    {
+      "name": "Orchestrator handles cmd_train=None (subprocess build)",
+      "pass": true
+    },
+    {
+      "name": "CBF offset = 10.0",
+      "pass": true
+    },
+    {
+      "name": "Eikonal v_eff dynamics-derived",
+      "pass": true
+    },
+    {
+      "name": "Eikonal w_fail = 50",
+      "pass": true
+    },
+    {
+      "name": "_smooth_clamp_nonneg defined",
+      "pass": true
+    },
+    {
+      "name": "Rule-based TTC index = 13",
+      "pass": true
+    }
+  ],
+  "pass": true
+}

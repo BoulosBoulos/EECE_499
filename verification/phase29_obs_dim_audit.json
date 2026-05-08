@@ -1,0 +1,18 @@
+{
+  "phase": "29.3",
+  "pass": true,
+  "obs_dim_total": 135,
+  "decomposition": "6 (ego) + 12 (geom) + 6 (vis) + 5*22 (top-5 agents) + 1 (pothole)",
+  "plus_one_semantic_name": "d_pothole",
+  "plus_one_description": "Signed Euclidean distance from ego to nearest pothole; sentinel value 100.0 m in non-pothole scenarios for cross-scenario obs_dim invariance.",
+  "concatenation_site": "env/sumo_env.py :: SumoEnv._augment_state",
+  "dim_declaration_site": "env/sumo_env.py :: SumoEnv.__init__ (line 152: self._state_dim = 6 + 12 + 6 + 5 * 22 + 1)",
+  "doc_added": "Phase 2 audit comment added at concatenation site identifying d_pothole as the +1 component, with sentinel value, purpose, and YAML anchor.",
+  "config_frozen_v1_yaml": {
+    "env.obs_dim_base": 135,
+    "env.obs_dim_with_intent": 165,
+    "matches_actual_computed_dim": true
+  },
+  "is_bug": false,
+  "rationale": "The +1 is intentional padding so that obs_dim is invariant across pothole vs non-pothole scenarios — the observation_space shape stays (135,) regardless of which scenario the env was constructed for. This matches the PDE-state convention and was audited live in Phase 2.8 (preflight_12_obsdim) which verifies obs_dim=135 across 11 distinct (scenario, maneuver, ablation) configurations."
+}

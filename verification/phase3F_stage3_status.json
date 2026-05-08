@@ -1,0 +1,1041 @@
+{
+  "stage": "3F-Stage3",
+  "name": "Soft-HJB drift investigation",
+  "status": "inconclusive",
+  "verdict": "inconclusive",
+  "data_sources_used": [
+    "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_soft_hjb_aux_1a_s42",
+    "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_soft_hjb_aux_1a_s123",
+    "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_soft_hjb_aux_1a_s456",
+    "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_soft_hjb_aux_2_dense_s42",
+    "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_soft_hjb_aux_2_dense_s123",
+    "/home/boulosboulos/Desktop/EECE_499-main/results/calibration/CAL_soft_hjb_aux_2_dense_s456"
+  ],
+  "data_completeness": {
+    "1a_s42": {
+      "metrics_csv": true,
+      "eval_metrics_csv": false,
+      "failures_csv": false,
+      "timings_csv": false,
+      "meta_json": true,
+      "train_soft_hjb_csv": true
+    },
+    "1a_s123": {
+      "metrics_csv": true,
+      "eval_metrics_csv": false,
+      "failures_csv": false,
+      "timings_csv": false,
+      "meta_json": true,
+      "train_soft_hjb_csv": true
+    },
+    "1a_s456": {
+      "metrics_csv": true,
+      "eval_metrics_csv": false,
+      "failures_csv": false,
+      "timings_csv": false,
+      "meta_json": true,
+      "train_soft_hjb_csv": true
+    },
+    "2_dense_s42": {
+      "metrics_csv": true,
+      "eval_metrics_csv": false,
+      "failures_csv": false,
+      "timings_csv": false,
+      "meta_json": true,
+      "train_soft_hjb_csv": true
+    },
+    "2_dense_s123": {
+      "metrics_csv": true,
+      "eval_metrics_csv": false,
+      "failures_csv": false,
+      "timings_csv": false,
+      "meta_json": true,
+      "train_soft_hjb_csv": true
+    },
+    "2_dense_s456": {
+      "metrics_csv": true,
+      "eval_metrics_csv": false,
+      "failures_csv": false,
+      "timings_csv": false,
+      "meta_json": true,
+      "train_soft_hjb_csv": true
+    }
+  },
+  "convergence_criterion_phase3": {
+    "source": "analysis/calibration_analysis.py:detect_convergence_in_run (Decision B)",
+    "window_steps": 50000,
+    "rolling_window": 5,
+    "reward_std_rel_threshold": 0.05,
+    "collision_std_abs_threshold": 0.02,
+    "metric_columns": [
+      "mean_reward",
+      "n_collisions/n_episodes"
+    ]
+  },
+  "per_seed_table": [
+    {
+      "cell": "1a_s42",
+      "scenario": "1a",
+      "seed": 42,
+      "n_iterations": 123,
+      "t_first": 114688,
+      "t_last": 217088,
+      "n_satisfied": 11,
+      "n_after_first": 96,
+      "drift_count": 85,
+      "drift_fraction": 0.8854166666666666
+    },
+    {
+      "cell": "1a_s123",
+      "scenario": "1a",
+      "seed": 123,
+      "n_iterations": 123,
+      "t_first": 16384,
+      "t_last": 425984,
+      "n_satisfied": 7,
+      "n_after_first": 120,
+      "drift_count": 113,
+      "drift_fraction": 0.9416666666666667
+    },
+    {
+      "cell": "1a_s456",
+      "scenario": "1a",
+      "seed": 456,
+      "n_iterations": 123,
+      "t_first": 233472,
+      "t_last": 253952,
+      "n_satisfied": 6,
+      "n_after_first": 67,
+      "drift_count": 61,
+      "drift_fraction": 0.9104477611940298
+    },
+    {
+      "cell": "2_dense_s42",
+      "scenario": "2_dense",
+      "seed": 42,
+      "n_iterations": 123,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied": 0,
+      "n_after_first": 0,
+      "drift_count": 0,
+      "drift_fraction": null,
+      "first_satisfaction_reason": "no_window_ever_satisfies"
+    },
+    {
+      "cell": "2_dense_s123",
+      "scenario": "2_dense",
+      "seed": 123,
+      "n_iterations": 123,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied": 0,
+      "n_after_first": 0,
+      "drift_count": 0,
+      "drift_fraction": null,
+      "first_satisfaction_reason": "no_window_ever_satisfies"
+    },
+    {
+      "cell": "2_dense_s456",
+      "scenario": "2_dense",
+      "seed": 456,
+      "n_iterations": 123,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied": 0,
+      "n_after_first": 0,
+      "drift_count": 0,
+      "drift_fraction": null,
+      "first_satisfaction_reason": "no_window_ever_satisfies"
+    }
+  ],
+  "metric_trajectory_summary": [
+    {
+      "cell": "1a_s42",
+      "metrics": {
+        "success_rate": {
+          "metric_column": "success_rate",
+          "direction_better": "higher",
+          "peak_step": 40960,
+          "peak_value": 1.0,
+          "final_step": 503808,
+          "final_value": 1.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 1.0,
+          "amplitude": 1.0
+        },
+        "mean_return": {
+          "metric_column": "mean_reward",
+          "direction_better": "higher",
+          "peak_step": 503808,
+          "peak_value": -1498.56005859375,
+          "final_step": 503808,
+          "final_value": -1498.56005859375,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": -11019.3779296875,
+          "max_value": -1498.56005859375,
+          "amplitude": 9520.81787109375
+        },
+        "soft_entropy": {
+          "metric_column": "L_entropy",
+          "direction_better": "higher",
+          "peak_step": 8192,
+          "peak_value": 1.5735158920288086,
+          "final_step": 503808,
+          "final_value": 1.3156616687774658,
+          "peak_to_final_gap_signed": 0.2578542232513428,
+          "min_value": 1.250225067138672,
+          "max_value": 1.5735158920288086,
+          "amplitude": 0.3232908248901365
+        },
+        "collision_rate": {
+          "metric_column": "collision_rate",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 0.0,
+          "amplitude": 0.0
+        },
+        "hjb_residual": {
+          "metric_column": "L_residual_optimality",
+          "direction_better": "lower",
+          "peak_step": 352256,
+          "peak_value": 1.3482251167297363,
+          "final_step": 503808,
+          "final_value": 39.507774353027344,
+          "peak_to_final_gap_signed": 38.15954923629761,
+          "min_value": 1.3482251167297363,
+          "max_value": 17497.130859375,
+          "amplitude": 17495.78263425827
+        },
+        "distill_gap": {
+          "metric_column": "L_distill",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 4.563389778137207,
+          "final_step": 503808,
+          "final_value": 14.202528953552246,
+          "peak_to_final_gap_signed": 9.639139175415039,
+          "min_value": 4.563389778137207,
+          "max_value": 62.63066864013672,
+          "amplitude": 58.06727886199951
+        },
+        "actor_align_kl": {
+          "metric_column": "actor_align_kl",
+          "direction_better": "lower",
+          "peak_step": 126976,
+          "peak_value": 0.1490269899368286,
+          "final_step": 495616,
+          "final_value": 0.2002067863941192,
+          "peak_to_final_gap_signed": 0.051179796457290594,
+          "min_value": 0.1490269899368286,
+          "max_value": 0.816620409488678,
+          "amplitude": 0.6675934195518494,
+          "n_eval_points": 13
+        }
+      }
+    },
+    {
+      "cell": "1a_s123",
+      "metrics": {
+        "success_rate": {
+          "metric_column": "success_rate",
+          "direction_better": "higher",
+          "peak_step": 28672,
+          "peak_value": 1.0,
+          "final_step": 503808,
+          "final_value": 1.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 1.0,
+          "amplitude": 1.0
+        },
+        "mean_return": {
+          "metric_column": "mean_reward",
+          "direction_better": "higher",
+          "peak_step": 479232,
+          "peak_value": -1675.0577392578125,
+          "final_step": 503808,
+          "final_value": -2878.11572265625,
+          "peak_to_final_gap_signed": 1203.0579833984375,
+          "min_value": -7463.11083984375,
+          "max_value": -1675.0577392578125,
+          "amplitude": 5788.0531005859375
+        },
+        "soft_entropy": {
+          "metric_column": "L_entropy",
+          "direction_better": "higher",
+          "peak_step": 4096,
+          "peak_value": 1.5143122673034668,
+          "final_step": 503808,
+          "final_value": 1.3215744495391846,
+          "peak_to_final_gap_signed": 0.19273781776428223,
+          "min_value": 1.2774081230163574,
+          "max_value": 1.5143122673034668,
+          "amplitude": 0.23690414428710938
+        },
+        "collision_rate": {
+          "metric_column": "collision_rate",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 0.0,
+          "amplitude": 0.0
+        },
+        "hjb_residual": {
+          "metric_column": "L_residual_optimality",
+          "direction_better": "lower",
+          "peak_step": 114688,
+          "peak_value": 1.3202393054962158,
+          "final_step": 503808,
+          "final_value": 1.559755563735962,
+          "peak_to_final_gap_signed": 0.2395162582397461,
+          "min_value": 1.3202393054962158,
+          "max_value": 43505.046875,
+          "amplitude": 43503.726635694504
+        },
+        "distill_gap": {
+          "metric_column": "L_distill",
+          "direction_better": "lower",
+          "peak_step": 8192,
+          "peak_value": 3.756513118743897,
+          "final_step": 503808,
+          "final_value": 11.82750129699707,
+          "peak_to_final_gap_signed": 8.070988178253174,
+          "min_value": 3.756513118743897,
+          "max_value": 38.360198974609375,
+          "amplitude": 34.60368585586548
+        },
+        "actor_align_kl": {
+          "metric_column": "actor_align_kl",
+          "direction_better": "lower",
+          "peak_step": 208896,
+          "peak_value": 0.1357739865779876,
+          "final_step": 495616,
+          "final_value": 0.2509822845458984,
+          "peak_to_final_gap_signed": 0.1152082979679108,
+          "min_value": 0.1357739865779876,
+          "max_value": 0.4763812124729156,
+          "amplitude": 0.340607225894928,
+          "n_eval_points": 13
+        }
+      }
+    },
+    {
+      "cell": "1a_s456",
+      "metrics": {
+        "success_rate": {
+          "metric_column": "success_rate",
+          "direction_better": "higher",
+          "peak_step": 36864,
+          "peak_value": 1.0,
+          "final_step": 503808,
+          "final_value": 1.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 1.0,
+          "amplitude": 1.0
+        },
+        "mean_return": {
+          "metric_column": "mean_reward",
+          "direction_better": "higher",
+          "peak_step": 372736,
+          "peak_value": -1827.4547119140625,
+          "final_step": 503808,
+          "final_value": -3519.33837890625,
+          "peak_to_final_gap_signed": 1691.8836669921875,
+          "min_value": -11088.005859375,
+          "max_value": -1827.4547119140625,
+          "amplitude": 9260.551147460938
+        },
+        "soft_entropy": {
+          "metric_column": "L_entropy",
+          "direction_better": "higher",
+          "peak_step": 8192,
+          "peak_value": 1.535355806350708,
+          "final_step": 503808,
+          "final_value": 1.363578200340271,
+          "peak_to_final_gap_signed": 0.171777606010437,
+          "min_value": 1.2835456132888794,
+          "max_value": 1.535355806350708,
+          "amplitude": 0.2518101930618286
+        },
+        "collision_rate": {
+          "metric_column": "collision_rate",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 0.0,
+          "amplitude": 0.0
+        },
+        "hjb_residual": {
+          "metric_column": "L_residual_optimality",
+          "direction_better": "lower",
+          "peak_step": 331776,
+          "peak_value": 1.1306495666503906,
+          "final_step": 503808,
+          "final_value": 273.8990173339844,
+          "peak_to_final_gap_signed": 272.768367767334,
+          "min_value": 1.1306495666503906,
+          "max_value": 11915.9716796875,
+          "amplitude": 11914.84103012085
+        },
+        "distill_gap": {
+          "metric_column": "L_distill",
+          "direction_better": "lower",
+          "peak_step": 8192,
+          "peak_value": 4.183840751647949,
+          "final_step": 503808,
+          "final_value": 17.550132751464844,
+          "peak_to_final_gap_signed": 13.366291999816895,
+          "min_value": 4.183840751647949,
+          "max_value": 38.47666931152344,
+          "amplitude": 34.29282855987549
+        },
+        "actor_align_kl": {
+          "metric_column": "actor_align_kl",
+          "direction_better": "lower",
+          "peak_step": 331776,
+          "peak_value": 0.1285565346479416,
+          "final_step": 495616,
+          "final_value": 0.188630998134613,
+          "peak_to_final_gap_signed": 0.06007446348667142,
+          "min_value": 0.1285565346479416,
+          "max_value": 0.5702068209648132,
+          "amplitude": 0.44165028631687164,
+          "n_eval_points": 13
+        }
+      }
+    },
+    {
+      "cell": "2_dense_s42",
+      "metrics": {
+        "success_rate": {
+          "metric_column": "success_rate",
+          "direction_better": "higher",
+          "peak_step": 36864,
+          "peak_value": 0.125,
+          "final_step": 503808,
+          "final_value": 0.0,
+          "peak_to_final_gap_signed": 0.125,
+          "min_value": 0.0,
+          "max_value": 0.125,
+          "amplitude": 0.125
+        },
+        "mean_return": {
+          "metric_column": "mean_reward",
+          "direction_better": "higher",
+          "peak_step": 4096,
+          "peak_value": -5340.4931640625,
+          "final_step": 503808,
+          "final_value": -24691.70703125,
+          "peak_to_final_gap_signed": 19351.2138671875,
+          "min_value": -33236.546875,
+          "max_value": -5340.4931640625,
+          "amplitude": 27896.0537109375
+        },
+        "soft_entropy": {
+          "metric_column": "L_entropy",
+          "direction_better": "higher",
+          "peak_step": 8192,
+          "peak_value": 1.5429978370666504,
+          "final_step": 503808,
+          "final_value": 1.5171394348144531,
+          "peak_to_final_gap_signed": 0.025858402252197266,
+          "min_value": 1.442934513092041,
+          "max_value": 1.5429978370666504,
+          "amplitude": 0.10006332397460938
+        },
+        "collision_rate": {
+          "metric_column": "collision_rate",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.375,
+          "peak_to_final_gap_signed": 0.375,
+          "min_value": 0.0,
+          "max_value": 0.6,
+          "amplitude": 0.6
+        },
+        "hjb_residual": {
+          "metric_column": "L_residual_optimality",
+          "direction_better": "lower",
+          "peak_step": 356352,
+          "peak_value": 1.6464228630065918,
+          "final_step": 503808,
+          "final_value": 145.2447967529297,
+          "peak_to_final_gap_signed": 143.5983738899231,
+          "min_value": 1.6464228630065918,
+          "max_value": 860084.25,
+          "amplitude": 860082.603577137
+        },
+        "distill_gap": {
+          "metric_column": "L_distill",
+          "direction_better": "lower",
+          "peak_step": 8192,
+          "peak_value": 17.273082733154297,
+          "final_step": 503808,
+          "final_value": 87.22334289550781,
+          "peak_to_final_gap_signed": 69.95026016235352,
+          "min_value": 17.273082733154297,
+          "max_value": 242.96034240722656,
+          "amplitude": 225.68725967407227
+        },
+        "actor_align_kl": {
+          "metric_column": "actor_align_kl",
+          "direction_better": "lower",
+          "peak_step": 208896,
+          "peak_value": 0.1074498742818832,
+          "final_step": 495616,
+          "final_value": 0.1478253901004791,
+          "peak_to_final_gap_signed": 0.0403755158185959,
+          "min_value": 0.1074498742818832,
+          "max_value": 0.434670090675354,
+          "amplitude": 0.3272202163934708,
+          "n_eval_points": 13
+        }
+      }
+    },
+    {
+      "cell": "2_dense_s123",
+      "metrics": {
+        "success_rate": {
+          "metric_column": "success_rate",
+          "direction_better": "higher",
+          "peak_step": 16384,
+          "peak_value": 0.125,
+          "final_step": 503808,
+          "final_value": 0.0,
+          "peak_to_final_gap_signed": 0.125,
+          "min_value": 0.0,
+          "max_value": 0.125,
+          "amplitude": 0.125
+        },
+        "mean_return": {
+          "metric_column": "mean_reward",
+          "direction_better": "higher",
+          "peak_step": 4096,
+          "peak_value": -4135.7177734375,
+          "final_step": 503808,
+          "final_value": -22649.359375,
+          "peak_to_final_gap_signed": 18513.6416015625,
+          "min_value": -32805.578125,
+          "max_value": -4135.7177734375,
+          "amplitude": 28669.8603515625
+        },
+        "soft_entropy": {
+          "metric_column": "L_entropy",
+          "direction_better": "higher",
+          "peak_step": 348160,
+          "peak_value": 1.5209252834320068,
+          "final_step": 503808,
+          "final_value": 1.4997988939285278,
+          "peak_to_final_gap_signed": 0.021126389503479004,
+          "min_value": 1.4215260744094849,
+          "max_value": 1.5209252834320068,
+          "amplitude": 0.09939920902252197
+        },
+        "collision_rate": {
+          "metric_column": "collision_rate",
+          "direction_better": "lower",
+          "peak_step": 16384,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.25,
+          "peak_to_final_gap_signed": 0.25,
+          "min_value": 0.0,
+          "max_value": 0.7857142857142857,
+          "amplitude": 0.7857142857142857
+        },
+        "hjb_residual": {
+          "metric_column": "L_residual_optimality",
+          "direction_better": "lower",
+          "peak_step": 446464,
+          "peak_value": 1.6788527965545654,
+          "final_step": 503808,
+          "final_value": 120.92674255371094,
+          "peak_to_final_gap_signed": 119.24788975715637,
+          "min_value": 1.6788527965545654,
+          "max_value": 176517.671875,
+          "amplitude": 176515.99302220345
+        },
+        "distill_gap": {
+          "metric_column": "L_distill",
+          "direction_better": "lower",
+          "peak_step": 24576,
+          "peak_value": 15.603548049926758,
+          "final_step": 503808,
+          "final_value": 64.29742431640625,
+          "peak_to_final_gap_signed": 48.69387626647949,
+          "min_value": 15.603548049926758,
+          "max_value": 229.03076171875,
+          "amplitude": 213.42721366882324
+        },
+        "actor_align_kl": {
+          "metric_column": "actor_align_kl",
+          "direction_better": "lower",
+          "peak_step": 208896,
+          "peak_value": 0.0766333490610122,
+          "final_step": 495616,
+          "final_value": 0.151270717382431,
+          "peak_to_final_gap_signed": 0.0746373683214188,
+          "min_value": 0.0766333490610122,
+          "max_value": 0.2659561038017273,
+          "amplitude": 0.18932275474071508,
+          "n_eval_points": 13
+        }
+      }
+    },
+    {
+      "cell": "2_dense_s456",
+      "metrics": {
+        "success_rate": {
+          "metric_column": "success_rate",
+          "direction_better": "higher",
+          "peak_step": 4096,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.0,
+          "peak_to_final_gap_signed": 0.0,
+          "min_value": 0.0,
+          "max_value": 0.0,
+          "amplitude": 0.0
+        },
+        "mean_return": {
+          "metric_column": "mean_reward",
+          "direction_better": "higher",
+          "peak_step": 4096,
+          "peak_value": -4129.1328125,
+          "final_step": 503808,
+          "final_value": -25358.73828125,
+          "peak_to_final_gap_signed": 21229.60546875,
+          "min_value": -30910.849609375,
+          "max_value": -4129.1328125,
+          "amplitude": 26781.716796875
+        },
+        "soft_entropy": {
+          "metric_column": "L_entropy",
+          "direction_better": "higher",
+          "peak_step": 4096,
+          "peak_value": 1.5259270668029783,
+          "final_step": 503808,
+          "final_value": 1.4881820678710938,
+          "peak_to_final_gap_signed": 0.037744998931884544,
+          "min_value": 1.4351648092269895,
+          "max_value": 1.5259270668029783,
+          "amplitude": 0.09076225757598877
+        },
+        "collision_rate": {
+          "metric_column": "collision_rate",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 0.0,
+          "final_step": 503808,
+          "final_value": 0.125,
+          "peak_to_final_gap_signed": 0.125,
+          "min_value": 0.0,
+          "max_value": 0.75,
+          "amplitude": 0.75
+        },
+        "hjb_residual": {
+          "metric_column": "L_residual_optimality",
+          "direction_better": "lower",
+          "peak_step": 204800,
+          "peak_value": 1.7651172876358032,
+          "final_step": 503808,
+          "final_value": 3.139646291732788,
+          "peak_to_final_gap_signed": 1.3745290040969849,
+          "min_value": 1.7651172876358032,
+          "max_value": 49612.45703125,
+          "amplitude": 49610.691913962364
+        },
+        "distill_gap": {
+          "metric_column": "L_distill",
+          "direction_better": "lower",
+          "peak_step": 4096,
+          "peak_value": 7.900108337402344,
+          "final_step": 503808,
+          "final_value": 112.98419189453124,
+          "peak_to_final_gap_signed": 105.08408355712889,
+          "min_value": 7.900108337402344,
+          "max_value": 197.2027740478516,
+          "amplitude": 189.30266571044925
+        },
+        "actor_align_kl": {
+          "metric_column": "actor_align_kl",
+          "direction_better": "lower",
+          "peak_step": 208896,
+          "peak_value": 0.0960945039987564,
+          "final_step": 495616,
+          "final_value": 0.1040634959936142,
+          "peak_to_final_gap_signed": 0.007968991994857802,
+          "min_value": 0.0960945039987564,
+          "max_value": 0.3011304438114166,
+          "amplitude": 0.20503593981266022,
+          "n_eval_points": 13
+        }
+      }
+    }
+  ],
+  "mechanism_correlations": [
+    {
+      "cell": "1a_s42",
+      "n_points_post_first": 96,
+      "n_diff_pairs": 95,
+      "corr_dSR_dHJB": 0.2414802444704883,
+      "corr_dSR_dL_distill": 0.3069903589406058,
+      "corr_dSR_dEntropy": -0.22710855986043438,
+      "post_first_HJB_trend": "increasing",
+      "post_first_L_distill_trend": "decreasing",
+      "post_first_entropy_trend": "increasing",
+      "post_first_SR_trend": "increasing"
+    },
+    {
+      "cell": "1a_s123",
+      "n_points_post_first": 120,
+      "n_diff_pairs": 119,
+      "corr_dSR_dHJB": 0.04032296187906091,
+      "corr_dSR_dL_distill": -0.005762027985535459,
+      "corr_dSR_dEntropy": -0.2237011731102702,
+      "post_first_HJB_trend": "decreasing",
+      "post_first_L_distill_trend": "increasing",
+      "post_first_entropy_trend": "decreasing",
+      "post_first_SR_trend": "increasing"
+    },
+    {
+      "cell": "1a_s456",
+      "n_points_post_first": 67,
+      "n_diff_pairs": 66,
+      "corr_dSR_dHJB": 0.0023681248942933712,
+      "corr_dSR_dL_distill": 0.04444946715934598,
+      "corr_dSR_dEntropy": 0.10974433782061112,
+      "post_first_HJB_trend": "increasing",
+      "post_first_L_distill_trend": "increasing",
+      "post_first_entropy_trend": "increasing",
+      "post_first_SR_trend": "increasing"
+    },
+    {
+      "cell": "2_dense_s42",
+      "error": "no_t_first",
+      "drift_fraction": null
+    },
+    {
+      "cell": "2_dense_s123",
+      "error": "no_t_first",
+      "drift_fraction": null
+    },
+    {
+      "cell": "2_dense_s456",
+      "error": "no_t_first",
+      "drift_fraction": null
+    }
+  ],
+  "numerical_anomalies": [
+    {
+      "cell": "1a_s42",
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 11019.3779296875
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 17497.130859375
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 62.63066864013672
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 1.5735158920288086
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 95.20809173583984
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.2218312323093414
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 17517.864815697074
+        }
+      }
+    },
+    {
+      "cell": "1a_s123",
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 7463.11083984375
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 43505.046875
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 38.360198974609375
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 1.5143122673034668
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 58.89311981201172
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.2576576769351959
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 43551.54147768207
+        }
+      }
+    },
+    {
+      "cell": "1a_s456",
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 11088.005859375
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 11915.9716796875
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 38.47666931152344
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 1.535355806350708
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 104.80271911621094
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.307171493768692
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 11988.487798929214
+        }
+      }
+    },
+    {
+      "cell": "2_dense_s42",
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 33236.546875
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 860084.25
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 242.96034240722656
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 1.5429978370666504
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 279.6919860839844
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.2187957912683487
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 860316.9033662304
+        }
+      }
+    },
+    {
+      "cell": "2_dense_s123",
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 32805.578125
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 176517.671875
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 229.03076171875
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 1.5209252834320068
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 316.53302001953125
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.2626477479934692
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 176801.52864331007
+        }
+      }
+    },
+    {
+      "cell": "2_dense_s456",
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 30910.849609375
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 49612.45703125
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 197.2027740478516
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 1.5259270668029783
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 308.658203125
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 0.2734354138374328
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0,
+          "max_abs": 49752.43006251752
+        }
+      }
+    }
+  ],
+  "bug_indicators_fired": [
+    "drift_fraction>0.5 on 3/3 converged seeds: [('1a_s42', 0.8854166666666666), ('1a_s123', 0.9416666666666667), ('1a_s456', 0.9104477611940298)]",
+    "drift_uncorrelated_with_mechanism (|rho|<0.3 on all 3 signals) on drifting seeds: [('1a_s123', [0.04032296187906091, -0.005762027985535459, -0.2237011731102702]), ('1a_s456', [0.0023681248942933712, 0.04444946715934598, 0.10974433782061112])]",
+    "high_amplitude_oscillation_post_t_first(>30%) on cells: [('1a_s123', 0.875)]"
+  ],
+  "phenomenon_indicators_fired": [
+    "no_regression_below_0.7*peak on any converged cell (post-t_first)",
+    "no_NaN_or_inf_in_any_logged_metric"
+  ],
+  "branch_artifact_path": "both verification/phase3F_stage3_phenomenon_artifact.md and verification/phase3F_stage3_bug_artifact.md",
+  "step_11_implication": "requires_user_direction",
+  "confidence_caveats": [
+    "n=6 Soft-HJB jobs is statistically limited; cannot rule out subtle bugs that manifest only on unobserved seeds or cells",
+    "single 500k training run per job (no within-run replication)",
+    "eval_metrics.csv, failures.csv, timings.csv MISSING for all 6 jobs; metrics.csv (per-iteration training) and train_soft_hjb_aux_*.csv (per-eval) provide the trajectory data; KL alignment is only available at eval points (~13/job) not per-iteration",
+    "Step 11's 36-job \u00d7 6-seed run will provide post-hoc validation"
+  ],
+  "references": {
+    "convergence_criterion_source": "analysis/calibration_analysis.py:18-24, 56-96",
+    "soft_hjb_config": "configs/pde/soft_hjb_aux.yaml",
+    "soft_hjb_agent": "models/pde/soft_hjb_aux_agent.py"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "phase": "3F-A",
+  "step": "7C",
+  "interventions_applied": [
+    "Kendall, Gal, Cipolla (CVPR 2018) homoscedastic uncertainty weighting: replaced fixed (w_eik, w_bc, w_ground) with learnable (log_sigma_eik, log_sigma_bc, log_sigma_ground); jointly optimized with aux_critic params via aux_optimizer.",
+    "Terminal replay buffers (DeepXDE-style sparse-data PINN training): three FIFO ring buffers (success, collision, intermediate) of capacity 1000. update_replay_buffers() walks current rollout segments per iter; _sample_bc_data() and _sample_ground_data() draw minibatches (256) from buffers.",
+    "Step 7B T_max^2 normalization REMOVED (superseded by uncertainty weighting per math derivation §9.3)."
+  ],
+  "code_changes_summary": [
+    "models/pde/eikonal_aux_agent.py: added log_sigma_{eik,bc,ground} as nn.Parameter, three deque buffers, update_replay_buffers + _sample_bc_data + _sample_ground_data helpers; rewrote critic-loss aggregation to Kendall form; removed T_max^2 normalization.",
+    "experiments/pde/train_eikonal_aux.py: added CLI flags --log_sigma_init, --replay_buffer_size, --replay_batch_size; CSV header gains sigma_eik/bc/ground + n_*_buffer columns.",
+    "configs/pde/eikonal_aux.yaml: added log_sigma_init, replay_buffer_size, replay_batch_size; deprecated w_eik/w_bc/w_ground (kept for back-compat).",
+    "verification/phase3F_A_math_derivation.md: appended Section 9 covering Kendall et al. derivation, replay buffer Monte-Carlo derivation, and references."
+  ],
+
+  "verification_runs": {
+    "1a": {
+      "out_dir": "/tmp/phase3F_A_step7C_eikonal_1a_50k",
+      "checkpoint": "/tmp/phase3F_A_step7C_eikonal_1a_50k/model_eikonal_aux_1a_stem_right_step50000.pt",
+      "rollout_outcomes_30_eps": {"success": 30, "collision": 0, "timeout": 0}
+    },
+    "2_dense": {
+      "out_dir": "/tmp/phase3F_A_step7C_eikonal_2dense_50k",
+      "checkpoint": "/tmp/phase3F_A_step7C_eikonal_2dense_50k/model_eikonal_aux_2_dense_stem_right_step50000.pt",
+      "rollout_outcomes_30_eps": {"success": 1, "collision": 25, "timeout": 4}
+    }
+  },
+
+  "criteria_with_margins": {
+    "thresholds_step_7c": {
+      "crit1_residual_ratio_max": 0.4,
+      "crit2a_T_succ_max": 3.0,
+      "crit2b_T_coll_min": 90.0,
+      "crit3_pearson_min": 0.75,
+      "crit4_A_eik_acc_min": 0.7,
+      "crit5_KL_max": 0.4
+    }
+  },
+
+  "criteria_1a": {
+    "crit1_residual_ratio": {"value": 1.6866, "head_rho": 1.6658, "tail_rho": 2.8094, "pass": false, "comment": "Residual GREW during training (1.66 -> 2.81). Kendall mechanism downweighted L_eik (sigma_eik 1.08 -> 2.21) because L_ground had naturally larger variance."},
+    "crit2_T_succ": {"value": -0.1517, "pass_succ_side": true, "T_coll_value": null, "pass_coll_side": "N/A (no collisions in 1a)", "pass": true},
+    "crit3_pearson": {"value": 0.3625, "n_pairs": 200, "pass": false},
+    "crit4_a_eik_accuracy": {"value": 0.07, "n_states": 100, "pass": false, "a_eik_action_dist": [50, 1, 1, 7, 41], "fwd_prog_action_dist": [0, 0, 0, 100, 0], "comment": "A_eik prefers STOP/ABORT (50/41) when forward-progress favors GO (100); T_phi gradient direction is wrong."},
+    "crit5_kl": {"value": 1.0663, "pass": false}
+  },
+
+  "criteria_2dense": {
+    "crit1_residual_ratio": {"value": 0.7735, "head_rho": 3.6149, "tail_rho": 2.7962, "pass": false, "comment": "Residual decreasing in late training (improving trend); ratio 0.77 fails strict <0.4 threshold but late-iter rho values reaching 2.5 from peak 5.2."},
+    "crit2_T_succ_T_coll": {"T_succ_value": 1.851, "T_coll_value": 97.39, "pass_succ_side": true, "pass_coll_side": true, "pass": true, "comment": "FIRST PASS for T_coll (was 36.4 in Step 7B). Replay buffer successfully sustained collision-BC training despite intermittent terminal events."},
+    "crit3_pearson": {"value": 0.3412, "n_pairs": 200, "pass": false},
+    "crit4_a_eik_accuracy": {"value": 0.20, "n_states": 100, "pass": false, "a_eik_action_dist": [50, 11, 9, 20, 10], "fwd_prog_action_dist": [0, 0, 0, 100, 0]},
+    "crit5_kl": {"value": 2.5313, "pass": false}
+  },
+
+  "sigma_final_1a": {"sigma_eik": 2.205, "sigma_bc": 0.360, "sigma_ground": 4.939, "comment": "All three sigmas evolved differently — adaptive weighting active. sigma_ground largest (downweights L_ground); sigma_bc smallest (upweights BC); sigma_eik mid (downweights residual signal — see crit1 failure)."},
+  "sigma_final_2dense": {"sigma_eik": 2.705, "sigma_bc": 0.810, "sigma_ground": 2.813, "comment": "sigma_eik and sigma_ground similar; sigma_bc smaller (upweighting BC anchor)."},
+
+  "replay_buffer_sizes_1a": {"success": 440, "collision": 0, "intermediate": 1000, "comment": "Collision buffer empty (0/30 collisions in 1a — expected). Success and intermediate buffers populated, with intermediate at full capacity."},
+  "replay_buffer_sizes_2dense": {"success": 32, "collision": 1000, "intermediate": 1000, "comment": "Collision buffer at capacity (replay sustained collision-BC training); intermediate at capacity. Success buffer small (32) — only 1 success was observed in evaluation, but training rollouts had similar outcomes; matches the policy's behavior in 2_dense."},
+
+  "bc_signal_continuity_1a": 0.50,
+  "ground_signal_continuity_1a": 0.50,
+  "bc_signal_continuity_2dense": 0.50,
+  "ground_signal_continuity_2dense": 0.50,
+  "continuity_caveat": "Computed from train CSV which logs at eval intervals; per-iteration metrics.csv shows continuous nonzero L_bc/L_ground after the first ~3 iters (when buffers populate). 50% reflects sparse log sampling rather than gaps in actual training signal.",
+
+  "qualitative_observations": [
+    "PASS: Crit 2 in 2_dense is a major qualitative improvement — first time T_phi(s_coll) ≈ 97 (target >90). Replay buffer successfully addressed the sparse-event BC training issue identified in Step 7B.",
+    "FAIL: Crit 1 in 1a — residual is GROWING (1.67 -> 2.81). The Kendall mechanism downweighted L_eik (sigma_eik 1.08 -> 2.21, increasing weight by 4x) because L_ground has naturally larger variance, making L_ground 'win' the precision-weighting and pulling T_phi values to fit observed times-to-arrival, which makes ||grad T||^2 grow.",
+    "FAIL: Crit 4 in both runs — A_eik gradient direction is wrong (preferring STOP/ABORT over the forward-progress-favored GO). T_phi has appropriate magnitude but its gradient field doesn't yet reflect time-optimality. This is consistent with L_ground (which fits absolute values) dominating L_eik (which constrains gradient magnitudes).",
+    "Adaptive weighting IS working as designed — sigmas evolve differently across the three terms. The issue is that Kendall optimizes for 'precision-weighted contribution to total loss' which is not exactly aligned with our goal of 'reduce residual to 0'.",
+    "Replay buffers successfully populated in 2_dense (1000 collision states cached) — Decision B was effective for the sparse-event scenario.",
+    "Crit 1 in 2_dense shows healthy late-training trend (residual decreasing 5.2 -> 2.5 over iters 5-13) but ratio 0.77 still fails strict <0.4."
+  ],
+
+  "verdict": {
+    "all_5_criteria_pass_with_margin_in_1a": false,
+    "all_5_criteria_pass_with_margin_in_2dense": false,
+    "passes_per_run": {
+      "1a": ["crit2"],
+      "2_dense": ["crit2"]
+    },
+    "fails_per_run": {
+      "1a": ["crit1", "crit3", "crit4", "crit5"],
+      "2_dense": ["crit1", "crit3", "crit4", "crit5"]
+    },
+    "overall": "fail"
+  },
+
+  "next_step_authorization": "step_7D_extended_training",
+  "next_step_recommendation": "Per Decision E priority list, the next intervention is to extend training (priority 1: 100k or 200k). Rationale: 2_dense Crit 1 trajectory shows healthy late-training decrease (5.2 -> 2.5), suggesting more iterations may push the ratio below 0.4. 1a Crit 1 trajectory is more chaotic (oscillating 1.5-3.3) and may not converge with budget alone — if 1a Crit 1 still fails after 100k/200k, escalate to Decision E priority 2 (BC weight curriculum) or priority 3 (auxiliary regularizers).",
+
+  "alternative_diagnostic": "The Kendall mechanism is correctly identifying L_ground as the highest-variance task and downweighting it. But because L_ground also constrains T_phi's absolute values strongly, downweighting it shifts T_phi away from observed time-to-arrival. The corresponding L_eik weight increase doesn't compensate because L_eik's residual is bounded below by network capacity (cannot reach exactly 0). This is a well-known failure mode of Kendall et al. when one task is point-wise observed (L_ground) and others are constraints (L_eik). A possible Decision E priority 3 intervention: bound log_sigma_eik below (e.g., log_sigma_eik >= -1, so sigma_eik >= 0.37 / weight <= 3.5), preventing the residual from being arbitrarily downweighted.",
+
+  "stop_point": "After Step 6 (criteria computed). Awaiting human authorization for next step. Per spec: do not abandon Eikonal, do not relax criteria, apply next principled fix from Decision E priority list."
+}

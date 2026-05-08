@@ -1,0 +1,130 @@
+{
+  "phase": "27",
+  "tests": {
+    "27.1_loader_tier1_synthetic": {
+      "pass": true,
+      "issues": [],
+      "counts": {
+        "n_runs": 6,
+        "n_valid": 6,
+        "long_rows": 30,
+        "wide_rows": 6
+      }
+    },
+    "27.2_loader_quality_failures": {
+      "pass": true,
+      "issues": [],
+      "qr_summary": {
+        "n_runs_discovered": 4,
+        "n_runs_valid": 1,
+        "n_runs_failed": 3
+      }
+    },
+    "27.3_final_window_metrics": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "final_collision_rate": 0.5,
+        "expected": 0.5
+      }
+    },
+    "27.4_welch_ttest": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "t": 0.16684292112614568,
+        "p": 0.8691195420835726,
+        "t_ref": 0.16684292112614568,
+        "p_ref": 0.8691195420835726
+      }
+    },
+    "27.5_holm_correction": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "adj": [
+          0.01,
+          0.045,
+          0.08,
+          0.14,
+          0.18,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "expected": [
+          0.01,
+          0.045,
+          0.08,
+          0.14,
+          0.18,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "n_sig": 2
+      }
+    },
+    "27.6_cohens_d": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "cohens_d": 2.0,
+        "expected": 2.0
+      }
+    },
+    "27.7_latex_table": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "n_tex": 7,
+        "n_csv": 7,
+        "tex_names": [
+          "computational_overhead.tex",
+          "tier1_main_comparison.tex",
+          "tier1_statistical_summary.tex",
+          "tier2a_lambda_sensitivity.tex",
+          "tier2b_occlusion_impact.tex",
+          "tier2c_fusion_weights.tex",
+          "tier4_holdout.tex"
+        ]
+      }
+    },
+    "27.8_plot_generation": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "n_pdf": 12,
+        "n_html": 4
+      }
+    },
+    "27.9_end_to_end": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "returncode": 0,
+        "stdout_tail": "[run_analysis] loading runs from /tmp/tmpu5g7e925/ablation\n[run_analysis] 12/12 runs valid; failure rate = 0.0%; report \u2192 /tmp/tmpu5g7e925/analysis/meta/data_quality_report.json\n[run_analysis] tables \u2192 /tmp/tmpu5g7e925/analysis/tables\n[run_analysis] figures \u2192 /tmp/tmpu5g7e925/analysis/figures\n[run_analysis] complete (0.9s); output \u2192 /tmp/tmpu5g7e925/analysis\n"
+      }
+    },
+    "27.10_determinism": {
+      "pass": true,
+      "issues": [],
+      "detail": {
+        "n_csvs": 7,
+        "mismatches": []
+      }
+    },
+    "27.11_existing_suite": {
+      "pass": true,
+      "n_phases": 29,
+      "all_pass": true,
+      "failed_phases": [],
+      "load_failures": []
+    }
+  },
+  "pass": true
+}

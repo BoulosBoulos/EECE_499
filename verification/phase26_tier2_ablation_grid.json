@@ -1,0 +1,142 @@
+{
+  "phase": "26",
+  "tests": {
+    "26.1_total_count_summary": {
+      "pass": true,
+      "issues": [],
+      "summary_total": 1160,
+      "summary_breakdown": {
+        "2a": 600,
+        "2b": 400,
+        "2c": 160
+      }
+    },
+    "26.2_subgrid_2a_content": {
+      "pass": true,
+      "issues": [],
+      "counts": {
+        "by_method": {
+          "hjb_aux": 120,
+          "soft_hjb_aux": 120,
+          "eikonal_aux": 120,
+          "cbf_aux": 120,
+          "fusion_aux": 120
+        },
+        "by_scenario": {
+          "1a": 300,
+          "2_dense": 300
+        },
+        "by_maneuver": {
+          "stem_right": 300,
+          "right_left": 300
+        },
+        "by_seed": {
+          "42": 120,
+          "123": 120,
+          "456": 120,
+          "789": 120,
+          "7": 120
+        },
+        "by_lambda": {
+          "0.01": 100,
+          "0.05": 100,
+          "0.1": 100,
+          "0.2": 100,
+          "0.5": 100,
+          "1.0": 100
+        }
+      }
+    },
+    "26.3_subgrid_2b_content": {
+      "pass": true,
+      "issues": [],
+      "counts": {
+        "by_method": {
+          "hjb_aux": 80,
+          "soft_hjb_aux": 80,
+          "eikonal_aux": 80,
+          "cbf_aux": 80,
+          "fusion_aux": 80
+        },
+        "by_scenario": {
+          "1a": 100,
+          "1b": 100,
+          "3": 100,
+          "2_dense": 100
+        },
+        "by_maneuver": {
+          "stem_right": 200,
+          "right_left": 200
+        },
+        "by_seed": {
+          "42": 80,
+          "123": 80,
+          "456": 80,
+          "789": 80,
+          "7": 80
+        },
+        "by_occ": {
+          "ON": 200,
+          "OFF": 200
+        }
+      }
+    },
+    "26.4_subgrid_2c_content": {
+      "pass": true,
+      "issues": [],
+      "counts": {
+        "by_scenario": {
+          "1a": 80,
+          "2_dense": 80
+        },
+        "by_maneuver": {
+          "stem_right": 80,
+          "right_left": 80
+        },
+        "by_seed": {
+          "42": 32,
+          "123": 32,
+          "456": 32,
+          "789": 32,
+          "7": 32
+        },
+        "by_weight_tuple": {
+          "1.0_1.0": 20,
+          "0.5_0.5": 20,
+          "1.0_0.0": 20,
+          "0.0_1.0": 20,
+          "2.0_1.0": 20,
+          "1.0_2.0": 20,
+          "3.0_1.0": 20,
+          "1.0_3.0": 20
+        }
+      }
+    },
+    "26.5_subgrid_filtering": {
+      "pass": true,
+      "issues": [],
+      "by_subgrid": {
+        "2a": 600,
+        "2b": 400,
+        "2c": 160
+      }
+    },
+    "26.6_determinism": {
+      "pass": true,
+      "issues": []
+    },
+    "26.7_tier1_regression": {
+      "pass": true,
+      "issues": [],
+      "tier1_count": 1680
+    },
+    "26.8_existing_suite": {
+      "pass": true,
+      "n_phases": 30,
+      "all_pass": true,
+      "failed_phases": [],
+      "load_failures": []
+    }
+  },
+  "pass": true
+}

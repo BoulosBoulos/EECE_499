@@ -1,0 +1,31 @@
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[fusion_aux] step=4096 ret=-329.50 coll=0 ttc=11.07 soft_res=1.4616 cbf_res=0.5512 align_kl=0.7975
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+Saved fusion_aux to /home/boulosboulos/Desktop/EECE_499-main/verification/_phase25_smoke/fusion_default/model_fusion_aux_1a_stem_right.pt
+Training complete. Metrics in /home/boulosboulos/Desktop/EECE_499-main/verification/_phase25_smoke/fusion_default/train_fusion_aux_1a_stem_right.csv

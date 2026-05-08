@@ -1,0 +1,15 @@
+Eval seed=1234 [deterministic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=-153.90 coll=0.000 success=0.000 ttc=10.90 ent=0.01 brakes=0.0
+Eval seed=1234 [stochastic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=-185.10 coll=0.000 success=0.000 ttc=15.69 ent=1.19 brakes=0.0
+Saved /home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/drppo/eval_drppo_1a_stem_right.csv

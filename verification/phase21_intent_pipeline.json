@@ -1,0 +1,146 @@
+{
+  "phase": "21",
+  "tests": {
+    "21.1_channel_parity": {
+      "pass": true,
+      "env_has_canonical_z": true,
+      "train_has_canonical_z": true,
+      "z_dim": 12,
+      "bit_identical": true,
+      "z_sample_first_three": [
+        10.22529262179565,
+        -3.382808123238956,
+        -0.4109468762930694
+      ],
+      "z_sample_last_three": [
+        6.0,
+        -1.5,
+        0.3
+      ]
+    },
+    "21.2_imperfection_caching": {
+      "pass": true,
+      "vehicle_id": "motorcyclist",
+      "traci_getImperfection": 0.05,
+      "ag_sigma_driver": 0.05,
+      "matches": true,
+      "cached": true,
+      "cached_value": 0.05,
+      "cache_correct": true,
+      "n_traci_calls_over_5_steps": 0,
+      "caching_works": true
+    },
+    "21.3_ped_synthetic_sigma": {
+      "pass": true,
+      "all_7_styles_mapped": true,
+      "missing_styles": [],
+      "n_peds_found": 1,
+      "per_ped": [
+        {
+          "id": "ped0",
+          "style": "distracted_slow",
+          "expected": 0.4,
+          "actual": 0.4,
+          "match": true
+        }
+      ],
+      "all_peds_match_lookup": true
+    },
+    "21.4_lstm_loads": {
+      "pass": true,
+      "input_dim": 12,
+      "hidden_dim": 384,
+      "num_layers": 3,
+      "bidirectional": true,
+      "n_members_loaded": 3,
+      "per_member": [
+        {
+          "member": 0,
+          "checkpoint_path": "/home/boulosboulos/Desktop/EECE_499-main/results/intent_model_v9_member0.pt",
+          "intent_shape": [
+            1,
+            50,
+            3
+          ],
+          "style_shape": [
+            1,
+            50,
+            3
+          ],
+          "shape_ok": true,
+          "finite": true,
+          "ok": true
+        },
+        {
+          "member": 1,
+          "checkpoint_path": "/home/boulosboulos/Desktop/EECE_499-main/results/intent_model_v9_member1.pt",
+          "intent_shape": [
+            1,
+            50,
+            3
+          ],
+          "style_shape": [
+            1,
+            50,
+            3
+          ],
+          "shape_ok": true,
+          "finite": true,
+          "ok": true
+        },
+        {
+          "member": 2,
+          "checkpoint_path": "/home/boulosboulos/Desktop/EECE_499-main/results/intent_model_v9_member2.pt",
+          "intent_shape": [
+            1,
+            50,
+            3
+          ],
+          "style_shape": [
+            1,
+            50,
+            3
+          ],
+          "shape_ok": true,
+          "finite": true,
+          "ok": true
+        }
+      ]
+    },
+    "21.5_use_intent_e2e": {
+      "pass": true,
+      "n_steps": 50,
+      "all_dim_165": true,
+      "all_finite": true,
+      "all_intent_in_unit": true,
+      "intent_std_across_steps": 0.3351784348487854,
+      "not_constant": true
+    },
+    "21.6_style_accuracy_gate": {
+      "pass": true,
+      "overall_style_accuracy": 0.665625,
+      "overall_intent_accuracy": 0.853125,
+      "style_per_class_acc": [
+        0.608955223880597,
+        0.7020057306590258,
+        0.6583990980834273
+      ],
+      "style_counts": [
+        335,
+        698,
+        887
+      ],
+      "mid_class_accuracy": 0.7020057306590258,
+      "gate_overall_ge_65": true,
+      "mid_class_ge_30": true,
+      "no_empty_class": true
+    },
+    "21.7_existing_suite": {
+      "pass": true,
+      "n_phases": 23,
+      "all_pass": true,
+      "failed_phases": []
+    }
+  },
+  "pass": true
+}

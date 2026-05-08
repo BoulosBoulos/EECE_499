@@ -1,0 +1,23 @@
+# Same exclusions as .gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+.venv/
+venv/
+.env
+logs/
+runs/
+results/
+wandb/
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.rou.xml
+*.sumocfg
+route_*.xml
+trip_*.xml
+output_*.xml

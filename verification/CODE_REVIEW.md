@@ -1,0 +1,312 @@
+# Code Review — EECE 499 (PDE-informed RL on SUMO T-intersection)
+
+Full sweep of 66 Python files (~10 154 LOC) plus 25 docs (~4 330 LOC), 12 YAML configs, the Makefile, `requirements.txt`, the SUMO scenarios, and the existing `verification/` self-tests. The codebase is substantial, mostly working (all 19 verification phases PASS), and ambitious. This review focuses on correctness concerns, doc/code drift, dead/duplicated code, and calibration risks. Module-by-module below; a "Top issues" summary follows.
+
+## Top issues (ranked by impact)
+
+1. **Massive doc/code drift.** Roughly half of `docs/` describes a code path that no longer exists (the legacy "Design A PINN-on-critic" pipeline) or one that was *never* implemented (the "88-D conflict-centric interaction benchmark"). New developers reading docs first will be misled. See §A below for a concrete inventory.
+2. **Frame-mismatch bug still live in `experiments/train_intent.py:62`.** `CHANGES_LOG.md #5` claims this CPA-frame bug was fixed in `env/sumo_env.py` (and it is, line 1029), but the *training-data collector* for the intent LSTM has the same bug verbatim. The intent model is being trained on data with mixed world/ego frames; the env then evaluates it on consistent ego-frame features. Likely accuracy loss.
+3. **`plot_learning_curves.py:57` misclassifies methods.** `for m in METHOD_LABELS: if m in basename` returns the *first* match; the dict is ordered `hjb_aux, soft_hjb_aux, …`, so any file containing `soft_hjb_aux_…` is silently labeled `hjb_aux`. Soft-HJB curves are plotted as Hard-HJB.
+4. **`compute_aulc.py:82` misnames methods.** `method = stem.split("_")[0]` returns `"soft"` for `soft_hjb_aux`, `"eikonal"` for `eikonal_aux`, etc. Per-method aggregation is wrong.
+5. **`Makefile:89` (`calibrate-analyze`) is broken.** It passes `--scenario`/`--ego_maneuver` (singular) but `run_calibration.py` only accepts `--scenarios`/`--ego_maneuvers` (plural) — the target will exit with an argparse error.
+6. **Aux-residual gradient scale.** `verification/phase1_residuals.json` shows HJB/Soft-HJB/CBF residuals have `‖∇‖₂ ≈ 2×10⁸` on synthetic random ξ. With `max_grad_norm=0.5`, clipping reduces the effective gradient by ~10⁸, essentially zeroing the aux update on out-of-distribution states. Eikonal (1.05) is fine. Real data is probably better, but this is a fragile knob; see §G.
+7. **CBF residual is dimensionally inconsistent with continuous-time CBF.** `models/pde/residuals.py:186` computes `(∇U · Δξ) + α·h` where `Δξ = F_a(ξ) − ξ` is a *raw* state change (not a drift `Δξ/dt`). With `dt = 0.1`, the advection term is 10× smaller than the continuous-time convention, and `α_cbf=1.0` dominates. The condition reduces to "U > −offset" — the CBF gives almost no information.
+8. **`info["prev_action"]` is misnamed in env.** `env/sumo_env.py:1309` sets `self._prev_action = action` *before* line 1310 returns `info["prev_action"]: self._prev_action`, so the field equals the *current* action, not the previous one.
+9. **Visibility sampling uses global numpy RNG (non-deterministic).** `env/sumo_env.py:929-930` calls `np.random.uniform(...)` instead of `self._env_rng`. Even with a fixed seed, `α_cz` jitters across processes / repeated runs.
+10. **State dim is always 135 (not 134/135).** The env always appends `d_pothole` (sentinel = 100.0 in non-pothole scenarios) for cross-scenario invariance. Many docs still say "134 base, 135 with pothole".
+11. **Multiple `setSpeedMode(EGO_ID, 0)` doc/code disagreement.** `env/sumo_env.py:674` sets it to **0** (disable all SUMO safety). `docs/PDE_METHODS_AND_ENV_UPDATES.md §5` claims "ego setSpeedMode enabling safety/negotiation".
+12. **A "diagnostic" print in `reset()` runs every episode.** `env/sumo_env.py:696-697` prints `[POTHOLE DIAG]` for every reset of every pothole scenario. Comment marks it "temporary — remove after verification".
+13. **~900 LOC of duplication across `experiments/pde/train_*.py`.** Five training scripts are 95% identical; refactor would shrink the surface dramatically.
+14. **Many dead defaults & legacy parameters.** `DRPPO.__init__` accepts ~14 ignored legacy `pinn_*` / `lambda_physics_*` kwargs; `configs/algo/default.yaml` has `use_pinn: true` flag with no consumer; `requirements.txt` lists `streamlit`, `plotly`, `optuna`, `stable-baselines3`, `sb3-contrib` that no file imports.
+15. **Run-ablation defaults are inconsistent with train scripts.** `run_ablation.py` uses `n_steps=256, batch_size=64, n_epochs=5` (looks like CI smoke values) vs `4096/128/8` in the direct training scripts.
+
+---
+
+## A. Doc/code drift inventory
+
+### A.1 Files referenced in docs that **do not exist on disk**
+- `experiments/run_train.py`, `experiments/run_eval.py`, `experiments/run_ablation.py` (top-level — only `experiments/pde/run_ablation.py` exists)
+- `experiments/run_visualize_sumo.py`, `experiments/run_visualize_ablation.py`
+- `experiments/dashboard.py`, `experiments/run_hpo.py`
+- `experiments/run_single_job.py`, `experiments/aggregate_results.py`, `experiments/generate_jobs.py`
+- `models/physics.py` (deleted per `CHANGES_LOG.md #7`, but `RUNNING.md`/`FRAMEWORK.md`/`PHYSICS_INFORMED.md` still cite it)
+- `env/t_intersection_env.py`
+- `scripts/launch_parallel_16gpu.sh`, `scripts/run_ablation_slurm.sbatch`, `scripts/train_intent.py`
+- `notebooks/colab_hpo.ipynb`
+- `configs/residuals/default.yaml` (per `CHANGES_LOG.md #11` it was supposed to remain as a deprecation stub; it's not even on disk now)
+- Entire interaction-v2 stack: `state/builder_interaction.py`, `env/sumo_env_interaction.py`, `scenario/conflict_map.py`, `scenario/template_sampler.py`, `scenario/scheduler.py`, `scenario/controllers.py`, `scenario/generator_v2.py`, `experiments/interaction/*.py`, `tests/test_*.py` — all listed as "implemented and verified" in §17–§18 of `BEHAVIORAL_DECISION_BENCHMARK_REDESIGN.md`. Only `configs/interaction/benchmark.yaml` actually exists.
+
+### A.2 Docs that are stale w.r.t. current code
+- `FRAMEWORK.md`, `HYPERPARAMETERS.md`, `ABLATION_HYPERPARAMETERS.md`: still describe Design A/B physics-on-critic, the 10-variant ablation (`pinn_critic`, `pinn_actor`, `pinn_no_ttc`, …), `make ablation-sensitivity`, dashboard, multi-seed legacy ablation. Per `CHANGES_LOG.md #6`, all that was stripped.
+- `FRAMEWORK.md`/`HYPERPARAMETERS.md` say `stem_length: 200`, `bar_half_length: 160`. **Actual config is 60 / 50.** `ENVIRONMENT.md` correctly says 60/50.
+- `STATE.md` / `STATE_SCHEMA.md`: claim base dim 134 with pothole optional → 135. Code always emits 135 (sentinel for non-pothole).
+- `BEHAVIORAL_DECISION_BENCHMARK_REDESIGN.md`: claims an "88-D" state. The benchmark YAML at `configs/interaction/benchmark.yaml:108` calculates `8+5+12+3·21+3 = 91`. Both numbers refer to a builder that doesn't exist.
+- Action effect tables disagree: `FRAMEWORK.md` (GO=+1, ABORT=-5), `ARCHITECTURE.md` / `ENVIRONMENT.md` / actual code (GO=+2, ABORT=-8).
+- `PDE_METHODS_AND_ENV_UPDATES.md §5`: "setSpeedMode enabling safety/negotiation" — code does the opposite (mode 0 disables safety entirely).
+- `RUNNING.md` / `SCENARIO.md` reference legacy SUMO scenario `scenarios/sumo_t/` and `make visualize-sumo`/`train-sumo` targets that don't exist.
+
+### A.3 Makefile targets referenced in docs but **not in Makefile**
+`train-intent`, `train`, `eval`, `eval-multiseed`, `train-1a..4`, `eval-1a..4`, `visualize`, `visualize-gui`, `visualize-sumo`, `train-sumo`, `ablation`, `ablation-sensitivity`, `ablation-pde`, `eval-pde-all`, `train-pde-all`, `pde-train-eval-all`, `dashboard`, `plot`, `plot-ablation`, `plot-interaction`, `jobs-manifest`, `jobs-manifest-batch1/2/...`, `ablation-aggregate`, `ablation-merge`, `ablation-16gpu`, `ablation-16gpu-batch1/2`, `hpo`, `clean` (only some exist). Net: ≥16 documented targets are missing.
+
+### A.4 `run_full_ablation.py` size disagrees with `CALIBRATION_AND_FIXES.md`
+Doc table says Tier 1 = 600 jobs (`12 × 5 × 5 × 2`). Code generates `12 × 6 × 10 × 2 = 1440` (6 methods incl. `rule_based`, 10 seeds). Tier counts in the doc are out of date.
+
+---
+
+## B. `env/sumo_env.py` (1314 LOC)
+
+Generally solid; the env is the pillar of the project. Major concerns:
+
+- **L152** `_state_dim = 6+12+6+5*22+1 = 135` always (sentinel for non-pothole). Comment is correct; docs are not.
+- **L173** `_junction_offset` defaults to `[0,0]` until `_init_occlusion_geometry()` runs in `reset()`. Fine, just don't rely on the constructor's default.
+- **L184–207** Intent-predictor loading:
+  - Hard-codes `results/intent_model.pt`. No way to point at an alternative path.
+  - **`torch.load(... map_location=...)` with no `weights_only`.** Default in modern PyTorch is `weights_only=False`, which un-pickles arbitrary code from the checkpoint. Trusted internally; flag for posterity.
+  - Vector-env users will reload the LSTM per env instance → memory waste.
+- **L200** `except FileNotFoundError: raise` is a no-op (the bare except above already covers it).
+- **L329–331** Auto-regenerates scenarios when `t.sumocfg` missing. Reasonable, but the auto-regen also fires if the sumocfg lacks `t_ped.rou.xml` — the heuristic at L314–322 then triggers an unnecessary regeneration on every reset for ped scenarios.
+- **L348** `traci.start(cmd)` with `--collision.action warn`. Good (we *want* collisions to be reported, not avoided by SUMO).
+- **L674** `setSpeedMode(EGO_ID, 0)` disables every SUMO safety check. This is intentional (we want full policy control), but the doc claims the opposite.
+- **L696–697** `print("[POTHOLE DIAG] …")` runs on every reset of pothole scenarios. The comment says "remove after verification". Should be deleted or guarded by a flag.
+- **L711–712** Yaw-rate from wrapped heading delta. Correct.
+- **L754** `chi_i = 1 if route has both _in AND _out edges else 0` — this is a *route completeness* bit, not "intent" in the modeling sense. Misleadingly named.
+- **L883** `kappa = psi_dot / max(v, 0.5)` — clamps to 0 below v=0.5. Fine.
+- **L928–935** Visibility sampling uses **global** `np.random.uniform`. With reproducibility important for paper claims, this should use `self._env_rng`. Each reset will draw 20 different samples even with the same seed.
+- **L962 vs L971** — two different `n_occluded` thresholds (0.5 then 0.8). `sigma_percep` uses the 0.5 cut, `n_occ` uses 0.8. Probably intentional but undocumented.
+- **L1029** `t_cpa` clipped to `[0, 3]` — hard-coded; the StateBuilder's `t_h_cpa` (config) is 3.0 by default but should be the source of truth. Likewise L1106, L1109 (TTC d_safe).
+- **L1185** `GO` action uses `setSpeed`, not `slowDown`. With `setSpeedMode=0` the speed jumps instantaneously by `2 m/s² · dt`. Calibrated to look like 2 m/s² but ignores vehicle accel limits. Probably fine.
+- **L1207** `n_steps = max(1, int(self.dt / 0.1))`. With `dt=0.1` this is 1 (correct). With `dt > 0.1` you'd advance SUMO `n_steps × dt` not `dt`, since `traci.start` already passed `--step-length self.dt`. Bug only if `dt ≠ 0.1`.
+- **L1247–1250** `ego_missing_success`: ego disappearing without collision is treated as success. Risk of false positives if SUMO removes the ego for other reasons.
+- **L1257** `r = w_prog*prog + w_time*self.dt`. With `w_time=-0.1` and `dt=0.1`, the per-step time penalty is −0.01, not −0.1 as docs say. Probably fine if the intent is "per-second", but the unit ambiguity causes confusion.
+- **L1310** `info["prev_action"]` returns the **current** action because L1309 sets `self._prev_action = action` first. Either rename or re-order.
+
+## C. `state/builder.py`
+
+- Default `g_turn=[0,1,0]` (straight) but env always passes `[0,0,1]` (right). Default is dead.
+- L80 (`g_turn` default), L81 (`rho` default) — defensive; OK.
+- Uses configured `t_h_cpa` and `d_safe` (consistent unlike env's hard-codes).
+- Correct ego-frame transforms (`R = _rot2d(-psi_e)`).
+- 134-D dim sums are right; env then appends 1 (always) and optionally 30 → 135 / 165.
+
+## D. `scenario/`
+
+### `scenario/generator.py`
+- Stem 60 / bar 50 default — matches docs that haven't drifted (ENVIRONMENT.md), not the others.
+- Hard-coded inner-margin set `_ped_scenarios = {"1b","2","3","4","2_dense","3_dense","4_dense"}` duplicates `SCENARIOS_WITH_SIDEWALKS` in `env/sumo_env.py`. Single source of truth would be cleaner.
+- Generated `t.sumocfg` hard-codes `<step-length value="0.1"/>` while the env passes `--step-length self.dt`. OK as long as `dt=0.1`.
+- Pothole shape is fixed at ±4 × ±2 — actual pothole randomization happens in env at runtime; the static XML pothole is a placeholder.
+
+### `scenario/behavior_sampler.py`
+- Per-style parameter tables match `FRAMEWORK.md §3` for car/moto/ped. ✓
+- L431 `f"{'left_in' if 'left_right' in maneuver else 'right_out'} {'right_out' if 'left_right' in maneuver else 'left_in'}"` is brittle — substring match instead of an explicit dict like `CAR_ROUTES`. Works for current strings only.
+- `PotholeConfig` produced by sampler is **never used by env** — env's `_randomize_pothole()` overrides it. Dead code or a documentation bug.
+
+## E. `models/`
+
+### `models/drppo.py`
+- `DRPPO.__init__` accepts ~14 legacy params (`pinn_placement`, `lambda_physics_*`, `use_l_ego`, …) and silently ignores them. Per `CHANGES_LOG.md #6`, the policy is a clean recurrent PPO baseline. Cruft.
+- `RecurrentActorCritic.forward` samples an action even when called via `evaluate_actions` chain (compute waste).
+- `load(path)` uses `weights_only=False` — same security caveat as env.
+
+### `models/intent_style.py`
+Compact, correct LSTM head. Entropy regularization with `(p+1e-8).log()` is fine.
+
+### `models/rule_based_policy.py`
+- L60–63 `if d_cz > far_zone_dist: GO else: GO` — both branches return `3`. The conditional is dead; condense to a single GO branch unless future extensions need it.
+- Otherwise the agent indexing into the flat obs is correct (offset 24 + 22·i + 13 for TTC).
+
+## F. `models/pde/` — the heart of the project
+
+### `state_builder.py`
+79-D layout is internally consistent. ξ[8..11] = vis sub-block (drops `sigma_percep`, `n_occ`). Top-3 agents (vs top-5 in full state). ξ[78] = `d_pothole`.
+
+### `dynamics.py`
+- `_smooth_clamp_nonneg` is a sound smooth-ReLU surrogate. Verified by `verification/test_smooth_clamp.py` (gradients positive everywhere).
+- `_nominal_accel`: STOP/YIELD/GO/ABORT match env; CREEP uses a simple `clamp(v_creep − v, −0.5, 0.5)`, env uses an asymmetric step (+0.5 vs −1.0). Slight inconsistency, probably immaterial.
+- L88–90 yaw-rate update simplifies to `v_new · κ` because `tan(atan(L·κ)) = L·κ` and the clamp at ±0.5 rad almost never fires for realistic curvatures. The bicycle-model dressing is illusory but not wrong.
+- L99 `if mask.sum() < 0.5: continue` checks the *batch sum* of one agent's mask. If only a subset of the batch has the agent active, the loop skips agent propagation for the entire minibatch (or, conversely, propagates "ghost" agents for batch elements where the mask is 0). Element-wise masking would be safer.
+
+### `local_reward.py`
+- `progress = v · dt` (pre-action `v`). `ARCHITECTURE.md` claims `0.5(v+v')·dt` (trapezoidal). Env uses post-action `getSpeed · dt`. Three different progress definitions.
+- Pothole sigmoid is `sigmoid((1.0 − d_pot_next)/0.05)` — fires when within ~1 m of *center*. Env's `_in_pothole` uses a 4–12 m × 2–4 m rectangle. **The PDE surrogate underestimates pothole reward** for typical pothole sizes.
+- ROW proxy is a triple-sigmoid that approximates "low TTC AND close to CZ AND moving fast". Env's full ROW check additionally requires `_ego_must_yield(edge)` and a priority agent within 15 m. PDE proxy is structurally weaker.
+
+### `residuals.py`
+- `_compute_grad_U` correctly detaches and re-attaches `requires_grad`. `create_graph=True` lets ∇U flow back through the aux update. ✓
+- `pde_q_values`: `q_a = r_a + γ · ∇U^⊤(F_a − ξ)`. The γ factor and use of raw Δξ are consistent with `CHANGES_LOG.md #1, #2`. ✓
+- `hjb_residual` uses `q_all.max(...).values`. The hard max is non-differentiable at switching points; soft-HJB is a legitimate fix.
+- **`cbf_residual` (L186)** sums `(∇U·Δξ) + α·h` where `Δξ` is **raw**, not divided by `dt`. With `dt=0.1`, the advection term is 10× too small for the continuous-time CBF condition `ḣ + α·h ≥ 0`. Either divide by `dt` here (matching `dynamics.drift`) or set `α_cbf ≈ 10` to compensate. As written with `α_cbf=1.0`, the residual is dominated by `α·h ≈ U + 10`, and `ReLU(−(α·h))` is positive only when `U < −10` — i.e. the regularizer is "U should be ≥ −10", a degenerate barrier. Suggested fix: `h_dot_a = (grad_U * delta_xi_a).sum(dim=-1) / dynamics.dt` (or pass a `dt` knob to the residual).
+- `eikonal_residual`: dynamics-derived `v_eff` via per-action `sigmoid((TTC − ttc_thr)/0.5) · v_next`, modulated by `α_cz` (clamped to ≥0.1). Sensible. Eikonal is the only residual with **bounded** gradient norms in `phase1_residuals.json` (≈1.05 vs ≈10⁸ for HJB/Soft-HJB/CBF). Probably the most numerically stable.
+
+### `collocation.py`
+- 70/30 real-vs-jittered mix. Jitter on primitives only; derived `τ`, `t_cpa`, `d_cpa`, `TTC` recomputed via `_recompute_agent_derived` — duplicates the inner loop in `dynamics.one_step` (bigger DRY issue).
+- Agent jitter clamps `v_i ≥ 0` and distances `≥ 0` but no upper clamp. With `randn`-scale noise std ~1 m/s on `v_i`, occasional 5σ tails could push speeds past `v_max`.
+
+### `*_aux_critic.py`
+All four critics are byte-identical except for class name. A single `AuxCritic` with `name=…` would suffice.
+
+### `*_aux_agent.py`
+- `HJBAuxAgent.train_step` line 142: `U_colloc = self.aux_critic(xi_colloc)` is computed but never used. Dead variable.
+- `SoftHJBAuxAgent.train_step` line 190: re-runs `self.policy.gru(obs_for_eval, hidden_t)` after `evaluate_actions` already did the same on line 124. Duplicate forward pass.
+- All four agents construct `BehavioralDynamics()` with default args; not configurable.
+- All four agents instantiate `self.pde_state_builder = ReducedPDEState()` then never use it (xi is supplied externally by `collect_rollouts`). Dead state.
+- **EikonalAuxAgent uses `w_fail=+50` for the collision boundary condition while every other agent uses `w_coll=−20`.** Documented in `ARCHITECTURE.md` ("collision = high cost"), but the asymmetry deserves a comment — the same physical event maps to opposite signs depending on the residual family.
+- BC test at L156 `succ_xi = xi_t[succ[:len(xi_t)]]` slices the boolean to the length of `xi_t`. Defensive but indicates `success_terminal` and `xi_t` may have differing lengths; if so, the slicing may misalign step indices.
+
+## G. `experiments/`
+
+### `experiments/train_intent.py`
+- **L62**: `t_cpa = -dot(dp, delta_v) / (dot(delta_v, delta_v) + eps)` mixes world-frame `dp` with ego-frame `delta_v`. Same pattern that `CHANGES_LOG.md #5` says was fixed in env — the fix never propagated here. Result: training data → CPA features ≠ inference data → CPA features. Likely accuracy hit on the intent LSTM.
+- L184 `avg_val_loss = val_loss / max(total // batch_size, 1)` — divides by integer floor, off-by-one for partial last batches. Minor.
+- Saves only-best-val checkpoint; no early stopping or LR scheduling.
+
+### `experiments/pde/collect_rollouts.py`
+- GAE computation correct. `dones_arr[t]` resets `last_gae=0`, `terminated_arr[t]` zeros bootstrap. Truncation bootstrap via `truncated_bootstrap` dict. ✓
+- Always normalizes advantages by std. ✓
+- Pads `extra` with `d_cz, v, ttc_min, kappa, a_lon` for legacy DRPPO compatibility — these are unused by all current PDE agents.
+
+### `experiments/pde/train_*.py` (5 files, ~290 LOC each)
+- ~95 % code duplication. Each script differs only in: `--config` default, agent class, `lambda_*` knob mapping, CSV column for residual, log key, meta filename, "method" string. A common `train_pde_main(method_name, agent_cls, lambda_key)` would shrink the surface to ~60 LOC × 5 entry-point shims.
+- Post-training checkpoint selection (≥50 k steps): re-instantiates `type(policy)(obs_dim=…, device=…)` with **default** lambdas/aux_lr. For inference this is harmless (only weights are loaded), but the optimizer state in the checkpoint may not align with default param groups. Adam state should still load because the architecture is identical.
+- Score formula `−coll_rate*100 + mean_r` weighting is hand-tuned and undocumented.
+- Three SUMO processes spun up sequentially (`SumoEnv` once for obs_dim, then `env`, then `eval_env`) — startup overhead but acceptable.
+
+### `experiments/pde/eval.py`
+- Comprehensive metric set (action entropy, switching rate, decision latency, hard-brakes, ROW violation heuristic, action fractions). Solid for paper-grade evaluation.
+- L52 hard-brake threshold = 3 m/s drop in one step (i.e. ≥30 m/s² with `dt=0.1`). Reasonable.
+- Both deterministic and stochastic eval modes per seed. ✓
+- L244 `policy.load(args.checkpoint)` for non-rule-based; for rule-based no load. Coherent.
+
+### `experiments/pde/run_ablation.py`
+- **L107–109** PPO hyperparameters defaults `n_steps=256, batch_size=64, n_epochs=5` — far below the train scripts' `4096/128/8`. Looks like accidental smoke-test values committed. Anyone running `make ablation-serial` will not reproduce the per-script training behavior.
+- _make_policy filters DRPPO-incompatible kwargs; defensive.
+- Uses **same env across all variants/seeds** within a scenario — fine for SUMO but reduces RNG isolation.
+
+### `experiments/pde/run_full_ablation.py`
+- Tier 1 size: 12 × 6 × 10 × 2 = 1 440 jobs (incl. `rule_based`). `CALIBRATION_AND_FIXES.md` says 600 (12 × 5 × 5 × 2) — **stale doc**.
+- Tier 2 lambda sweep: 32 jobs (2 × 4 × 4 × 1)? Actually `2 combos × 4 methods × 4 lambdas × 5 seeds = 160`. Doc says 48. Doc is **doubly stale**.
+- L326 `best_method = "hjb_aux"  # PLACEHOLDER` for the supplementary tier — needs to be updated post-Tier-1 run.
+- L417 `subprocess.Popen(shell_cmd, shell=True)` with constructed strings. Args are from a fixed allow-list, but path components could theoretically contain shell metacharacters. Prefer `shell=False` with a list of args.
+- No per-job timeout — a hung SUMO process (e.g. lost TraCI socket) would block forever.
+
+### `experiments/pde/run_calibration.py`
+- L39 `assert len(scenarios) == len(ego_maneuvers)` enforces parallel lists. Fragile vs taking a list of `(scen, man)` tuples.
+- Convergence heuristic (last-20% within 5%) is reasonable but noisy at 1k step granularity.
+- Recommendation is printed, not auto-applied.
+
+### `experiments/pde/smoke_test.py`, `verify_conflicts.py`, `smoke_test_orchestrator.py`
+Small, well-scoped scripts. `smoke_test_orchestrator.py:66` uses `stdout.count("none")` which can over-count (substring of other words); checks "≥0" so it can't false-pass.
+
+### `experiments/pde/visualize_sumo.py`
+- L121–143 creates two `SumoEnv` instances (one to read obs_dim, one for the actual run). The first is never `.close()`d before the second starts → two TraCI processes alive concurrently. Should `del env_for_dim` after extracting obs_dim, or just import the constant.
+- Visibility overlay POIs (L18–44) — debug helper, fine.
+
+### `experiments/pde/plot_*.py`
+- `plot_pde.py` L54: `res_key = "hjb_residual_mean" if "hjb" in var and "soft" not in var else "soft_residual_mean"`. **Wrong** for `eikonal_aux` and `cbf_aux` — they fall to `soft_residual_mean`, which doesn't exist in their CSVs, so the plot becomes 0. Switch on the variant name directly via a dict.
+- `plot_visibility_progression.py` runs a single GO trajectory with/without buildings — single-episode plot, fine for a paper figure but should average across seeds to be defensible.
+
+### `experiments/pde/analysis/*.py`
+- **`compute_aulc.py:82`** `method = stem.split("_")[0]` returns `"soft"` for `soft_hjb_aux`, `"eikonal"` for `eikonal_aux`, etc. Use longest-match like `generate_results_tables.py`.
+- **`plot_learning_curves.py:57`** uses `for m in METHOD_LABELS: if m in basename`, returns first dict-order match — silently labels `soft_hjb_aux_*.csv` as `hjb_aux`. Same fix.
+- `plot_pde_convergence.py` uses an explicit `RESIDUAL_COLUMNS` dict and is correct.
+- `generate_results_tables.py` (785 LOC): well-engineered. Holm–Bonferroni, bootstrap CI, Cohen's d with bootstrap CI, paired t-test, Mann-Whitney U, paradigm comparison, held-out (Tier 4) analysis. The most rigorous statistical surface in the project. **Caveat (L506)**: the main results table aggregates across scenarios by taking `matching[0]` (first match), not by averaging — for multi-scenario data the "main" cell shows only the first scenario.
+
+## H. `Makefile`, `requirements.txt`, configs
+
+### Makefile
+- `setup` uses `pip install … --break-system-packages`. **Don't** — should default to a venv or warn.
+- `plot-pde` hard-codes `--pde_dir results/ablation` (not `pde_ablation`); contradicts the dual-pipeline structure in PDE_METHODS_AND_ENV_UPDATES.md.
+- `calibrate-analyze` passes `--scenario` / `--ego_maneuver` (singular) but `run_calibration.py` accepts only `--scenarios` / `--ego_maneuvers` plural. Target is broken.
+- ~16 documented targets are missing (see §A.3).
+
+### requirements.txt
+- `streamlit`, `plotly`, `optuna`, `stable-baselines3`, `sb3-contrib` are not imported anywhere in the repo. Dead deps.
+- No upper bounds on `torch`, etc. — risk of breakage on torch 3.x.
+
+### configs/algo/default.yaml
+- `use_pinn: true` flag has no consumer. Dead.
+- Comment "DRPPO + optional PINN residuals" mismatches the stripped DRPPO.
+
+### configs/pde/*.yaml
+Coherent across methods. `lambda_anchor=1.0, lambda_*=0.2, lambda_bc=0.5, lambda_distill=0.25` everywhere. Soft adds `lambda_align=0.05, tau_soft=0.1`. CBF: `alpha_cbf=1.0, cbf_safe_offset=10.0`. Eikonal: `v_min=0.5`. Note the `cbf_safe_offset=10.0` is hard-coded in `models/pde/residuals.py:182` as `cbf_safe_offset=10.0` default — config respected.
+
+### configs/scenario/default.yaml
+`stem_length=60`, `bar_half_length=50`. **Use this as ground truth; ignore the 200/160 in FRAMEWORK.md/HYPERPARAMETERS.md.**
+
+### configs/interaction/benchmark.yaml
+Comprehensive 100-line config for a benchmark whose code does not exist. Either delete or rebuild.
+
+## I. `verification/`
+
+Self-tests are well-designed and complete. All 19 phases PASS as of `verification/REPORT.md`. Notable details:
+
+- **`phase1_residuals.json`**: HJB residual ranges `[−5281, +722]`, `‖∇‖ ≈ 2 × 10⁸` on synthetic `randn(B, 79)` ξ. Same scale for soft-HJB and CBF. Eikonal: `[−4.0, −0.2]`, `‖∇‖ ≈ 1.05`. With `max_grad_norm=0.5`, the HJB/soft/CBF aux update on out-of-distribution states would be reduced by ~10⁸ — i.e. the optimizer never moves. On real ξ the scale is hopefully smaller (typical `d_cz ≤ 60`, `v ≤ 14`, `Δξ ≤ ~1.5`), but residual magnitude scales with `‖∇U‖ · ‖Δξ‖` which can still be large early in training. Worth instrumenting actual `‖∇‖` in the train CSVs.
+- **`phase4_residual_sanity.json`**: `hjb_residual_mean` = 0.9058 across first 50 / last 50 steps with **ratio = 1.0** — but only one row exists; the test is a smoke check, not real convergence evidence.
+- **`phase2_step8_conflicts.json`**: conflict rates ≥ 96 % across 6 (scenario, maneuver) combos. Strong scenario design.
+- **`phase2_step12_obsdim.json`**: 11 configurations all produce `obs_dim = 135`. Cross-scenario invariance verified.
+
+## J. Recommendations (prioritized)
+
+### Must fix before relying on results
+1. **Fix `experiments/train_intent.py:62` frame mismatch** (apply the same fix used in env L1029).
+2. **Fix `plot_learning_curves.py:57` and `compute_aulc.py:82`** method-name parsers (use longest-match). Otherwise published learning curves and AULC tables are mislabeled.
+3. **Decide on CBF advection scaling** — either divide by `dt` or document that `α_cbf` should be ~10× the apparent value. Rerun any CBF-relevant experiments after the fix.
+4. **Remove the `[POTHOLE DIAG]` print in `env/sumo_env.py:696`.**
+5. **Fix `info["prev_action"]` to actually be the previous action**, or rename to `current_action` (which is redundant) or just delete it.
+6. **Replace `np.random.uniform` in `_get_geom_vis` with `self._env_rng`** for reproducible visibility sampling.
+7. **Fix `Makefile:89`** `calibrate-analyze` argparse mismatch.
+
+### Should fix for clarity / paper rigor
+8. Synchronize docs: delete or rewrite `FRAMEWORK.md`, `HYPERPARAMETERS.md`, `ABLATION_HYPERPARAMETERS.md`, `PHYSICS_INFORMED.md`, `PIPELINE.md`, `RUNNING.md`, `SCENARIO_SUMO.md`, `BEHAVIORAL_DECISION_BENCHMARK_REDESIGN.md`. Make them either describe what's actually implemented or move to a `docs/legacy/` folder.
+9. Update `CALIBRATION_AND_FIXES.md` tier-size table to match `run_full_ablation.py`.
+10. Reconcile `run_ablation.py` PPO defaults with the train scripts (`n_steps=4096, batch_size=128, n_epochs=8`).
+11. Switch `subprocess.Popen(..., shell=True)` to `shell=False` with arg lists in `run_full_ablation.py`.
+12. Add per-job timeouts to `run_full_ablation.py` to prevent hangs.
+13. Aggregate across scenarios in `generate_results_tables.py:506` (currently uses `matching[0]`).
+14. Hard-coded constants in env (`d_safe=2.0`, `t_h=3.0`, `CZ_BAR_HALF_LENGTH=30`, `CZ_BAR_HALF_WIDTH=7`, success threshold `exit_len-10`, etc.) should be in configs.
+
+### Cleanup (low risk, high signal)
+15. Refactor 5× duplicate train scripts into a common `train_pde_common.py`.
+16. Collapse 4× identical `*_aux_critic.py` into a single class.
+17. Delete legacy DRPPO `pinn_*` / `lambda_physics_*` constructor params.
+18. Drop `streamlit`, `plotly`, `optuna`, `stable-baselines3`, `sb3-contrib` from `requirements.txt` (or restore the missing dashboard / HPO scripts).
+19. Drop `use_pinn: true` from `configs/algo/default.yaml`.
+20. Remove dead `pde_state_builder` / `U_colloc` variables in PDE agents.
+21. Fix `RuleBasedTTCPolicy.get_action` redundant if/elif/else returning GO twice.
+22. Replace `t_cpa` substring-route logic in `behavior_sampler.py:431` with explicit dict.
+
+### Nice to have
+23. Add an entry-point CLI (e.g. `python -m experiments.train --method hjb_aux …`) to centralize the duplicated argparse in train scripts.
+24. Add `weights_only=True` to `torch.load` for production loads (env intent model, agent.load).
+25. Wire `BehavioralDynamics` constructor to PDE configs so `dt`, `a_brake`, `a_abort`, `a_go`, `v_creep`, `v_max`, `L`, `d_safe`, `t_h` can be tuned without code edits.
+
+## K. What's good
+
+- The PDE residual framework is mathematically coherent and clearly documented in `ARCHITECTURE.md` and `PDE_METHODS.md`.
+- `verification/` self-tests are thorough and pass — strong signal that the core math is wired up correctly.
+- Eikonal residual is well-scaled (∇ norm ≈ 1) and looks the most numerically stable of the four.
+- `generate_results_tables.py` does proper multi-test correction (Holm–Bonferroni), bootstrap CIs, paired tests, and effect sizes — better than typical RL papers.
+- Scenario diversity / conflict-guarantee logic in `BehaviorSampler` (insurance + dense + style filtering) is well thought out and verified at ≥96 % conflict rate.
+- Provenance metadata (`meta_*.json` per run, including git hash, configs, lambda overrides, wall time) is excellent.
+- `_smooth_clamp_nonneg`, the autograd patterns in `_compute_grad_U`, and the GAE-with-truncation logic in `collect_rollouts` are clean implementations.
+- Cross-scenario `obs_dim = 135` invariance (verified) makes ablation cleanly comparable.
+
+## L. Quick stats
+
+| | Count / Lines |
+|---|---|
+| Python files | 66 |
+| Python LOC | 10 154 |
+| Largest module | `env/sumo_env.py` 1314 LOC |
+| Doc files | 25 |
+| Doc LOC | 4 330 |
+| YAML configs | 16 |
+| Verification phases | 19 (all PASS) |
+| Doc-referenced files missing on disk | ≥30 |
+| Doc-referenced Makefile targets missing | ≥16 |
+| Train script duplication (lines that could collapse) | ~900 |
+| Dead Python deps in `requirements.txt` | 5 |
+
+---
+
+*Review generated by line-by-line read of every Python file plus all docs and configs. Findings are grounded in specific file:line references; "verification PASS" claims cross-checked against `verification/REPORT.md`.*

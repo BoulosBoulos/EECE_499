@@ -1,0 +1,32 @@
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=4096 ret=-118.45 coll=0 ttc=11.29 eik_res=1.8861
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=8192 ret=-132.74 coll=0 ttc=10.67 eik_res=1.9824
+Saved eikonal_aux to /home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/eikonal_aux/model_eikonal_aux_1a_stem_right.pt
+Training complete. Metrics in /home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/eikonal_aux/train_eikonal_aux_1a_stem_right.csv

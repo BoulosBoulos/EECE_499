@@ -1,0 +1,15 @@
+{
+  "phase": "29.4",
+  "pass": true,
+  "tier3_total": 275,
+  "subgrids": {
+    "state_ablation": {"jobs": 100, "combos": 4, "methods": 5, "seeds": 5},
+    "behavioral_robustness": {"jobs": 100, "combos": 4, "methods": 5, "seeds": 5},
+    "dense_scenarios": {"jobs": 75, "scenarios": 3, "methods": 5, "seeds": 5}
+  },
+  "spec_phase1f_claim": 275,
+  "matches_phase1f": true,
+  "older_master_plan_estimate": 165,
+  "stale_estimate_reason": "MASTER_PLAN_MAY11.md predates Phase 1F expansion of methods (3->5) and seeds (3->5) per sub-grid",
+  "doc_path": "verification/MASTER_PLAN_RECONCILIATION.md"
+}

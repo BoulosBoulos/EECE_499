@@ -1,0 +1,76 @@
+{
+  "phase": "3F-A",
+  "name": "Eikonal reformulation",
+  "status": "closed_with_documented_limitation",
+  "closure_date": "2026-05-07T07:52:30Z",
+  "closure_outcome": "step_7E_outcome_2_capacity_bump_did_not_resolve",
+  "eikonal_tier_1_inclusion": true,
+  "eikonal_final_config": {
+    "hidden_dim": 256,
+    "loss_formulation": "ALM_for_L_eik__Kendall_for_L_bc_L_ground",
+    "alm_init": {
+      "lambda_0": 0,
+      "mu_0": 1,
+      "mu_max": 10000,
+      "alpha": 0.25,
+      "beta": 5.0,
+      "update_interval": 5000
+    },
+    "kendall_params": ["log_sigma_bc", "log_sigma_ground"],
+    "replay_buffer_sizes": {
+      "success": 1000,
+      "collision": 1000,
+      "intermediate": 1000
+    },
+    "boundary_conditions": {
+      "T_succ": 0,
+      "T_coll": 100,
+      "T_max": 100
+    },
+    "distillation": {
+      "w_distill": 0.5,
+      "beta_KL": 0.1,
+      "tau": 1.0,
+      "stop_grad_T_phi": true
+    },
+    "total_steps_for_calibration": 500000
+  },
+  "iteration_summary": {
+    "step_7C": {
+      "verdict": "kendall_for_constraint_loss_failed",
+      "key_finding": "Kendall variance-based weighting downweights L_eik because constraint residual is identified as high-noise; opposite of what is needed"
+    },
+    "step_7D": {
+      "verdict": "ALM_50k_mid_convergence",
+      "key_finding": "Bertsekas reasonableness checks pass; strict criteria fail; Pearson regressed to negative"
+    },
+    "step_8": {
+      "verdict": "500k_all_conditions_fail_mu_saturated",
+      "key_finding": "ALM did not reach asymptotic regime; mu saturated at mu_max on all 6 cells; Pearson stayed <= 0 on all cells with finite values"
+    },
+    "step_7E": {
+      "verdict": "hidden_dim_512_strict_margins_fail",
+      "key_finding": "capacity increase did not produce strict 7D margins; multi-branch admissibility is supervision-bound not capacity-bound"
+    }
+  },
+  "structural_limitation": {
+    "name": "multi_branch_admissibility_under_sparse_BC_supervision",
+    "description": "ALM enforces ||grad T||^2 approx c^2 globally; under sparse BC supervision (only success/collision states anchor T), network locks onto a solution branch that does not align with empirical T_obs across visited states; capacity increase does not resolve since the issue is supervision-bound",
+    "evidence": [
+      "pearson_negative_across_step_8_cells",
+      "pearson_stayed_non_positive_after_capacity_bump_at_step_7E",
+      "lambda_ascended_through_500k_on_all_6_cells",
+      "mu_saturated_at_mu_max_on_all_6_cells"
+    ]
+  },
+  "tier_1_framing": "Eikonal-PINN with ALM-hybrid loss formulation, exhibiting weaker action discrimination than HJB and Soft-HJB due to multi-branch admissibility under sparse BC supervision in discrete-action behavioral driving",
+  "references": {
+    "math_derivation": "verification/phase3F_A_math_derivation.md",
+    "step_7C_status": "verification/phase3F_A_step7C_status.json",
+    "step_7D_status": "verification/phase3F_A_step7D_status.json",
+    "step_8_status": "verification/phase3F_A_step8_status.json",
+    "step_7E_status": "verification/phase3F_A_step7E_status.json",
+    "closure_document": "verification/phase3F_A_CLOSURE.md",
+    "phase31_marker": "verification/phase31_investigation_eikonal.json"
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "phase": "23",
+  "tests": {
+    "23.1_schema_consistency": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "smoke_returncode_zero": true,
+          "elapsed_seconds": 49.97388291358948,
+          "metrics_csv_exists": true,
+          "schema_matches": true,
+          "header_mismatch_first": [],
+          "n_rows": 2,
+          "log": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/drppo/smoke.log"
+        },
+        {
+          "method": "hjb_aux",
+          "smoke_returncode_zero": true,
+          "elapsed_seconds": 52.48272228240967,
+          "metrics_csv_exists": true,
+          "schema_matches": true,
+          "header_mismatch_first": [],
+          "n_rows": 2,
+          "log": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/hjb_aux/smoke.log"
+        },
+        {
+          "method": "soft_hjb_aux",
+          "smoke_returncode_zero": true,
+          "elapsed_seconds": 53.74165725708008,
+          "metrics_csv_exists": true,
+          "schema_matches": true,
+          "header_mismatch_first": [],
+          "n_rows": 2,
+          "log": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/soft_hjb_aux/smoke.log"
+        },
+        {
+          "method": "eikonal_aux",
+          "smoke_returncode_zero": true,
+          "elapsed_seconds": 52.22732925415039,
+          "metrics_csv_exists": true,
+          "schema_matches": true,
+          "header_mismatch_first": [],
+          "n_rows": 2,
+          "log": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/eikonal_aux/smoke.log"
+        },
+        {
+          "method": "cbf_aux",
+          "smoke_returncode_zero": true,
+          "elapsed_seconds": 51.82242226600647,
+          "metrics_csv_exists": true,
+          "schema_matches": true,
+          "header_mismatch_first": [],
+          "n_rows": 2,
+          "log": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/cbf_aux/smoke.log"
+        }
+      ]
+    },
+    "23.2_value_sanity": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "pass": true,
+          "n_problems": 0,
+          "problems": []
+        },
+        {
+          "method": "hjb_aux",
+          "pass": true,
+          "n_problems": 0,
+          "problems": []
+        },
+        {
+          "method": "soft_hjb_aux",
+          "pass": true,
+          "n_problems": 0,
+          "problems": []
+        },
+        {
+          "method": "eikonal_aux",
+          "pass": true,
+          "n_problems": 0,
+          "problems": []
+        },
+        {
+          "method": "cbf_aux",
+          "pass": true,
+          "n_problems": 0,
+          "problems": []
+        }
+      ]
+    },
+    "23.3_meta_schema": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "pass": true,
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "hjb_aux",
+          "pass": true,
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "soft_hjb_aux",
+          "pass": true,
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "eikonal_aux",
+          "pass": true,
+          "n_issues": 0,
+          "issues": []
+        },
+        {
+          "method": "cbf_aux",
+          "pass": true,
+          "n_issues": 0,
+          "issues": []
+        }
+      ]
+    },
+    "23.4_trajectory_ring_buffer": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "trajectories_dir_exists": true,
+          "n_collision_files": 0,
+          "ring_capped_to_50": true,
+          "first_file_sample_ok": null,
+          "first_file_issue": null,
+          "first_file_n_rows": 0
+        },
+        {
+          "method": "hjb_aux",
+          "trajectories_dir_exists": true,
+          "n_collision_files": 0,
+          "ring_capped_to_50": true,
+          "first_file_sample_ok": null,
+          "first_file_issue": null,
+          "first_file_n_rows": 0
+        },
+        {
+          "method": "soft_hjb_aux",
+          "trajectories_dir_exists": true,
+          "n_collision_files": 0,
+          "ring_capped_to_50": true,
+          "first_file_sample_ok": null,
+          "first_file_issue": null,
+          "first_file_n_rows": 0
+        },
+        {
+          "method": "eikonal_aux",
+          "trajectories_dir_exists": true,
+          "n_collision_files": 0,
+          "ring_capped_to_50": true,
+          "first_file_sample_ok": null,
+          "first_file_issue": null,
+          "first_file_n_rows": 0
+        },
+        {
+          "method": "cbf_aux",
+          "trajectories_dir_exists": true,
+          "n_collision_files": 0,
+          "ring_capped_to_50": true,
+          "first_file_sample_ok": null,
+          "first_file_issue": null,
+          "first_file_n_rows": 0
+        }
+      ],
+      "any_collision_observed_across_methods": false
+    },
+    "23.5_eval_metrics_csv": {
+      "pass": true,
+      "subprocess_ok": true,
+      "schema_matches": true,
+      "n_rows": 10,
+      "valid_terminal_states": true,
+      "bad_terminal_values_first": [],
+      "log": "/home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/drppo/eval_smoke.log"
+    },
+    "23.6_existing_suite": {
+      "pass": true,
+      "n_phases": 25,
+      "all_pass": true,
+      "failed_phases": [],
+      "load_failures": []
+    },
+    "23.7_forward_compat": {
+      "pass": true,
+      "per_method": [
+        {
+          "method": "drppo",
+          "metrics_has_both_residual_columns": true,
+          "meta_has_both_final_residual_keys": true
+        },
+        {
+          "method": "hjb_aux",
+          "metrics_has_both_residual_columns": true,
+          "meta_has_both_final_residual_keys": true
+        },
+        {
+          "method": "soft_hjb_aux",
+          "metrics_has_both_residual_columns": true,
+          "meta_has_both_final_residual_keys": true
+        },
+        {
+          "method": "eikonal_aux",
+          "metrics_has_both_residual_columns": true,
+          "meta_has_both_final_residual_keys": true
+        },
+        {
+          "method": "cbf_aux",
+          "metrics_has_both_residual_columns": true,
+          "meta_has_both_final_residual_keys": true
+        }
+      ]
+    }
+  },
+  "pass": true
+}

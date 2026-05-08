@@ -1,0 +1,2 @@
+step,episode_return,episode_len,actor_loss,vf_loss,collision_count,collision_rate,mean_ttc,min_ttc,entropy,train_time_per_iter
+4096,-82.55821351922582,10,0.16401614248752594,45.55593490600586,0,0.0,8.488396858111594,0.011451734601533974,1.4686866998672485,49.584680795669556

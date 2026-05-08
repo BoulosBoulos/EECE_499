@@ -1,0 +1,151 @@
+{
+  "phase": "20",
+  "tests": {
+    "20.1_intent_cpa_frame": {
+      "pass": true,
+      "d_cpa_post_fix": 11.195251847636717,
+      "d_cpa_pre_fix_simulated": 12.649110640673518,
+      "delta": 1.453858793036801,
+      "uses_delta_xy_in_source": true,
+      "no_old_dp_code": true,
+      "bug_detectable_pre_fix": true
+    },
+    "20.2_cbf_scaling": {
+      "pass": true,
+      "finite": true,
+      "nonzero": true,
+      "bounded_below_1e6": true,
+      "alpha_response": true,
+      "dt_response": true,
+      "rho_alpha1_dt1_mean": 1.7640564441680908,
+      "rho_alpha2_dt1_mean": 3.8471736907958984,
+      "rho_alpha1_dt2_mean": 1.6679694652557373,
+      "rho_alpha1_dt1_max": 3.62638783454895
+    },
+    "20.3_cbf_non_degenerate": {
+      "pass": true,
+      "finite": true,
+      "n_active_elements": 9,
+      "n_zero_elements": 7,
+      "batch_size": 16,
+      "rho_mean": 1.5647804737091064,
+      "rho_max": 6.332155227661133
+    },
+    "20.4_method_extraction": {
+      "pass": true,
+      "cases": [
+        {
+          "stem": "hjb_aux_1a_stem_right_seed42",
+          "expected": "hjb_aux",
+          "actual": "hjb_aux",
+          "ok": true
+        },
+        {
+          "stem": "soft_hjb_aux_4_dense_stem_right_seed99",
+          "expected": "soft_hjb_aux",
+          "actual": "soft_hjb_aux",
+          "ok": true
+        },
+        {
+          "stem": "eikonal_aux_1b_stem_left_seed42",
+          "expected": "eikonal_aux",
+          "actual": "eikonal_aux",
+          "ok": true
+        },
+        {
+          "stem": "cbf_aux_3_dense_right_left_seed42",
+          "expected": "cbf_aux",
+          "actual": "cbf_aux",
+          "ok": true
+        },
+        {
+          "stem": "drppo_1a_stem_right_seed42",
+          "expected": "drppo",
+          "actual": "drppo",
+          "ok": true
+        },
+        {
+          "stem": "rule_based_1a_stem_right_seed42",
+          "expected": "rule_based",
+          "actual": "rule_based",
+          "ok": true
+        },
+        {
+          "stem": "fusion_aux_2_left_right_seed7",
+          "expected": "fusion_aux",
+          "actual": "fusion_aux",
+          "ok": true
+        },
+        {
+          "stem": "nonsense_filename",
+          "expected": "unknown",
+          "actual": "unknown",
+          "ok": true
+        }
+      ],
+      "plot_learning_curves_imports_extract_method_name": true,
+      "canonical_count": 7
+    },
+    "20.5_prev_action": {
+      "pass": true,
+      "actions_taken": [
+        0,
+        3,
+        2,
+        4,
+        1
+      ],
+      "info_prev_action_observed": [
+        null,
+        0,
+        3,
+        2,
+        4
+      ],
+      "expected_post_fix": [
+        null,
+        0,
+        3,
+        2,
+        4
+      ],
+      "bug_form_distinguishable": true
+    },
+    "20.6_vis_reproducibility": {
+      "pass": true,
+      "seed42_run1": [
+        0.3,
+        0.3,
+        200.0,
+        0.0,
+        0.05,
+        0.0
+      ],
+      "seed42_run2": [
+        0.3,
+        0.3,
+        200.0,
+        0.0,
+        0.05,
+        0.0
+      ],
+      "seed99": [
+        0.4,
+        0.4,
+        200.0,
+        0.0,
+        0.05,
+        0.0
+      ],
+      "identical_same_seed": true,
+      "differs_different_seed": true
+    },
+    "20.7_existing_suite": {
+      "pass": true,
+      "n_phases": 22,
+      "all_pass": true,
+      "failed_phases": []
+    }
+  },
+  "pass": true
+}

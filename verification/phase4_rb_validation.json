@@ -1,0 +1,11 @@
+{
+  "phase": "4.2",
+  "pass": true,
+  "n_rows": 2,
+  "modes_present": [
+    "deterministic",
+    "stochastic"
+  ],
+  "required_cols_present": true,
+  "values_sane": true
+}

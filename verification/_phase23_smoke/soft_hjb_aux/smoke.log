@@ -1,0 +1,32 @@
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[soft_hjb_aux] step=4096 ret=-118.63 coll=0 ttc=11.29 soft_res=886.4956 align_kl=1.5217
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[soft_hjb_aux] step=8192 ret=-133.66 coll=0 ttc=10.61 soft_res=0.7617 align_kl=1.6586
+Saved soft_hjb_aux to /home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/soft_hjb_aux/model_soft_hjb_aux_1a_stem_right.pt
+Training complete. Metrics in /home/boulosboulos/Desktop/EECE_499-main/verification/_phase23_smoke/soft_hjb_aux/train_soft_hjb_aux_1a_stem_right.csv

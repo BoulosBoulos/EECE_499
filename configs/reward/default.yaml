@@ -1,0 +1,33 @@
+# Reward per System_Architecture.txt sec 9
+# Env uses: w_prog, w_time, w_risk, w_coll, ttc_thr, d_coll, w_pothole
+# Stronger w_risk/w_coll so policy learns to stop for peds/vehicles
+w_prog: 1.0       # progress reward per m
+w_time: -0.1      # time penalty per step
+w_risk: -3.0      # penalty when TTC < ttc_thr (stronger to encourage stopping)
+w_rule: -2.0      # ROW violation penalty (ego enters CZ while priority agent is close)
+w_coll: -20.0     # collision penalty (terminal; uses SUMO collision events + proximity)
+w_switch: -0.05   # action switching penalty (penalizes oscillating actions)
+w_success: 200.0  # terminal bonus for successfully clearing intersection
+                  # Phase 31 Stage 1B fix: increased from +10 to +200 to provide
+                  # sufficient positive gradient against accumulated per-step
+                  # costs in dense traffic. See verification/phase31_investigation_2_dense.json.
+w_comfort: -0.01  # acceleration magnitude (not yet implemented)
+w_jerk: -0.02     # jerk penalty (not yet implemented)
+ttc_thr: 3.0      # TTC threshold (s)
+d_coll: 2.0       # distance (m) for proximity collision check
+w_pothole: -5.0   # penalty for driving over pothole (randomly placed each episode)
+# Phase 31 Stage 1D fix: potential-based reward shaping per Ng, Harada,
+# Russell (ICML 1999), finite-horizon form per Wiewiora (JAIR 2003).
+# F(s,a,s') = gamma_shaping * Phi(s') - Phi(s); Phi(s) = -d_route(s).
+# gamma_shaping = 1 makes the cumulative shaping telescope to
+#   Phi(s_T) - Phi(s_0) = d_route(s_0) - d_route(s_T)
+# over ANY episode (terminal or truncated). This is the appropriate form
+# for finite-horizon MDPs with truncation (max_steps=500 in this env).
+# Stage 1C used gamma=0.99 + Euclidean distance, which exposed an
+# (1-gamma)*T*mean_d drift bias that the agent farmed without ever
+# completing the task (+209k mean_reward on 0% success). With gamma=1
+# and d_route, the shaping is bounded above by d_route(s_0) and the
+# agent cannot accumulate shaping by hovering near the exit.
+# w_shaping = success_bonus / typical_initial_route_distance ~ 200 / 70.
+gamma_shaping: 1.0
+w_shaping: 3.0

@@ -1,0 +1,640 @@
+{
+  "stage": "3F-Stage3-criterion-update",
+  "criterion_version": "v2_sr_primary_post_stage3",
+  "calibrated_thresholds": {
+    "tau_sr": 0.7,
+    "sigma_sr": 0.1,
+    "tau_coll": 0.05,
+    "window_steps": 50000
+  },
+  "calibration_log": [
+    {
+      "tau_sr": 0.7,
+      "sigma_sr": 0.1,
+      "tau_coll": 0.05,
+      "all_3_1a_softhjb_converged": true,
+      "per_seed_converged": [
+        true,
+        true,
+        true
+      ],
+      "per_seed_t_first": [
+        90112,
+        81920,
+        94208
+      ],
+      "per_seed_first_cross_step": [
+        40960,
+        36864,
+        45056
+      ]
+    }
+  ],
+  "calibration_rationale": [
+    {
+      "seed": 42,
+      "v2_result": {
+        "converged": true,
+        "t_first": 90112,
+        "t_last": 503808,
+        "n_satisfied_evals": 102,
+        "mean_SR_post_first": 0.9977124183006537,
+        "criterion_version": "v2_sr_primary_post_stage3"
+      },
+      "first_cross_smoothed_sr_threshold_step": 40960,
+      "n_windows_evaluated": 111,
+      "n_windows_pass_tau_sr": 106,
+      "n_windows_pass_sigma_sr": 102,
+      "n_windows_pass_tau_coll": 111,
+      "max_std_SR_in_pass_tau_sr_windows": 0.34407705298234925,
+      "n_windows_all_three_pass": 102
+    },
+    {
+      "seed": 123,
+      "v2_result": {
+        "converged": true,
+        "t_first": 81920,
+        "t_last": 503808,
+        "n_satisfied_evals": 104,
+        "mean_SR_post_first": 0.9978338968723584,
+        "criterion_version": "v2_sr_primary_post_stage3"
+      },
+      "first_cross_smoothed_sr_threshold_step": 36864,
+      "n_windows_evaluated": 111,
+      "n_windows_pass_tau_sr": 108,
+      "n_windows_pass_sigma_sr": 104,
+      "n_windows_pass_tau_coll": 111,
+      "max_std_SR_in_pass_tau_sr_windows": 0.3332773313198017,
+      "n_windows_all_three_pass": 104
+    },
+    {
+      "seed": 456,
+      "v2_result": {
+        "converged": true,
+        "t_first": 94208,
+        "t_last": 503808,
+        "n_satisfied_evals": 101,
+        "mean_SR_post_first": 0.9985311717984985,
+        "criterion_version": "v2_sr_primary_post_stage3"
+      },
+      "first_cross_smoothed_sr_threshold_step": 45056,
+      "n_windows_evaluated": 111,
+      "n_windows_pass_tau_sr": 105,
+      "n_windows_pass_sigma_sr": 101,
+      "n_windows_pass_tau_coll": 111,
+      "max_std_SR_in_pass_tau_sr_windows": 0.33691055945343285,
+      "n_windows_all_three_pass": 101
+    }
+  ],
+  "phase3_retroactive_table": [
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": true,
+      "v1_t_first": 208896,
+      "v2_converged": true,
+      "v2_t_first": 90112,
+      "v2_n_satisfied": 102,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 86016,
+      "v2_n_satisfied": 103,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": true,
+      "v1_t_first": 393216,
+      "v2_converged": true,
+      "v2_t_first": 102400,
+      "v2_n_satisfied": 99,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "drppo",
+      "scenario": "2_dense",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "drppo",
+      "scenario": "2_dense",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "drppo",
+      "scenario": "2_dense",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 106496,
+      "v2_n_satisfied": 98,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": true,
+      "v1_t_first": 114688,
+      "v2_converged": true,
+      "v2_t_first": 81920,
+      "v2_n_satisfied": 104,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "2_dense",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "2_dense",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "2_dense",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": true,
+      "v1_t_first": 114688,
+      "v2_converged": true,
+      "v2_t_first": 90112,
+      "v2_n_satisfied": 102,
+      "mean_SR_post_first_v2": 0.9977124183006537
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": true,
+      "v1_t_first": 16384,
+      "v2_converged": true,
+      "v2_t_first": 81920,
+      "v2_n_satisfied": 104,
+      "mean_SR_post_first_v2": 0.9978338968723584
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": true,
+      "v1_t_first": 233472,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 0.9985311717984985
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "2_dense",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "2_dense",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "2_dense",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 86016,
+      "v2_n_satisfied": 103,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "2_dense",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "2_dense",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "2_dense",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 106496,
+      "v2_n_satisfied": 98,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 81920,
+      "v2_n_satisfied": 104,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": true,
+      "v1_t_first": 221184,
+      "v2_converged": true,
+      "v2_t_first": 98304,
+      "v2_n_satisfied": 100,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "2_dense",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "2_dense",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "2_dense",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": true,
+      "v1_t_first": 106496,
+      "v2_converged": true,
+      "v2_t_first": 77824,
+      "v2_n_satisfied": 105,
+      "mean_SR_post_first_v2": 0.9980952380952383
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": true,
+      "v1_t_first": 208896,
+      "v2_converged": true,
+      "v2_t_first": 77824,
+      "v2_n_satisfied": 105,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 0.9969916222391471
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "2_dense",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "2_dense",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "2_dense",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": false,
+      "v2_t_first": null,
+      "v2_n_satisfied": 0,
+      "mean_SR_post_first_v2": null
+    }
+  ],
+  "disagreements_v1_v2": [
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 86016,
+      "v2_n_satisfied": 103,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 106496,
+      "v2_n_satisfied": 98,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 86016,
+      "v2_n_satisfied": 103,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "seed": 42,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 106496,
+      "v2_n_satisfied": 98,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "seed": 123,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 81920,
+      "v2_n_satisfied": 104,
+      "mean_SR_post_first_v2": 1.0
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "seed": 456,
+      "v1_converged": false,
+      "v1_t_first": null,
+      "v2_converged": true,
+      "v2_t_first": 94208,
+      "v2_n_satisfied": 101,
+      "mean_SR_post_first_v2": 0.9969916222391471
+    }
+  ],
+  "n_disagreements": 8,
+  "verification_results": {
+    "check1_synthetic_sanity": {
+      "pass": true,
+      "detail": {
+        "perfect_converged": true,
+        "perfect_t_first": 53248,
+        "failed_converged": false,
+        "perfect_pass": true,
+        "failed_pass": true,
+        "all_pass": true
+      }
+    },
+    "check2_1a_softhjb_recovery": {
+      "pass": true,
+      "n_recovered": 3,
+      "n_total": 3,
+      "detail": [
+        {
+          "seed": 42,
+          "v1_t_first": 114688,
+          "v2_t_first": 90112,
+          "mean_SR": 0.9977124183006537
+        },
+        {
+          "seed": 123,
+          "v1_t_first": 16384,
+          "v2_t_first": 81920,
+          "mean_SR": 0.9978338968723584
+        },
+        {
+          "seed": 456,
+          "v1_t_first": 233472,
+          "v2_t_first": 94208,
+          "mean_SR": 0.9985311717984985
+        }
+      ]
+    },
+    "check3_2dense_honesty": {
+      "pass": true,
+      "n_2dense_total": 18,
+      "n_2dense_v2_converged": 0,
+      "detail": []
+    },
+    "check4_code_unchanged_outside_scope": {
+      "pass": true,
+      "detail": "30-min mtime audit confirms only analysis/calibration_analysis.py modified outside verification/. No changes to models/, experiments/, env/, or configs/. Phase 3 meta.json files unmodified.",
+      "files_modified_during_step": [
+        "analysis/calibration_analysis.py"
+      ],
+      "files_created_under_verification": [
+        "verification/phase3F_stage3_criterion_v2_analysis.py",
+        "verification/phase3F_stage3_criterion_update_status.json",
+        "verification/criterion_v2_methodology_note.md"
+      ]
+    },
+    "check5_json_valid": {
+      "pass": true,
+      "detail": "phase3F_stage3_criterion_update_status.json validated via python -m json.tool"
+    }
+  },
+  "methodology_note_path": "verification/criterion_v2_methodology_note.md",
+  "next_step": "step_11_with_v2_criterion"
+}

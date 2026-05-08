@@ -1,0 +1,60 @@
+{
+  "phase": "22",
+  "tests": {
+    "22.1_label_consistency": {
+      "pass": true,
+      "n_problems": 0,
+      "problems": [],
+      "n_car_styles": 7,
+      "n_moto_styles": 6,
+      "n_ped_styles": 7
+    },
+    "22.2_class_distribution": {
+      "pass": true,
+      "n_samples": 1000,
+      "car_counts": [
+        139,
+        309,
+        552
+      ],
+      "ped_counts": [
+        136,
+        421,
+        443
+      ],
+      "moto_counts": [
+        327,
+        329,
+        344
+      ],
+      "all_classes_>=_100": true
+    },
+    "22.3_v5_accuracy_gate": {
+      "pass": true,
+      "overall_style_accuracy": 0.665625,
+      "overall_intent_accuracy": 0.853125,
+      "style_per_class_acc": [
+        0.608955223880597,
+        0.7020057306590258,
+        0.6583990980834273
+      ],
+      "style_counts": [
+        335,
+        698,
+        887
+      ],
+      "normal_class_accuracy": 0.7020057306590258,
+      "gate_overall_style_ge_65": true,
+      "normal_class_ge_30": true,
+      "intent_ge_80": true,
+      "no_empty_class": true
+    },
+    "22.4_existing_suite": {
+      "pass": true,
+      "n_phases": 24,
+      "all_pass": true,
+      "failed_phases": []
+    }
+  },
+  "pass": true
+}

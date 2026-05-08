@@ -1,0 +1,211 @@
+{
+  "previous_status": "deferred_to_phase_3F_A",
+  "current_status": "closed_with_documented_limitation",
+  "closed_in_phase": "3F-A",
+  "closed_via_step": "step_7E_outcome_2",
+  "see_closure": "verification/phase3F_A_closure_status.json",
+  "see_closure_document": "verification/phase3F_A_CLOSURE.md",
+  "see_math_derivation": "verification/phase3F_A_math_derivation.md",
+  "tier_1_eikonal_config_locked": true,
+  "stage_2_history": {
+    "phase": "31.2",
+    "investigation": "Eikonal residual non-decrease",
+    "method": "Code audit of Eikonal residual + numerical magnitude analysis on 2 production checkpoints + literature cross-reference. No code modified.",
+    "residual_implementation_code": {
+      "_comment": "Verbatim code from the project's Eikonal implementation as of 2026-05-06.",
+      "models_pde_residuals_py_lines_123_to_163": "def eikonal_residual(\n    U_net: nn.Module,\n    xi: torch.Tensor,\n    dynamics: BehavioralDynamics,\n    v_min: float = 0.5,\n    ttc_thr: float = 3.0,\n    m_stop_ref: float = 5.0,\n) -> torch.Tensor:\n    \"\"\"Eikonal PDE residual: ||nabla_xi U||^2 - c(xi)^2.\n\n    c(xi) = 1 / v_eff(xi) where v_eff is the maximum safe speed achievable\n    by any action. An action is 'safe' if the post-action TTC remains above\n    ttc_thr. This grounds the Eikonal constraint in the actual dynamics\n    and action space rather than hand-crafted heuristic features.\n    \"\"\"\n    U_val, grad_U = _compute_grad_U(U_net, xi)\n    grad_norm_sq = (grad_U ** 2).sum(dim=-1)\n\n    alpha_cz = xi[:, 8]  # visibility of conflict zone\n\n    # Compute maximum safe speed from dynamics\n    safe_speeds = []\n    for a in range(5):\n        xi_next = dynamics.one_step(xi, a)\n        v_next = xi_next[:, IDX_V]\n        ttc_next = xi_next[:, IDX_TTC_MIN]\n        # Smooth safety indicator: 1.0 if ttc >> ttc_thr, 0.0 if ttc << ttc_thr\n        safe_weight = torch.sigmoid((ttc_next - ttc_thr) / 0.5)\n        safe_speeds.append(v_next * safe_weight)\n\n    # v_eff = max safe speed across all actions\n    v_eff_dynamics = torch.stack(safe_speeds, dim=0).max(dim=0).values\n\n    # Visibility modulation: can't go fast if you can't see\n    vis_factor = alpha_cz.clamp(min=0.1)\n    v_eff = (v_eff_dynamics * vis_factor).clamp(min=v_min)\n\n    c_sq = (1.0 / v_eff) ** 2\n\n    rho = grad_norm_sq - c_sq\n    return rho",
+      "models_pde_eikonal_aux_agent_py_lines_148_to_185": "if extra is not None and \"xi_curr\" in extra:\n    xi_np = extra[\"xi_curr\"]\n    xi_t = torch.FloatTensor(xi_np).to(self.device)\n\n    xi_colloc = sample_collocation(xi_t, ratio_real=self.collocation_ratio)\n\n    rho = eikonal_residual(self.aux_critic, xi_colloc, self.dynamics, v_min=self.v_min)\n    L_eik = (rho ** 2).mean()       # squared residual loss\n\n    U_rollout = self.aux_critic(xi_t)\n    if 'collision_terminal' in extra:\n        coll_mask = torch.BoolTensor(extra['collision_terminal']).to(self.device)\n        non_coll = ~coll_mask[:len(U_rollout)]\n        U_for_anchor = U_rollout[non_coll]\n        returns_for_anchor = returns_t[:len(U_rollout)][non_coll]\n        if len(U_for_anchor) > 0:\n            L_anchor = F.mse_loss(U_for_anchor, returns_for_anchor)\n        ...\n    L_bc = torch.tensor(0.0, device=self.device)\n    if 'success_terminal' in extra:\n        succ_xi = xi_t[succ[:len(xi_t)]]\n        # Stage 1B: anchor U at +200 (env w_success) at success terminals\n        L_bc = L_bc + ((self.aux_critic(succ_xi) - 200.0) ** 2).mean()\n    if 'collision_terminal' in extra:\n        coll_xi = xi_t[coll[:len(xi_t)]]\n        L_bc = L_bc + ((self.aux_critic(coll_xi) - self.w_fail) ** 2).mean()\n\n    aux_loss = (self.lambda_anchor * L_anchor +\n                self.lambda_eik    * L_eik    +\n                self.lambda_bc     * L_bc)",
+      "loss_components": {
+        "L_residual_safety_metric_definition": "metrics.csv 'L_residual_safety' column = float(rho.detach().abs().mean()) per iter (i.e., MEAN ABSOLUTE residual, not squared). Logged as 'eikonal_residual_mean' in the agent and renamed to L_residual_safety in the training script.",
+        "L_eik_loss_form_used_for_gradient": "(rho ** 2).mean()  \u2014 squared residual",
+        "lambda_weights_in_aux_loss": {
+          "lambda_anchor": 1.0,
+          "lambda_eik": 0.2,
+          "lambda_bc": 0.5
+        }
+      }
+    },
+    "magnitude_analysis": {
+      "n_states_sampled": 512,
+      "sampling_method": "synthetic xi vectors drawn uniformly within physically plausible per-component ranges (v: [0,14], TTC: [0.5,10], d_cz: [0,60], alpha_cz: [0.1,1.0], etc.) consistent with state_builder ranges",
+      "checkpoints_evaluated": [
+        "results/calibration/CAL_eikonal_aux_1a_s42/model_eikonal_aux_1a_stem_right_step500000.pt",
+        "results/calibration/CAL_eikonal_aux_2_dense_s42/model_eikonal_aux_2_dense_stem_right_step500000.pt"
+      ],
+      "checkpoint_arch": {
+        "obs_dim": 135,
+        "n_actions": 5,
+        "hidden_dim": 256,
+        "aux_hidden_dim": 256
+      },
+      "results_1a_s42_step500000": {
+        "U_xi": {
+          "mean": -40.07,
+          "median": -41.26,
+          "std": 31.9,
+          "min": -113.1,
+          "max": 59.4
+        },
+        "grad_norm_sq": {
+          "mean": 29.76,
+          "median": 18.22,
+          "std": 34.89,
+          "min": 0.55,
+          "max": 252.0
+        },
+        "v_eff": {
+          "mean": 0.52,
+          "median": 0.5,
+          "std": 0.161,
+          "min": 0.5,
+          "max": 3.01
+        },
+        "c_sq": {
+          "mean": 3.916,
+          "median": 4.0,
+          "std": 0.471,
+          "min": 0.11,
+          "max": 4.0
+        },
+        "rho": {
+          "mean": 25.84,
+          "median": 14.22,
+          "std": 34.87,
+          "min": -3.45,
+          "max": 248.0
+        },
+        "abs_rho_mean": 26.15,
+        "rho_squared_mean": 1884.0,
+        "ratio_grad_norm_sq_to_c_sq_mean": 8.42,
+        "fraction_states_grad_norm_sq_GREATER_than_c_sq": 0.893,
+        "fraction_states_grad_norm_sq_LESS_than_c_sq": 0.107
+      },
+      "results_2_dense_s42_step500000": {
+        "U_xi": {
+          "mean": -59.8,
+          "median": -57.86,
+          "std": 28.67,
+          "min": -144.2,
+          "max": 0.99
+        },
+        "grad_norm_sq": {
+          "mean": 51.63,
+          "median": 29.51,
+          "std": 69.71,
+          "min": 0.01,
+          "max": 618.8
+        },
+        "v_eff": {
+          "mean": 0.52,
+          "median": 0.5,
+          "std": 0.161,
+          "min": 0.5,
+          "max": 3.01
+        },
+        "c_sq": {
+          "mean": 3.916,
+          "median": 4.0,
+          "std": 0.471,
+          "min": 0.11,
+          "max": 4.0
+        },
+        "rho": {
+          "mean": 47.71,
+          "median": 25.84,
+          "std": 69.73,
+          "min": -3.99,
+          "max": 614.8
+        },
+        "abs_rho_mean": 48.13,
+        "rho_squared_mean": 7138.0,
+        "ratio_grad_norm_sq_to_c_sq_mean": 15.85,
+        "fraction_states_grad_norm_sq_GREATER_than_c_sq": 0.896,
+        "fraction_states_grad_norm_sq_LESS_than_c_sq": 0.104
+      },
+      "any_NaN_or_inf": false,
+      "well_conditioned": true,
+      "key_observations": [
+        "\u2016\u2207U\u2016\u00b2 is 8-16x LARGER than c(\u03be)\u00b2 on average; ~89% of sampled states have \u2016\u2207U\u2016\u00b2 > c(\u03be)\u00b2. The residual rho is dominantly POSITIVE.",
+        "c(\u03be)\u00b2 is essentially CONSTANT (mean 3.92, median 4.0, max 4.0) because v_eff is hitting its FLOOR (v_min=0.5 \u2192 c\u00b2 = 4.0) for >50% of states. The kinematic 'speed-limit' signal has very low spatial variation.",
+        "Across the two checkpoints, \u2016\u2207U\u2016\u00b2 is 73% larger in the 2_dense run than in the 1a run (51.6 vs 29.8) \u2014 i.e., the Eikonal residual is MORE violated in the harder scenario, consistent with the empirical training curves we observed (head/tail ratios 1.20-1.39 increasing in 2_dense vs 1.02-1.28 in 1a).",
+        "The training metric 'L_residual_safety' (= mean|rho|) was ~3 in early-training Eikonal runs (matching the c(\u03be)\u00b2 magnitude scale at zero-grad initialization). At 500k steps |rho| has grown to 26-48 (i.e., 8-16x higher than initial). This confirms training INCREASED \u2016\u2207U\u2016\u00b2 as the auxiliary critic learned to fit returns, growing the residual rather than shrinking it."
+      ]
+    },
+    "literature_check": {
+      "source_method_referenced": "Eik-HIQL (arXiv:2509.06782); Eikonal HJ-PDE classical theory.",
+      "canonical_eikonal_form": {
+        "pde": "\u2016\u2207V(x)\u2016 = c(x), where V is a 'time-of-arrival' or 'shortest-path-cost' function and c(x) is the local 'speed' at which information propagates",
+        "squared_form": "\u2016\u2207V(x)\u2016\u00b2 = c(x)\u00b2",
+        "boundary_condition": "V = 0 at the target (success states); V \u2192 \u221e or large positive at unreachable / failure states",
+        "value_landscape": "V is non-negative everywhere; gradient points away from target; magnitude grows with distance from target",
+        "natural_loss": "(\u2016\u2207V\u2016\u00b2 \u2212 c\u00b2)\u00b2 with viscosity-solution discretization or upwind scheme; some methods use ReLU-based one-sided constraints to prevent \u2016\u2207V\u2016\u00b2 < c\u00b2 (sub-eikonality, ill-posed)"
+      },
+      "match_to_source": "DIVERGED",
+      "missing_assumptions": [
+        "**Sign convention is INVERTED.** Project anchors U at +200 at success_terminal and at w_fail=+50 at collision_terminal (both positive, with success > collision). Canonical Eikonal V should anchor at V=0 at success (the target) and V \u2192 large positive at unreachable states. The project's U is essentially -V flipped relative to the canonical form, so the gradient field (\u2207U) points TOWARD the target instead of AWAY from it.",
+        "**Goal-conditioning is implicit.** Canonical Eikonal requires a fixed target/source set; here the 'target' is the maneuver-exit edge but no goal-encoded input is provided to U_net (just xi). The implicit goal-conditioning depends on xi[IDX_D_EXIT], xi[IDX_D_CZ] features carrying location information, but the auxiliary critic must infer goal location from these without explicit guidance.",
+        "**The 'reward-anchor' L_anchor is incompatible with Eikonal V.** In canonical Eikonal, V is a non-negative time/distance function uniquely determined by the PDE + boundary conditions. The project's L_anchor force-fits U to GAE-style discounted-return targets, which can be in [-1500, +200] (range ~1700) with no relationship to \u2016\u2207U\u2016\u00b2 \u2248 c\u00b2 \u2248 4 kinematic constraints. The two losses pull U toward fundamentally different functions.",
+        "**No upwind/viscosity-solution scheme.** Canonical Eikonal solvers use careful numerical schemes (fast marching, fast sweeping, upwind discretization) to avoid getting trapped in non-viscosity solutions. The project uses pure autograd squared-residual minimization with no viscosity regularization, which is known to admit spurious minima in Eikonal problems.",
+        "**Squared residual penalises sub-eikonality and super-eikonality symmetrically.** Many practical Eikonal methods use ReLU(c\u00b2 \u2212 \u2016\u2207V\u2016\u00b2) (penalize only sub-eikonal violations) because over-eikonal solutions are harmless trivially. The project uses (rho)\u00b2 which penalises both, increasing the optimization burden."
+      ],
+      "is_paper_inspired_by_framing_still_valid": false,
+      "paper_framing_note": "The 'inspired by Eikonal' framing in the project's documentation is LITERAL \u2014 the implementation copies the surface form \u2016\u2207U\u2016\u00b2 = c\u00b2 but does not satisfy the underlying assumptions (sign convention, boundary conditions, isolation from incompatible auxiliary losses). The implementation behaves as a pure regularizer that pushes \u2016\u2207U\u2016\u00b2 toward a constant ~4, fighting the dominant L_anchor signal that pulls U to track returns of magnitude 200. The Eikonal interpretation does not survive this conflict."
+    },
+    "diagnosis": "Structural ill-posedness. The Eikonal residual loss L_eik = mean((\u2016\u2207U\u2016\u00b2 \u2212 c(\u03be)\u00b2)\u00b2) was added to a critic whose other two losses (L_anchor MSE-to-GAE-returns with weight 1.0, and L_bc anchoring U at +200/+50/+w_fail at terminals with weight 0.5) define U as a reward-shaped value function. The Eikonal residual demands U be a kinematic distance-to-target function with very specific gradient magnitude. These objectives are not simultaneously satisfiable: the reward returns (range ~1700) force U to vary by hundreds across the state space, pushing \u2016\u2207U\u2016\u00b2 to large values, while the Eikonal target c(\u03be)\u00b2 \u2248 4 (essentially constant due to v_eff floor at v_min=0.5) demands \u2016\u2207U\u2016\u00b2 stay small and uniform. Empirically the L_anchor wins (its squared error is ~10\u2075 vs L_eik squared error ~10\u00b3, weighted 1.0 vs 0.2) and \u2016\u2207U\u2016\u00b2 grows during training, increasing the residual instead of decreasing it. This explains the head/tail residual ratios of 1.02-1.39 (flat or increasing) observed in all 6 production Eikonal runs at 500k steps. Three independent root causes contribute: (a) sign convention of L_bc is inverted vs canonical Eikonal (success at high positive instead of zero), (b) c(\u03be)\u00b2 has no spatial variation (clamped to v_min in 50%+ of states, so the PDE constraint is effectively '\u2016\u2207U\u2016\u00b2 = 4 everywhere' \u2014 very tight and unlikely to coexist with reward-shaped anchor), (c) the squared-residual loss weight (lambda_eik=0.2) cannot compete with the much larger L_anchor signal coming from GAE returns of magnitude ~200-1500.",
+    "diagnosis_category": "structural_ill_posedness",
+    "recommended_fix": {
+      "primary_recommendation": "DEFER TO PHASE 3F (per Decision D of parent spec).",
+      "rationale_for_deferral": "Restoring the Eikonal residual to a meaningful learning signal requires multi-day reformulation, not parameter tuning. There is no single-knob fix because the issue is the simultaneous incompatibility of three losses on the same U. Per parent spec Decision D: 'If reformulation is needed but cannot be done within 1 day, the spec authorizes deferring to Phase 3F.'",
+      "reformulation_options_for_phase_3F": [
+        {
+          "option": "1. Remove L_anchor for the Eikonal critic; let U be defined purely by L_eik + L_bc.",
+          "tradeoff": "U becomes a pure 'distance/time to target' surrogate, no longer a value function. Need to re-design how PPO distills from this (currently L_distill matches the PPO V to the auxiliary U; if U is no longer a value function, distillation must change). Estimated 2-3 days of work + 50k smoke verification.",
+          "soundness": "Most theoretically clean; matches canonical Eikonal. But changes the auxiliary's role from 'value-function with PDE structure' to 'pure distance heuristic'."
+        },
+        {
+          "option": "2. Re-derive c(\u03be) to match the anchor's value-function scale.",
+          "tradeoff": "Replace the kinematic '1/v_eff' with c(\u03be) = sqrt of expected per-step reward magnitude. This makes Eikonal residual self-consistent with rewards but loses the original 'speed-limit' interpretation. Estimated 2-4 days (must re-derive c from reward function + verify on small smoke).",
+          "soundness": "Theoretically loose \u2014 the new c(\u03be) is empirically derived, not from first principles. But may be the cheapest path to a useful auxiliary."
+        },
+        {
+          "option": "3. Invert the BC sign convention to canonical Eikonal: U(success)=0, U(collision)=large positive, U(distant states) grows with distance.",
+          "tradeoff": "Conflicts with Stages 1B + the env reward landscape; would require separate treatment of Eikonal U from the env-shaped value function used by other PDE methods. Estimated 1-2 days for BC change + L_anchor reformulation but the soundness of L_distill (PPO critic \u2190 Eikonal U) is broken because the PPO critic expects an env-aligned value function.",
+          "soundness": "Theoretically clean for Eikonal alone; awkward in the multi-PDE-method setting."
+        },
+        {
+          "option": "4. Use ReLU(c\u00b2 \u2212 \u2016\u2207U\u2016\u00b2) (one-sided sub-eikonal constraint).",
+          "tradeoff": "Half-fix: only penalises \u2016\u2207U\u2016\u00b2 < c\u00b2, not the >c\u00b2 case which is what we observe. Won't help here because our problem is \u2016\u2207U\u2016\u00b2 >> c\u00b2. Estimated 1 day to try, but not promising.",
+          "soundness": "Doesn't address the magnitude-mismatch root cause."
+        },
+        {
+          "option": "5. Drop Eikonal as a method.",
+          "tradeoff": "Reduces the Tier 1 grid from 6 methods to 5. Conflicts with parent spec ('Do not abandon Eikonal as a method without explicit human direction').",
+          "soundness": "Trivial but removes a paper contribution."
+        }
+      ],
+      "fallback_for_immediate_progression": "If the user wants to keep moving on Phase 31 without a Phase 3F detour, accept Stage 1A+1B+1D state, document that Eikonal is a known-broken auxiliary (residual fails to decrease, no theoretical soundness), and proceed to Stage 3 (Soft-HJB drift). Eikonal calibration data still exists; it can be reported in the paper with the appropriate caveat. The other 5 PDE methods (DRPPO baseline, HJB, Soft-HJB, CBF, Fusion) are not affected by the Eikonal issue."
+    },
+    "estimated_fix_complexity_hours": "16-32 hours (2-4 days) for any of the principled reformulations (Options 1, 2, or 3). Out of scope for Phase 31 per Decision D \u2014 defer to Phase 3F.",
+    "answers_to_critical_questions": {
+      "is_this_sign_or_scaling_bug_1_hour_fix": "No. The bug is structural \u2014 it would require redesigning the auxiliary critic's training objective.",
+      "can_reformulation_be_done_within_1_day": "No. Each principled option requires 2-4 days including 50k smoke verification.",
+      "is_proposed_fix_consistent_with_paper_inspired_by_framing": "Phase 3F reformulation is consistent with the framing if executed properly; Option 1 (pure Eikonal+BC, drop L_anchor) is most faithful to the canonical 'inspired by' interpretation.",
+      "is_phase_3F_deferral_triggered": true,
+      "what_to_do_for_phase_31_continuation": "Continue Phase 31 with current Stage 1A+1B+1D state. Eikonal calibration data is documented as 'method has unresolved auxiliary-critic issue requiring reformulation' but DR-PPO + HJB + Soft-HJB + CBF + Fusion remain valid. The spec's Decision D escape hatch is the appropriate vehicle."
+    },
+    "fix_authorized_yet": false,
+    "files_examined_in_this_investigation": [
+      "models/pde/residuals.py (eikonal_residual function, lines 123-163)",
+      "models/pde/eikonal_aux_agent.py (compute_aux_loss section, lines 144-200)",
+      "experiments/pde/train_eikonal_aux.py (lambda weight propagation, lines 53-120)",
+      "configs/pde/eikonal_aux.yaml (lambda_anchor=1.0, lambda_eik=0.2, lambda_bc=0.5)",
+      "models/pde/state_builder.py (xi indexing for IDX_V, IDX_TTC_MIN, alpha_cz=xi[:,8])",
+      "models/pde/dynamics.py (one_step transition)"
+    ],
+    "files_modified_in_this_investigation": [],
+    "files_created_in_this_investigation": [
+      "verification/phase31_investigation_eikonal.json (this file)"
+    ],
+    "stage_2_status": "INVESTIGATION COMPLETE. Stop and report. Awaiting human authorization to either (a) defer Eikonal to Phase 3F and proceed to Stage 3 (Soft-HJB drift), or (b) attempt one of the reformulation options now (would extend Phase 31 by 2-4 days)."
+  }
+}

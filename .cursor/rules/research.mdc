@@ -1,0 +1,30 @@
+---
+description: Research context and constraints for SUMO T-intersection behavioral DM
+globs: []
+alwaysApply: true
+---
+
+# SUMO T-Intersection Behavioral Decision Model
+
+## Research Goal
+Reinforcement learning for discrete behavioral decision-making at a T-intersection in SUMO, with partial observability and physics-informed critics.
+
+## Behavioral Discretization
+- Discrete behaviors: `STOP`, `CREEP`, `YIELD`, `GO`, `ABORT` (optional)
+- Decisions map to high-level behaviors; low-level control is handled separately
+
+## Partial Observability
+- Occlusion modeling: agents can be occluded (e.g., by buildings, other vehicles)
+- State representation must support visibility masks / occlusion flags
+
+## Physics-Informed Critic
+- Auxiliary residual losses for physics consistency
+- **No HJB** (Hamilton–Jacobi–Bellman): use residual-style losses, not value-function PDEs
+
+## Architecture
+- **Pluggable algorithm interface**: swap algorithms (PPO, SAC, etc.) via config; core env and state logic remain unchanged
+- Config-driven: `configs/scenario/`, `configs/state/`, `configs/algo/`, `configs/residuals/`, `configs/reward/`
+
+## Definition of Done
+- `make train` and `make eval` (or equivalent commands) produce CSV metrics and plots
+- Source of truth for commands: `docs/RUNNING.md`

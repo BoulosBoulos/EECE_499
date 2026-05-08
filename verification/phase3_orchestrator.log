@@ -1,0 +1,34 @@
+Test 1: Tier 1 dry-run includes rule_based jobs...
+  PASS: 1200 rule_based references in output
+
+Test 2: Tier 1 job count...
+  Generated 1440 jobs for tier '1':
+  Tier 1 jobs: 1440
+
+Test 3: rule_based TRAIN annotation...
+  PASS: 240 '(none' annotations for rule_based TRAIN
+
+Test 4: Tier 4 dry-run without crash...
+  PASS: Tier 4 exit code 0
+  Generated 0 jobs for tier '4':
+
+Test 5: All tiers dry-run...
+  --tier 1: OK
+  --tier 2: OK
+  --tier 3: OK
+  --tier 4: OK
+  --tier all: OK
+  --tier supp: OK
+
+==================================================
+ORCHESTRATOR SMOKE TEST SUMMARY
+==================================================
+  [PASS] tier1_rule_based
+  [PASS] tier1_count
+  [PASS] train_none_annotation
+  [PASS] tier4_no_crash
+  [PASS] all_tiers_ok
+
+5/5 tests passed.
+
+ALL TESTS PASSED — orchestrator handles cmd_train=None correctly.

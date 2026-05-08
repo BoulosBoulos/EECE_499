@@ -1,0 +1,2095 @@
+{
+  "phase": "3F-Step11",
+  "name": "Full 36-job re-calibration at 500k",
+  "status": "complete",
+  "criterion_version": "v2_sr_primary_post_stage3",
+  "criterion_thresholds": {
+    "tau_sr": 0.7,
+    "sigma_sr": 0.1,
+    "tau_coll": 0.05,
+    "window_steps": 50000
+  },
+  "wall_time_hours": 6.571645444366667,
+  "jobs_completed": 36,
+  "jobs_failed": 0,
+  "per_job_results": [
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 42,
+      "v2_converged": true,
+      "t_first": 86016,
+      "t_last": 503808,
+      "n_satisfied_evals": 67,
+      "mean_SR_post_first": 0.9518045948474447,
+      "sigma_SR_at_end": 0.020594621839155187,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": null,
+      "residual_head": null,
+      "residual_tail": null,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 81920,
+      "t_last": 479232,
+      "n_satisfied_evals": 68,
+      "mean_SR_post_first": 0.9612894471217471,
+      "sigma_SR_at_end": 0.018748005936293416,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": null,
+      "residual_head": null,
+      "residual_tail": null,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "drppo",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 456,
+      "v2_converged": true,
+      "t_first": 86016,
+      "t_last": 503808,
+      "n_satisfied_evals": 72,
+      "mean_SR_post_first": 0.9567207316859043,
+      "sigma_SR_at_end": 0.015175017916510856,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": null,
+      "residual_head": null,
+      "residual_tail": null,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "drppo",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 42,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.049516896883014354,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": null,
+      "residual_head": null,
+      "residual_tail": null,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "drppo",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 123,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.03278121813032978,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": null,
+      "residual_head": null,
+      "residual_tail": null,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "drppo",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 456,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.012659242088545835,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": null,
+      "residual_head": null,
+      "residual_tail": null,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 42,
+      "v2_converged": true,
+      "t_first": 98304,
+      "t_last": 503808,
+      "n_satisfied_evals": 67,
+      "mean_SR_post_first": 0.9534191745980486,
+      "sigma_SR_at_end": 0.016867037245929552,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 74.56739081194003,
+      "residual_tail": 1.7629250983397167,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 86016,
+      "t_last": 503808,
+      "n_satisfied_evals": 62,
+      "mean_SR_post_first": 0.952771216472813,
+      "sigma_SR_at_end": 0.014349034823724153,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 1082.0772456228733,
+      "residual_tail": 2.0045386453469596,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 456,
+      "v2_converged": true,
+      "t_first": 90112,
+      "t_last": 503808,
+      "n_satisfied_evals": 68,
+      "mean_SR_post_first": 0.9488285489254314,
+      "sigma_SR_at_end": 0.010157271985397306,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 1134.6178254783154,
+      "residual_tail": 2.2856709361076355,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 42,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.05087377542153742,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 522.6767570674419,
+      "residual_tail": 177.99900363882384,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 331776,
+      "t_last": 503808,
+      "n_satisfied_evals": 43,
+      "mean_SR_post_first": 0.9624383368569415,
+      "sigma_SR_at_end": 0.0,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 1150.5851192176342,
+      "residual_tail": 3107.516211003065,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "hjb_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 456,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.10009640414848472,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 106.09313008189201,
+      "residual_tail": 737.7823794384798,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 42,
+      "v2_converged": true,
+      "t_first": 81920,
+      "t_last": 503808,
+      "n_satisfied_evals": 52,
+      "mean_SR_post_first": 0.9449728208403596,
+      "sigma_SR_at_end": 0.01099825294599377,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 681.354701474309,
+      "residual_tail": 2.2185500860214233,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 270336,
+      "t_last": 438272,
+      "n_satisfied_evals": 33,
+      "mean_SR_post_first": 0.9488642024772855,
+      "sigma_SR_at_end": 0.007733706211017717,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 956.1742596427599,
+      "residual_tail": 2.2505777974923453,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 456,
+      "v2_converged": true,
+      "t_first": 77824,
+      "t_last": 503808,
+      "n_satisfied_evals": 51,
+      "mean_SR_post_first": 0.9474499239039265,
+      "sigma_SR_at_end": 0.011605430010175223,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 1648.6302081942558,
+      "residual_tail": 5626.454601178567,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 42,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.0,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 516.8499845763048,
+      "residual_tail": 39.38181495666504,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 123,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.01297186304156927,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 3138.802947898706,
+      "residual_tail": 1656.3579082588356,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "soft_hjb_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 456,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.017677669529663688,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": true,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 223.92028538386026,
+      "residual_tail": 14583.876442869505,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 42,
+      "v2_converged": true,
+      "t_first": 102400,
+      "t_last": 503808,
+      "n_satisfied_evals": 99,
+      "mean_SR_post_first": 0.9988075196408529,
+      "sigma_SR_at_end": 0.0,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 94208,
+      "t_last": 503808,
+      "n_satisfied_evals": 76,
+      "mean_SR_post_first": 0.8680848716739806,
+      "sigma_SR_at_end": 0.0,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": true,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 456,
+      "v2_converged": true,
+      "t_first": 90112,
+      "t_last": 503808,
+      "n_satisfied_evals": 88,
+      "mean_SR_post_first": 0.9750021764727647,
+      "sigma_SR_at_end": 0.01786121333049875,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 42,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.0,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 123,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.012009611535381536,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "eikonal_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 456,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.02531848417709167,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 42,
+      "v2_converged": true,
+      "t_first": 94208,
+      "t_last": 503808,
+      "n_satisfied_evals": 101,
+      "mean_SR_post_first": 1.0,
+      "sigma_SR_at_end": 0.0,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 81920,
+      "t_last": 503808,
+      "n_satisfied_evals": 64,
+      "mean_SR_post_first": 0.9490206755566055,
+      "sigma_SR_at_end": 0.013501108056171406,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 456,
+      "v2_converged": true,
+      "t_first": 90112,
+      "t_last": 491520,
+      "n_satisfied_evals": 69,
+      "mean_SR_post_first": 0.9600426466563481,
+      "sigma_SR_at_end": 0.024344530490555124,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 42,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.018125276302049607,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 123,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.03443686158605973,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "cbf_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 456,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.041602514716892185,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 0.0,
+      "residual_tail": 0.0,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 42,
+      "v2_converged": true,
+      "t_first": 77824,
+      "t_last": 462848,
+      "n_satisfied_evals": 27,
+      "mean_SR_post_first": 0.9436665321417287,
+      "sigma_SR_at_end": 0.017298411199005298,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 2754.3055867155394,
+      "residual_tail": 104.06615540385246,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 123,
+      "v2_converged": true,
+      "t_first": 73728,
+      "t_last": 503808,
+      "n_satisfied_evals": 25,
+      "mean_SR_post_first": 0.9443527414038803,
+      "sigma_SR_at_end": 0.013919548393908274,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 391.42174232999486,
+      "residual_tail": 1.9998461405436199,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "1a",
+      "maneuver": "stem_right",
+      "seed": 456,
+      "v2_converged": true,
+      "t_first": 77824,
+      "t_last": 483328,
+      "n_satisfied_evals": 30,
+      "mean_SR_post_first": 0.9411311566783919,
+      "sigma_SR_at_end": 0.027685704157498162,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 621.8036800722281,
+      "residual_tail": 2.250347594420115,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 42,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.012659242088545833,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 97.11897580822308,
+      "residual_tail": 747.4747798244158,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 123,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.02531848417709167,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 1340.3534378210704,
+      "residual_tail": 36.380716145038605,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    },
+    {
+      "method": "fusion_aux",
+      "scenario": "2_dense",
+      "maneuver": "right_left",
+      "seed": 456,
+      "v2_converged": false,
+      "t_first": null,
+      "t_last": null,
+      "n_satisfied_evals": 0,
+      "mean_SR_post_first": null,
+      "sigma_SR_at_end": 0.02192645048267573,
+      "anti_pattern_high_sigma_at_end": false,
+      "anti_pattern_catastrophic_post_t_first": false,
+      "anti_pattern_residual_diverged": false,
+      "residual_col_used": "L_residual_optimality",
+      "residual_head": 254.68122785290083,
+      "residual_tail": 1412.334635913372,
+      "anomalies": {
+        "mean_reward": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_optimality": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_residual_safety": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_distill": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_entropy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_value": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_policy": {
+          "n_nan": 0,
+          "n_inf": 0
+        },
+        "L_total": {
+          "n_nan": 0,
+          "n_inf": 0
+        }
+      },
+      "any_NaN_inf": false,
+      "n_iterations": 123
+    }
+  ],
+  "method_cell_pass_table": {
+    "drppo_x_1a_stem_right": "3/3 PASS",
+    "drppo_x_2_dense_right_left": "0/3 FAIL",
+    "hjb_aux_x_1a_stem_right": "3/3 PASS",
+    "hjb_aux_x_2_dense_right_left": "1/3 FAIL",
+    "soft_hjb_aux_x_1a_stem_right": "3/3 PASS",
+    "soft_hjb_aux_x_2_dense_right_left": "0/3 FAIL",
+    "eikonal_aux_x_1a_stem_right": "3/3 PASS",
+    "eikonal_aux_x_2_dense_right_left": "0/3 FAIL",
+    "cbf_aux_x_1a_stem_right": "3/3 PASS",
+    "cbf_aux_x_2_dense_right_left": "0/3 FAIL",
+    "fusion_aux_x_1a_stem_right": "3/3 PASS",
+    "fusion_aux_x_2_dense_right_left": "0/3 FAIL"
+  },
+  "aggregate_outcome": "all_pass_1a",
+  "n_1a_methods_pass": 6,
+  "n_2dense_methods_pass": 0,
+  "anti_patterns_detected": [
+    {
+      "job": "soft_hjb_aux 2_dense\u00d7right_left s456",
+      "type": "residual_diverged",
+      "head": 223.92028538386026,
+      "tail": 14583.876442869505,
+      "col": "L_residual_optimality"
+    },
+    {
+      "job": "eikonal_aux 1a\u00d7stem_right s123",
+      "type": "catastrophic_post_t_first"
+    }
+  ],
+  "n_anti_patterns": 2,
+  "comparisons_vs_phase3_v2_retroactive": {
+    "available": true,
+    "rows": [
+      {
+        "method": "drppo",
+        "cell": "1a_stem_right",
+        "phase3_v2_pass": "3/3",
+        "step11_v2_pass": "3/3",
+        "comparable": true,
+        "note": ""
+      },
+      {
+        "method": "drppo",
+        "cell": "2_dense_right_left",
+        "phase3_v2_pass": "0/3",
+        "step11_v2_pass": "0/3",
+        "comparable": false,
+        "note": "Phase 3 used 2_dense\u00d7stem_right; Step 11 uses 2_dense\u00d7right_left \u2014 different deployment cell, comparison not directly meaningful"
+      },
+      {
+        "method": "hjb_aux",
+        "cell": "1a_stem_right",
+        "phase3_v2_pass": "3/3",
+        "step11_v2_pass": "3/3",
+        "comparable": true,
+        "note": ""
+      },
+      {
+        "method": "hjb_aux",
+        "cell": "2_dense_right_left",
+        "phase3_v2_pass": "0/3",
+        "step11_v2_pass": "1/3",
+        "comparable": false,
+        "note": "Phase 3 used 2_dense\u00d7stem_right; Step 11 uses 2_dense\u00d7right_left \u2014 different deployment cell, comparison not directly meaningful"
+      },
+      {
+        "method": "soft_hjb_aux",
+        "cell": "1a_stem_right",
+        "phase3_v2_pass": "3/3",
+        "step11_v2_pass": "3/3",
+        "comparable": true,
+        "note": ""
+      },
+      {
+        "method": "soft_hjb_aux",
+        "cell": "2_dense_right_left",
+        "phase3_v2_pass": "0/3",
+        "step11_v2_pass": "0/3",
+        "comparable": false,
+        "note": "Phase 3 used 2_dense\u00d7stem_right; Step 11 uses 2_dense\u00d7right_left \u2014 different deployment cell, comparison not directly meaningful"
+      },
+      {
+        "method": "eikonal_aux",
+        "cell": "1a_stem_right",
+        "phase3_v2_pass": "2/3",
+        "step11_v2_pass": "3/3",
+        "comparable": true,
+        "note": ""
+      },
+      {
+        "method": "eikonal_aux",
+        "cell": "2_dense_right_left",
+        "phase3_v2_pass": "0/3",
+        "step11_v2_pass": "0/3",
+        "comparable": false,
+        "note": "Phase 3 used 2_dense\u00d7stem_right; Step 11 uses 2_dense\u00d7right_left \u2014 different deployment cell, comparison not directly meaningful"
+      },
+      {
+        "method": "cbf_aux",
+        "cell": "1a_stem_right",
+        "phase3_v2_pass": "3/3",
+        "step11_v2_pass": "3/3",
+        "comparable": true,
+        "note": ""
+      },
+      {
+        "method": "cbf_aux",
+        "cell": "2_dense_right_left",
+        "phase3_v2_pass": "0/3",
+        "step11_v2_pass": "0/3",
+        "comparable": false,
+        "note": "Phase 3 used 2_dense\u00d7stem_right; Step 11 uses 2_dense\u00d7right_left \u2014 different deployment cell, comparison not directly meaningful"
+      },
+      {
+        "method": "fusion_aux",
+        "cell": "1a_stem_right",
+        "phase3_v2_pass": "3/3",
+        "step11_v2_pass": "3/3",
+        "comparable": true,
+        "note": ""
+      },
+      {
+        "method": "fusion_aux",
+        "cell": "2_dense_right_left",
+        "phase3_v2_pass": "0/3",
+        "step11_v2_pass": "0/3",
+        "comparable": false,
+        "note": "Phase 3 used 2_dense\u00d7stem_right; Step 11 uses 2_dense\u00d7right_left \u2014 different deployment cell, comparison not directly meaningful"
+      }
+    ],
+    "material_differences": []
+  },
+  "recommended_next_step": "step_12_and_phase_4"
+}

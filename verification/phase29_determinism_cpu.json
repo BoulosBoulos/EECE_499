@@ -1,0 +1,50 @@
+{
+  "phase": "29.9",
+  "mode": "cpu",
+  "wall_a": 52.9,
+  "wall_b": 52.9,
+  "exit_a": 0,
+  "exit_b": 0,
+  "tolerance_3sigma": {
+    "final_collision_rate": 0.0,
+    "final_success_rate": 0.0,
+    "final_mean_reward": 1711.7157017570526,
+    "n_collisions_sum": 0.0,
+    "n_successes_sum": 0.0
+  },
+  "metrics_a": {
+    "final_collision_rate": 0.0,
+    "final_success_rate": 0.0,
+    "final_mean_reward": -7216.642578125,
+    "n_collisions_sum": 0,
+    "n_successes_sum": 0,
+    "shape": [
+      2,
+      26
+    ]
+  },
+  "metrics_b": {
+    "final_collision_rate": 0.0,
+    "final_success_rate": 0.0,
+    "final_mean_reward": -7484.21435546875,
+    "n_collisions_sum": 0,
+    "n_successes_sum": 0,
+    "shape": [
+      2,
+      26
+    ]
+  },
+  "int_cols_match_exactly": true,
+  "bad_int_cols": [],
+  "abs_deltas": {
+    "final_collision_rate": 0.0,
+    "final_success_rate": 0.0,
+    "final_mean_reward": 267.57177734375
+  },
+  "within_3sigma": {
+    "final_collision_rate": true,
+    "final_success_rate": true,
+    "final_mean_reward": true
+  },
+  "pass": true
+}

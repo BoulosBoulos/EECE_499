@@ -1,0 +1,7 @@
+{
+  "phase": "4.1",
+  "pass": true,
+  "make_n_default": "python3 experiments/pde/run_calibration.py --scenarios 1a 4_dense --ego_maneuvers stem_right stem_right --seeds 42 123 456 --steps 50000 --out_dir results/calibration --max_parallel 5",
+  "override_check": "STEPS=4000 SEEDS=42 propagates correctly into the printed command",
+  "notes": "Default STEPS in Makefile is 50000 (preserves existing variable); spec's calibration command requires --steps 200000, which is provided explicitly via the spec's calibration command, not via the Makefile default."
+}

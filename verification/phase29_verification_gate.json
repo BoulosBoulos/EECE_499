@@ -1,0 +1,464 @@
+{
+  "phase": "29",
+  "tests": {
+    "29.1_orchestrator_filter_flags": {
+      "pass": true,
+      "details": {
+        "exit": 0,
+        "n_jobs": 2
+      }
+    },
+    "29.2_schema_consistency": {
+      "pass": true,
+      "details": {
+        "phase": "29.2",
+        "consistent": true,
+        "issues": [],
+        "pass": true
+      }
+    },
+    "29.3_obs_dim_audit_documented": {
+      "pass": true,
+      "details": {
+        "audit_json_pass": true,
+        "comment_in_source": true,
+        "yaml_match": true
+      }
+    },
+    "29.4_tier3_reconciliation": {
+      "pass": true,
+      "details": {
+        "md_ok": true,
+        "json_ok": true
+      }
+    },
+    "29.5_synthetic_stats_path": {
+      "pass": true,
+      "details": {
+        "phase": "29.5",
+        "pass": true,
+        "csv_path": "/tmp/synthetic_60run_analysis/statistical_tests/tier1_family_A_final_collision_rate.csv",
+        "checks": [
+          {
+            "check": "n_rows == 5",
+            "pass": true,
+            "actual": 5
+          },
+          {
+            "check": "all required columns populated (no NaN)",
+            "pass": true
+          },
+          {
+            "check": "insufficient_n is False for all rows (n=10)",
+            "pass": true
+          },
+          {
+            "check": "hjb_aux: sig True, d~-2.4",
+            "pass": true,
+            "actual_d": -2.370659403584231,
+            "actual_sig": true,
+            "d_dev_frac": 0.01222524850657029
+          },
+          {
+            "check": "soft_hjb_aux: sig True, d~-2.6",
+            "pass": true,
+            "actual_d": -2.578013546541959,
+            "actual_sig": true,
+            "d_dev_frac": 0.008456328253092674
+          },
+          {
+            "check": "eikonal_aux: sig False, d~-0.4",
+            "pass": true,
+            "actual_d": -0.4008918628686375,
+            "actual_sig": false,
+            "d_dev_frac": 0.002229657171593652
+          },
+          {
+            "check": "cbf_aux: sig True, d~-3.9",
+            "pass": true,
+            "actual_d": -3.9361552603137477,
+            "actual_sig": true,
+            "d_dev_frac": 0.009270579567627649
+          },
+          {
+            "check": "fusion_aux: sig True, d~-4.2",
+            "pass": true,
+            "actual_d": -4.113750762119346,
+            "actual_sig": true,
+            "d_dev_frac": 0.020535532828727214
+          }
+        ],
+        "n_rows": 5,
+        "mismatches": []
+      }
+    },
+    "29.6_e2e_orchestrator_smoke": {
+      "pass": true,
+      "details": {
+        "phase": "29.6",
+        "pass": true,
+        "per_method": [
+          {
+            "method": "drppo",
+            "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_drppo_nointent_s42",
+            "exists_run_dir": true,
+            "exists_metrics_csv": true,
+            "exists_meta_json": true,
+            "exists_eval_csv": true,
+            "exists_checkpoint": true,
+            "metrics_n_rows": 2,
+            "metrics_n_cols": 26,
+            "metrics_has_nan": false,
+            "meta_has_result_summary": true,
+            "meta_method": "drppo"
+          },
+          {
+            "method": "hjb_aux",
+            "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_hjb_aux_nointent_s42",
+            "exists_run_dir": true,
+            "exists_metrics_csv": true,
+            "exists_meta_json": true,
+            "exists_eval_csv": true,
+            "exists_checkpoint": true,
+            "metrics_n_rows": 2,
+            "metrics_n_cols": 26,
+            "metrics_has_nan": false,
+            "meta_has_result_summary": true,
+            "meta_method": "hjb_aux"
+          },
+          {
+            "method": "soft_hjb_aux",
+            "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_soft_hjb_aux_nointent_s42",
+            "exists_run_dir": true,
+            "exists_metrics_csv": true,
+            "exists_meta_json": true,
+            "exists_eval_csv": true,
+            "exists_checkpoint": true,
+            "metrics_n_rows": 2,
+            "metrics_n_cols": 26,
+            "metrics_has_nan": false,
+            "meta_has_result_summary": true,
+            "meta_method": "soft_hjb_aux"
+          },
+          {
+            "method": "eikonal_aux",
+            "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_eikonal_aux_nointent_s42",
+            "exists_run_dir": true,
+            "exists_metrics_csv": true,
+            "exists_meta_json": true,
+            "exists_eval_csv": true,
+            "exists_checkpoint": true,
+            "metrics_n_rows": 2,
+            "metrics_n_cols": 26,
+            "metrics_has_nan": false,
+            "meta_has_result_summary": true,
+            "meta_method": "eikonal_aux"
+          },
+          {
+            "method": "cbf_aux",
+            "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_cbf_aux_nointent_s42",
+            "exists_run_dir": true,
+            "exists_metrics_csv": true,
+            "exists_meta_json": true,
+            "exists_eval_csv": true,
+            "exists_checkpoint": true,
+            "metrics_n_rows": 2,
+            "metrics_n_cols": 26,
+            "metrics_has_nan": false,
+            "meta_has_result_summary": true,
+            "meta_method": "cbf_aux"
+          },
+          {
+            "method": "fusion_aux",
+            "run_dir": "/tmp/phase2_smoke_v2/tier1/1a_stem_right_fusion_aux_nointent_s42",
+            "exists_run_dir": true,
+            "exists_metrics_csv": true,
+            "exists_meta_json": true,
+            "exists_eval_csv": true,
+            "exists_checkpoint": true,
+            "metrics_n_rows": 2,
+            "metrics_n_cols": 26,
+            "metrics_has_nan": false,
+            "meta_has_result_summary": true,
+            "meta_method": "fusion_aux"
+          }
+        ],
+        "smoke_root": "/tmp/phase2_smoke_v2",
+        "log_size_bytes": 671,
+        "log_tail": [
+          "  [START] T1_1a_stem_right_drppo_nointent_s42 (pid 12483)",
+          "",
+          "Done: 6 completed, 0 failed, 0.4h total"
+        ],
+        "n_ok_tag_in_log": 0,
+        "n_fail_tag_in_log": 0,
+        "done_line": "Done: 6 completed, 0 failed, 0.4h total",
+        "n_jobs_completed": 6,
+        "n_jobs_failed": 0
+      }
+    },
+    "29.7_checkpoint_load_round_trip": {
+      "pass": true,
+      "details": {
+        "phase": "29.7",
+        "pass": true,
+        "per_method": [
+          {
+            "method": "drppo",
+            "eval_csv": "/tmp/phase2_ckpt_round_trip/drppo/eval_metrics.csv",
+            "eval_csv_n_rows": 10,
+            "eval_csv_columns": [
+              "ego_maneuver",
+              "ego_max_speed",
+              "episode_length",
+              "eval_episode_idx",
+              "iteration",
+              "mean_ttc",
+              "min_distance_to_collision",
+              "min_ttc",
+              "n_action_changes",
+              "return_total",
+              "scenario",
+              "seed",
+              "terminal_state"
+            ],
+            "schema_match": true,
+            "no_nan_in_core_metrics": true,
+            "eval_ok": true
+          },
+          {
+            "method": "hjb_aux",
+            "eval_csv": "/tmp/phase2_ckpt_round_trip/hjb_aux/eval_metrics.csv",
+            "eval_csv_n_rows": 10,
+            "eval_csv_columns": [
+              "ego_maneuver",
+              "ego_max_speed",
+              "episode_length",
+              "eval_episode_idx",
+              "iteration",
+              "mean_ttc",
+              "min_distance_to_collision",
+              "min_ttc",
+              "n_action_changes",
+              "return_total",
+              "scenario",
+              "seed",
+              "terminal_state"
+            ],
+            "schema_match": true,
+            "no_nan_in_core_metrics": true,
+            "eval_ok": true
+          },
+          {
+            "method": "soft_hjb_aux",
+            "eval_csv": "/tmp/phase2_ckpt_round_trip/soft_hjb_aux/eval_metrics.csv",
+            "eval_csv_n_rows": 10,
+            "eval_csv_columns": [
+              "ego_maneuver",
+              "ego_max_speed",
+              "episode_length",
+              "eval_episode_idx",
+              "iteration",
+              "mean_ttc",
+              "min_distance_to_collision",
+              "min_ttc",
+              "n_action_changes",
+              "return_total",
+              "scenario",
+              "seed",
+              "terminal_state"
+            ],
+            "schema_match": true,
+            "no_nan_in_core_metrics": true,
+            "eval_ok": true
+          },
+          {
+            "method": "eikonal_aux",
+            "eval_csv": "/tmp/phase2_ckpt_round_trip/eikonal_aux/eval_metrics.csv",
+            "eval_csv_n_rows": 10,
+            "eval_csv_columns": [
+              "ego_maneuver",
+              "ego_max_speed",
+              "episode_length",
+              "eval_episode_idx",
+              "iteration",
+              "mean_ttc",
+              "min_distance_to_collision",
+              "min_ttc",
+              "n_action_changes",
+              "return_total",
+              "scenario",
+              "seed",
+              "terminal_state"
+            ],
+            "schema_match": true,
+            "no_nan_in_core_metrics": true,
+            "eval_ok": true
+          },
+          {
+            "method": "cbf_aux",
+            "eval_csv": "/tmp/phase2_ckpt_round_trip/cbf_aux/eval_metrics.csv",
+            "eval_csv_n_rows": 10,
+            "eval_csv_columns": [
+              "ego_maneuver",
+              "ego_max_speed",
+              "episode_length",
+              "eval_episode_idx",
+              "iteration",
+              "mean_ttc",
+              "min_distance_to_collision",
+              "min_ttc",
+              "n_action_changes",
+              "return_total",
+              "scenario",
+              "seed",
+              "terminal_state"
+            ],
+            "schema_match": true,
+            "no_nan_in_core_metrics": true,
+            "eval_ok": true
+          },
+          {
+            "method": "fusion_aux",
+            "eval_csv": "/tmp/phase2_ckpt_round_trip/fusion_aux/eval_metrics.csv",
+            "eval_csv_n_rows": 10,
+            "eval_csv_columns": [
+              "ego_maneuver",
+              "ego_max_speed",
+              "episode_length",
+              "eval_episode_idx",
+              "iteration",
+              "mean_ttc",
+              "min_distance_to_collision",
+              "min_ttc",
+              "n_action_changes",
+              "return_total",
+              "scenario",
+              "seed",
+              "terminal_state"
+            ],
+            "schema_match": true,
+            "no_nan_in_core_metrics": true,
+            "eval_ok": true
+          }
+        ]
+      }
+    },
+    "29.8_determinism_gpu": {
+      "pass": true,
+      "details": {
+        "phase": "29.8",
+        "mode": "gpu",
+        "wall_a": 59.4,
+        "wall_b": 59.3,
+        "exit_a": 0,
+        "exit_b": 0,
+        "tolerance_3sigma": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": 1711.7157017570526,
+          "n_collisions_sum": 0.0,
+          "n_successes_sum": 0.0
+        },
+        "metrics_a": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": -7047.3876953125,
+          "n_collisions_sum": 0,
+          "n_successes_sum": 0,
+          "shape": [
+            2,
+            26
+          ]
+        },
+        "metrics_b": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": -7564.95703125,
+          "n_collisions_sum": 0,
+          "n_successes_sum": 0,
+          "shape": [
+            2,
+            26
+          ]
+        },
+        "int_cols_match_exactly": true,
+        "bad_int_cols": [],
+        "abs_deltas": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": 517.5693359375
+        },
+        "within_3sigma": {
+          "final_collision_rate": true,
+          "final_success_rate": true,
+          "final_mean_reward": true
+        },
+        "pass": true
+      }
+    },
+    "29.9_determinism_cpu_strict": {
+      "pass": true,
+      "details": {
+        "phase": "29.9",
+        "mode": "cpu",
+        "wall_a": 52.9,
+        "wall_b": 52.9,
+        "exit_a": 0,
+        "exit_b": 0,
+        "tolerance_3sigma": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": 1711.7157017570526,
+          "n_collisions_sum": 0.0,
+          "n_successes_sum": 0.0
+        },
+        "metrics_a": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": -7216.642578125,
+          "n_collisions_sum": 0,
+          "n_successes_sum": 0,
+          "shape": [
+            2,
+            26
+          ]
+        },
+        "metrics_b": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": -7484.21435546875,
+          "n_collisions_sum": 0,
+          "n_successes_sum": 0,
+          "shape": [
+            2,
+            26
+          ]
+        },
+        "int_cols_match_exactly": true,
+        "bad_int_cols": [],
+        "abs_deltas": {
+          "final_collision_rate": 0.0,
+          "final_success_rate": 0.0,
+          "final_mean_reward": 267.57177734375
+        },
+        "within_3sigma": {
+          "final_collision_rate": true,
+          "final_success_rate": true,
+          "final_mean_reward": true
+        },
+        "pass": true
+      }
+    },
+    "29.10_existing_suite": {
+      "pass": true,
+      "details": {
+        "n_phase_files": 40,
+        "failing": []
+      }
+    }
+  },
+  "pass": true,
+  "n_pass": 10,
+  "n_total": 10
+}

@@ -1,0 +1,44 @@
+# Phase 3F-A Step 7D — Eikonal time-of-arrival auxiliary critic configuration.
+# Hybrid loss formulation:
+#   - L_eik enforced via Augmented Lagrangian Method (Bertsekas 1996;
+#     Lu et al. 2021). λ and μ updated by canonical Bertsekas §4.2 rule.
+#   - L_bc, L_ground use Kendall-Gal-Cipolla 2018 uncertainty weighting
+#     (legitimate noisy supervised tasks).
+#   - L_distill uses fixed weight w_distill (actor-side soft-KL).
+#   - Replay buffers (Step 7C) retained for sparse-event BC training.
+# See verification/phase3F_A_math_derivation.md §10 for the derivation.
+
+# Step 7D — Augmented Lagrangian on the L_eik constraint:
+alm_lambda_init: 0.0      # initial Lagrange multiplier (no enforcement at start)
+alm_mu_init: 1.0          # initial penalty parameter
+alm_mu_max: 10000.0       # upper bound on μ to prevent numerical blow-up
+alm_alpha: 0.25           # required improvement ratio per ALM epoch (g_{k+1} <= α g_k)
+alm_beta: 5.0             # geometric growth factor for μ when constraint not improving
+alm_update_interval: 5000 # training steps between λ, μ updates
+
+# Step 7C — Kendall et al. 2018 uncertainty weighting (RETAINED for BC/GROUND only):
+log_sigma_init: 0.0       # σ_bc, σ_ground init (= exp(0) = 1)
+                          # NOTE: log_sigma_eik is REMOVED in 7D (L_eik now via ALM).
+
+# Step 7C — terminal replay buffers (retained):
+replay_buffer_size: 1000  # FIFO ring capacity per buffer
+replay_batch_size: 256    # minibatch size sampled per buffer per iter
+
+# Phase 3F-A actor-side / boundary / temperature knobs (unchanged):
+w_distill: 0.5            # weight for L_distill (KL π_θ || π_eik)
+beta_KL: 0.1              # KL strength inside L_distill
+tau: 1.0                  # softmax temperature for A_eik in π_eik
+T_max: 100.0              # finite-horizon collision-boundary anchor (timesteps)
+v_min: 0.5                # numerical floor for v_eff in c(xi)
+
+# Existing critic knobs retained:
+aux_hidden_dim: 256  # Step 7D state, locked at Phase 3F-A closure (Step 7E hidden_dim 512 did not produce strict 7D margins; reverted per Outcome 2 pre-committed close rule)
+aux_lr: 1.0e-3
+collocation_ratio: 0.7
+
+# DEPRECATED — kept for back-compat constructor calls; do not enter the
+# Step 7D gradient. L_eik is now enforced via ALM (λ, μ); L_bc, L_ground
+# weighted by KGC σ.
+w_eik: 1.0                # SUPERSEDED in 7D by ALM (λ, μ)
+w_bc: 0.5                 # SUPERSEDED in 7C by σ_bc
+w_ground: 1.0             # SUPERSEDED in 7C by σ_ground

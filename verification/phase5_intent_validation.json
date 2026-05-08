@@ -1,0 +1,27 @@
+{
+  "phase": "5",
+  "pass": true,
+  "per_member": [
+    {
+      "member": 0,
+      "checkpoint": "results/intent_model_v9_member0.pt",
+      "exists": true,
+      "has_model_key": true,
+      "load_ok": true
+    },
+    {
+      "member": 1,
+      "checkpoint": "results/intent_model_v9_member1.pt",
+      "exists": true,
+      "has_model_key": true,
+      "load_ok": true
+    },
+    {
+      "member": 2,
+      "checkpoint": "results/intent_model_v9_member2.pt",
+      "exists": true,
+      "has_model_key": true,
+      "load_ok": true
+    }
+  ]
+}

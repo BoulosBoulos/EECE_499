@@ -1,0 +1,33 @@
+Warning: Vehicle 'other' performs emergency braking on lane ':center_8_0' with decel=9.00, wished=4.00, severity=1.00, time=8.90.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_8_0' with decel=9.00, wished=7.00, severity=1.00, time=9.70.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[soft_hjb_aux] step=4096 ret=-434.30 coll=0 ttc=8.91 soft_res=4.6915 align_kl=0.8496
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+Saved soft_hjb_aux to /home/boulosboulos/Desktop/EECE_499-main/verification/_phase24_smoke/soft_hjb_aux_default/model_soft_hjb_aux_1a_stem_right.pt
+Training complete. Metrics in /home/boulosboulos/Desktop/EECE_499-main/verification/_phase24_smoke/soft_hjb_aux_default/train_soft_hjb_aux_1a_stem_right.csv
