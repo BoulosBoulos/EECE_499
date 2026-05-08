@@ -36,6 +36,7 @@ if _REPO_ROOT not in sys.path:
 
 from experiments.pde.run_full_ablation import (  # noqa: E402
     _apply_filters,
+    _partition_balance_jobs,
     generate_jobs,
     manifest_sort_key,
 )
@@ -91,10 +92,13 @@ def main() -> None:
     jobs = _apply_filters(jobs, _build_filter_args(
         include_rule_based=args.include_rule_based,
     ))
-    # CRITICAL: same sort key as the orchestrator uses (imported from
-    # run_full_ablation). If you edit one of the two scripts' sort keys,
-    # edit `manifest_sort_key` in run_full_ablation.py — both pick it up.
-    jobs = sorted(jobs, key=manifest_sort_key)
+    # CRITICAL: same balanced ordering as the orchestrator uses (both call
+    # `_partition_balance_jobs` from run_full_ablation). The function
+    # interleaves rule_based jobs at deterministic stride positions among
+    # the trainable jobs so any contiguous slice gets a proportional
+    # rule_based share. Editing the balance algorithm in one script
+    # without the other would break slice correspondence across machines.
+    jobs = _partition_balance_jobs(jobs)
 
     total = len(jobs)
     if total == 0:
@@ -102,7 +106,9 @@ def main() -> None:
     per_machine = total // args.n_machines
     remainder = total % args.n_machines
 
-    print(f"Total jobs: {total}")
+    n_rb_total = sum(1 for j in jobs if j.get("method") == "rule_based")
+    n_train_total = total - n_rb_total
+    print(f"Total jobs: {total} ({n_train_total} trainable + {n_rb_total} rule_based)")
     print(
         f"Per machine (base): {per_machine}, remainder distributed to "
         f"first {remainder} machine(s)"
@@ -113,11 +119,18 @@ def main() -> None:
     for m in range(args.n_machines):
         n = per_machine + (1 if m < remainder else 0)
         end = start + n
-        first = jobs[start]
-        last = jobs[end - 1]
+        slice_jobs = jobs[start:end]
+        n_rb = sum(1 for j in slice_jobs if j.get("method") == "rule_based")
+        n_train = n - n_rb
+        # Within-slice deterministic ordering for the first/last display so
+        # the preview matches what the orchestrator launches per-rental.
+        slice_sorted = sorted(slice_jobs, key=manifest_sort_key)
+        first = slice_sorted[0]
+        last = slice_sorted[-1]
         print(
             f"Machine {m + 1}: --job_index_start {start} "
-            f"--job_index_end {end} ({n} jobs)"
+            f"--job_index_end {end} ({n} jobs: {n_train} trainable + "
+            f"{n_rb} rule_based)"
         )
         print(
             f"  first: method={first['method']} | scen={first['scenario']} "

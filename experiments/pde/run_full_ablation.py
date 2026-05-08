@@ -207,6 +207,79 @@ def manifest_sort_key(job: dict) -> tuple:
     )
 
 
+def _partition_balance_jobs(jobs: list[dict]) -> list[dict]:
+    """Interleave rule_based jobs evenly through the trainable jobs so any
+    contiguous slice of the manifest sees a proportional rule_based share.
+
+    Motivation: rule_based jobs are eval-only (~30 min each); trainable jobs
+    are training+eval (~5–6 h each at 400 k steps). Plain alphabetical sort
+    by `manifest_sort_key` clusters rule_based after the trainable methods,
+    which on a 4-way slice means M1/M2 get all-trainable workloads (~30 h)
+    and M3/M4 get rule_based-heavy workloads (~22–25 h). Balancing the slices
+    cuts the M1/M2 wall-time bottleneck while keeping the total compute the
+    same.
+
+    Algorithm: deterministic stride placement.
+      1. Partition: trainable = method != "rule_based"; rule_based otherwise.
+      2. Sort each partition by `manifest_sort_key` (alphabetical determinism
+         within each kind).
+      3. Compute, for each rule_based index i ∈ [0, R), the global position
+         `pos = ((2*i + 1) * total) // (2 * R)` — i.e., centered on the
+         (i+0.5)/R fractile, rounded down. Integer arithmetic so the result
+         is bit-identical across machines and Python versions.
+      4. Should two positions collide (mathematically can't happen for the
+         canonical Tier 1 case T:R = 1440:240 = 6:1, but covered defensively
+         for arbitrary ratios), the colliding entry spills to the next
+         vacant slot, wrapping at `total`.
+      5. Fill the global ordering: rule_based at their stride positions,
+         trainable filling the remaining positions in their sorted order.
+
+    For T:R = 1440:240 (Tier 1) the rule_based jobs land at positions
+    {3, 10, 17, ..., 1676} — exactly every 7th. A 4-way 420-job slice
+    therefore receives exactly 60 rule_based + 360 trainable.
+
+    The output is the canonical "global ordering" used for slicing across
+    machines. Within-slice deterministic ordering (alphabetical by
+    `manifest_sort_key`) is applied separately by the orchestrator AFTER
+    slicing and by the preview's per-slice display logic.
+    """
+    trainable = sorted(
+        [j for j in jobs if j.get("method") != "rule_based"],
+        key=manifest_sort_key,
+    )
+    rule_based = sorted(
+        [j for j in jobs if j.get("method") == "rule_based"],
+        key=manifest_sort_key,
+    )
+    T, R = len(trainable), len(rule_based)
+    if R == 0:
+        return trainable
+    if T == 0:
+        return rule_based
+    total = T + R
+    # Compute deterministic stride positions for the rule_based partition.
+    rb_positions = [None] * R
+    used = set()
+    for i in range(R):
+        pos = ((2 * i + 1) * total) // (2 * R)
+        # Defensive collision spill (should be a no-op for T:R = 1440:240).
+        while pos in used:
+            pos = (pos + 1) % total
+        used.add(pos)
+        rb_positions[i] = pos
+    # Order the rule_based assignments by ascending position so the overall
+    # slice retains the rule_based partition's alphabetical stride.
+    rb_pairs = sorted(zip(rb_positions, range(R)))
+    out: list[dict] = [None] * total  # type: ignore[assignment]
+    for pos, rb_idx in rb_pairs:
+        out[pos] = rule_based[rb_idx]
+    train_iter = iter(trainable)
+    for i in range(total):
+        if out[i] is None:
+            out[i] = next(train_iter)
+    return out
+
+
 def _annotate_meta_with_tier(out_dir: str, tier_label: str) -> None:
     """Post-run annotation: write tier_label into the per-job meta.json.
 
@@ -718,11 +791,12 @@ def main():
               f"scenarios={args.scenarios}, maneuvers={args.maneuvers}, "
               f"intents={args.intents}, include_rule_based={args.include_rule_based})")
 
-    # Multi-machine: deterministically sort the filtered manifest before
-    # slicing so [job_index_start, job_index_end) corresponds to identical
-    # jobs across machines. The same key is exported as `manifest_sort_key`
-    # and reused by `preview_tier_1_split.py`.
-    jobs = sorted(jobs, key=manifest_sort_key)
+    # Multi-machine: produce a balanced global ordering (rule_based
+    # interleaved among trainable jobs at deterministic stride positions)
+    # so contiguous slices [start, end) on different rentals each get a
+    # proportional rule_based share. The same helper is imported by
+    # `preview_tier_1_split.py` so slice indices match across scripts.
+    jobs = _partition_balance_jobs(jobs)
 
     total_after_filter = len(jobs)
     slice_start = max(0, int(args.job_index_start))
@@ -736,15 +810,25 @@ def main():
         )
     if slice_start != 0 or slice_end != total_after_filter:
         jobs = jobs[slice_start:slice_end]
+        n_rb = sum(1 for j in jobs if j.get("method") == "rule_based")
         print(
             f"[machine={args.machine_id}] running jobs [{slice_start}:{slice_end}]"
-            f" of {total_after_filter} total ({len(jobs)} jobs in slice)"
+            f" of {total_after_filter} total ({len(jobs)} jobs in slice: "
+            f"{len(jobs) - n_rb} trainable + {n_rb} rule_based)"
         )
     else:
+        n_rb = sum(1 for j in jobs if j.get("method") == "rule_based")
         print(
             f"[machine={args.machine_id}] running full manifest "
-            f"({total_after_filter} jobs)"
+            f"({total_after_filter} jobs: {total_after_filter - n_rb} "
+            f"trainable + {n_rb} rule_based)"
         )
+
+    # Within-slice deterministic ordering: re-sort by manifest_sort_key so
+    # this rental launches jobs in alphabetical order regardless of where
+    # they sat in the global balanced ordering. Identical-content slices
+    # produce identical run logs across re-launches.
+    jobs = sorted(jobs, key=manifest_sort_key)
 
     # Print tier breakdown
     tier_counts = {}
