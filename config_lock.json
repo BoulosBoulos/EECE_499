@@ -6,6 +6,10 @@
   "lock_phase": "3F-Step12",
   "_compat_note": "config_hash + config_file at top level provided for backward compatibility with config_loader.check_config_lock(); same value as frozen_config_file.sha256 below.",
   "criterion_version": "v2_sr_primary_post_stage3",
+  "git_commit": "4c5ead7425c1afbeea70696414c981150dec6765",
+  "git_branch": "master",
+  "git_tag": "v2_phase_3F_step_12-tier_1_ready",
+  "git_dirty": false,
   "total_steps_calibrated": 400000,
   "calibration_rationale": "max(t_first across 19 converged Step 11 seeds) + W_steps + small buffer = 331776 + 50000 = 381776, rounded up to 400000. Override of spec's hard ceiling 300000 explicitly authorized; rationale documented in CALIBRATION_REPORT.md Section 7.",
   "frozen_config_file": {
