@@ -319,7 +319,16 @@ def write_meta_start(
     # Phase 3F Step 12: stamp criterion_version directly onto every job's
     # meta.json at training-start time so downstream analysis can key off
     # the run-time criterion without a separate post-run annotation step.
-    from analysis.calibration_analysis import CRITERION_VERSION
+    # Source: config_frozen_v1.yaml::calibration.criterion_version (the
+    # same value as analysis.calibration_analysis.CRITERION_VERSION; we
+    # read from config rather than import the analysis module because the
+    # local `experiments/pde/analysis/` paper-figures package shadows the
+    # top-level `analysis/` package on sys.path when train scripts are
+    # launched as `python3 experiments/pde/train_*.py`).
+    criterion_version = (
+        _FROZEN.get("calibration", {}).get("criterion_version")
+        or "v2_sr_primary_post_stage3"
+    )
     run_id = str(uuid.uuid4())
     meta = {
         "run_id": run_id,
@@ -334,7 +343,7 @@ def write_meta_start(
         "total_steps_target": int(total_steps_target),
         "total_steps_actual": None,
         "convergence_reason": None,
-        "criterion_version": CRITERION_VERSION,
+        "criterion_version": criterion_version,
         **_git_info(),
         "hostname": socket.gethostname(),
         "device": _device_string(),
