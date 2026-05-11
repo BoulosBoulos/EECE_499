@@ -1,0 +1,160 @@
+START PROMPT >>>
+
+
+
+CONTEXT
+I am Boulos Boulos, AUB EECE 499 capstone (PINN-RL for autonomous driving at unsignalized T-intersections, target IEEE T-ITS / T-IV, hard deadline end of May 2026). You have worked on this codebase extensively in prior sessions. Latest state was pushed to https://github.com/BoulosBoulos/EECE_499 at commit b648cda with tag v2_phase_3F_step_12-tier_1_ready at 4c5ead7. Repo lives at /home/boulosboulos/Desktop/EECE_499-main. Python venv at /home/boulosboulos/.venvs/eece499/bin/python. PYTHONPATH must be set to /home/boulosboulos/Desktop/EECE_499-main.
+Hardware: i9-14900 (24 cores / 32 threads), 64 GB DDR5, RTX 4000 Ada 20 GB VRAM, Ubuntu 24.04, kernel 6.17.0-22-generic. SUMO 1.18.0 installed system-wide.
+SITUATION (READ CAREFULLY)
+I am simultaneously trying to provision DigitalOcean cloud rentals for the Tier 1 ablation. DigitalOcean has restricted my new account from provisioning CPU-Optimized and General Purpose Droplets in every region. I have filed a support ticket requesting access (Account → Droplet Limits → CPU-Optimized) and am waiting for a response (estimated 1–24 hours, possibly until Monday since today is Saturday May 9, 2026).
+Your job is to maximize useful work on this local Ubuntu PC while I sort out cloud access. The single most important action is launching Tier 1 locally as a parallel hedge, because:
+
+Local Tier 1 at 22-parallel takes approximately 6.4 days
+Every hour delayed is an hour pushed back on the delivery date
+If DigitalOcean approves cloud access later, I will kill the local run and migrate
+If DigitalOcean denies, the local run still finishes well within the end-of-May hard deadline
+
+OBJECTIVE — execute these phases in order
+Phase 1 (must complete before Phase 2): Pre-launch verification
+Run these checks. If any fail, STOP and report — do not proceed to Phase 2.
+
+Git state check. cd /home/boulosboulos/Desktop/EECE_499-main && git rev-parse HEAD && git log -1 --oneline && git status --short. HEAD must be b648cda (or a clean ancestor). Working tree must be clean except for known untracked files. Tag v2_phase_3F_step_12-tier_1_ready must exist at 4c5ead7.
+Environment activation check. Confirm /home/boulosboulos/.venvs/eece499/bin/python exists and the venv has the right deps:
+
+   /home/boulosboulos/.venvs/eece499/bin/python -c "import torch, traci, sumolib, numpy, scipy; print(torch.__version__, traci.__version__ if hasattr(traci,'__version__') else 'ok')"
+And which sumo && sumo --version must show 1.18.0.
+
+Resource baseline. Capture current CPU + memory + disk + GPU state so we have a baseline before launch:
+
+   nproc; free -g; df -h /home; nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv
+Disk: at least 100 GB free required. If less than 100 GB free, STOP and tell me — Tier 1 will fill the disk.
+
+Orchestrator dry-run. Verify the orchestrator can preview the full Tier 1 manifest cleanly with single-machine config:
+
+   PYTHONPATH=/home/boulosboulos/Desktop/EECE_499-main \
+     /home/boulosboulos/.venvs/eece499/bin/python \
+     experiments/pde/run_full_ablation.py \
+     --tier 1 \
+     --total_steps 400000 \
+     --max_parallel 22 \
+     --dry_run \
+     2>&1 | tail -50
+Verify: 1,440 trainable + 240 rule_based = 1,680 total jobs reported. No errors in the output. If the orchestrator reports something other than 1,680 total jobs at total_steps=400000, STOP and report.
+
+Quick 4-job smoke test (single-machine, NOT the same as the multi-machine smoke test). Run a 4-job slice to confirm the orchestrator works in single-machine mode (no --machine_id, no --job_index_start/end). Use --total_steps 1000 so this finishes in ~5 min:
+
+   rm -rf /tmp/tier1_smoke_local
+   PYTHONPATH=/home/boulosboulos/Desktop/EECE_499-main \
+     /home/boulosboulos/.venvs/eece499/bin/python \
+     experiments/pde/run_full_ablation.py \
+     --tier 1 \
+     --total_steps 1000 \
+     --max_parallel 4 \
+     --job_index_start 0 \
+     --job_index_end 4 \
+     --machine_id smoke_local \
+     2>&1 | tail -30
+Verify 4 result directories exist with metrics.csv in each. Then clean up: rm -rf results/tier_1_machine_smoke_local.
+If all 5 checks pass, proceed to Phase 2. If any fail, STOP and report exact error.
+Phase 2: Launch Tier 1 locally as detached background process
+Use nohup setsid so the process survives terminal disconnection. Use tmux as a secondary safety net.
+cd /home/boulosboulos/Desktop/EECE_499-main
+
+# Wipe any stale logs but DO NOT touch results/ directory
+rm -f /tmp/tier1_local.log /tmp/tier1_local.pid
+
+# Launch — note we do NOT pass --machine_id, --job_index_start, --job_index_end
+# This makes the orchestrator run all 1,680 jobs sequentially with internal parallelism of 22
+PYTHONPATH=/home/boulosboulos/Desktop/EECE_499-main \
+  nohup setsid /home/boulosboulos/.venvs/eece499/bin/python \
+  experiments/pde/run_full_ablation.py \
+  --tier 1 \
+  --total_steps 400000 \
+  --max_parallel 22 \
+  > /tmp/tier1_local.log 2>&1 &
+
+echo $! > /tmp/tier1_local.pid
+sleep 5
+echo "Launched orchestrator PID: $(cat /tmp/tier1_local.pid)"
+After launch, wait 60 seconds, then verify:
+
+Orchestrator process is alive: ps -p $(cat /tmp/tier1_local.pid) -o pid,cmd 2>&1 | head -3
+Worker processes are spawning: ps -ef | grep -E "train_drppo|train_pde|sumo" | grep -v grep | wc -l — expect a number greater than 0 within 2 minutes
+SUMO processes are running: ps -ef | grep "sumo " | grep -v grep | wc -l — expect ~22 within 5 minutes
+CPU usage is high: top -b -n 1 | head -20 — load average should climb toward 22+
+Log file is growing: ls -la /tmp/tier1_local.log && tail -30 /tmp/tier1_local.log
+First result directory created within 10 minutes: ls results/tier_1_machine_local/tier1/ 2>/dev/null | head -5 (or whatever path the orchestrator uses when machine_id is not specified — adapt based on what you see)
+
+Report all 6 verifications back to me with exact numbers.
+Phase 3: Background work while Tier 1 runs (lightweight only)
+Once Tier 1 is launched and verified, the system will be at high CPU utilization. Do NOT run anything CPU-heavy on this machine. The following lightweight tasks are appropriate:
+3A — Set up automated periodic health monitoring (one-time, then runs in background)
+Create a shell script at /home/boulosboulos/tier1_health_monitor.sh that captures system + training state every 30 minutes and appends to a log. Should capture:
+
+Wall time since launch
+Orchestrator PID alive (yes/no)
+Number of worker Python processes
+Number of SUMO processes
+Load average (1m, 5m, 15m)
+Memory used / total
+Disk free on /home
+GPU utilization + memory
+Number of completed result directories under results/tier_1_machine_local/tier1/
+Number of distinct (combo, method, seed, intent) configurations completed
+Last 5 lines of /tmp/tier1_local.log
+
+Schedule it via cron or a while true; sleep 1800 loop in tmux. Output to /tmp/tier1_health.log. Show me the script + the cron line / tmux command used to start it.
+Use minimal CPU. The monitor itself should run in well under 1 second per invocation.
+3B — Prepare cloud migration scaffolding (no execution, just staging)
+In case DigitalOcean approves access while Tier 1 is running locally, prepare the migration playbook. Create verification/cloud_migration_playbook.md documenting:
+
+Exact local launch command (so it can be killed cleanly)
+Killing the local run: kill -TERM $(cat /tmp/tier1_local.pid); sleep 30; pkill -KILL -f "experiments/pde/run_full_ablation"; pkill -KILL -f sumo
+How to compute partial-completion state: which (combo, method, seed, intent) tuples are already done, which are not
+Decision tree: if X% of Tier 1 is done locally when cloud opens up, is migration worth it?
+Cloud setup steps (paraphrase from prior chat history if available, or note as TBD if not)
+Multi-machine launch commands for 4-machine and 10-machine cases (use preview_tier_1_split.py --n_machines N to generate the index pairs and write them into the playbook)
+Result-aggregation procedure: rsync from cloud Droplets back to local, then run experiments/pde/aggregate_tier_1_results.py
+
+Run preview_tier_1_split.py for both --n_machines 4 and --n_machines 10 and capture the index pairs in the playbook. Verify byte-identical determinism on each (run twice, sha256 should match).
+3C — Quality-of-life improvements (only if 3A and 3B are done and Tier 1 is healthy)
+Optional, low-priority, only after the above are complete:
+
+Audit experiments/pde/aggregate_tier_1_results.py for edge cases (does it handle missing per-job artifacts? does it dedupe correctly?). If you find bugs, write a SPEC document under verification/ describing them — DO NOT FIX without my approval.
+Audit analysis/calibration_analysis.py for v2 criterion correctness.
+Read through latest verification/CALIBRATION_REPORT.md and flag any inconsistencies with current state.
+
+For all 3C items: read-only audit, write findings to disk, do not modify code.
+Phase 4: Stop conditions
+Halt and report immediately if any of these occur:
+
+Orchestrator process dies unexpectedly (PID gone but Tier 1 not complete)
+Disk free on /home drops below 30 GB
+Load average drops below 5 for more than 30 minutes (suggests workers are crashing)
+SUMO process count drops to 0 for more than 5 minutes
+NaN or Inf appears in any metrics.csv
+I send you a message saying "DigitalOcean approved" — at which point we transition to migration based on the playbook from 3B
+
+REPORTING REQUIREMENTS
+After Phase 1: full report of all 5 checks, exact outputs.
+After Phase 2: 6-point launch verification with numbers.
+After Phase 3A: script contents + how it was scheduled.
+After Phase 3B: playbook saved + 4-way and 10-way split indices captured.
+After Phase 3C: any audit findings, written to disk, not applied.
+Then go quiet — only report again when a Phase 4 stop condition triggers, or every 6 hours with a brief health summary, or when I message you.
+WHAT NOT TO DO
+
+Do NOT delete results/ or any verification artifacts
+Do NOT push to GitHub without explicit confirmation
+Do NOT modify code in experiments/pde/, models/, env/, or scenario/ while Tier 1 is running — risk of pulling code mid-run
+Do NOT run heavy CPU/GPU work in parallel with Tier 1 (audits and plots are OK; new training runs are NOT)
+Do NOT force-kill the orchestrator unless I say so
+Do NOT change git branch or do destructive git operations
+Do NOT modify config_lock.json or anything in verification/ referenced by the lock
+
+BEGIN
+Start with Phase 1 now.
+
+
+
+END PROMPT >>>
