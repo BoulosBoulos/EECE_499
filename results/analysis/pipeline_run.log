@@ -1,0 +1,6 @@
+[run_analysis] loading runs from results/tier_1_combined
+[run_analysis] 71/93 runs valid; failure rate = 23.7%; report → results/analysis_new/meta/data_quality_report.json
+[run_analysis] WARNING: 23.7% of runs failed quality checks (gate = 5%).
+Continue anyway? [y/N]: [run_analysis] tables → results/analysis_new/tables
+[run_analysis] figures → results/analysis_new/figures
+[run_analysis] complete (8.0s); output → results/analysis_new

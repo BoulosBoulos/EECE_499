@@ -1,0 +1,38 @@
+--- 1a / stem_right ---
+Saved results/analysis_new/figures/learning_curves/learning_curves_1a_stem_right.png
+Saved results/analysis_new/figures/pde_convergence/pde_convergence_1a_stem_right.png
+--- 1a / stem_left ---
+Saved results/analysis_new/figures/learning_curves/learning_curves_1a_stem_left.png
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (13,) + inhomogeneous part.
+--- 1a / right_stem ---
+Saved results/analysis_new/figures/learning_curves/learning_curves_1a_right_stem.png
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (20,) + inhomogeneous part.
+--- 1b / stem_right ---
+Saved results/analysis_new/figures/learning_curves/learning_curves_1b_stem_right.png
+Saved results/analysis_new/figures/pde_convergence/pde_convergence_1b_stem_right.png
+--- 2_dense / right_left ---
+Saved results/analysis_new/figures/learning_curves/learning_curves_2_dense_right_left.png
+Saved results/analysis_new/figures/pde_convergence/pde_convergence_2_dense_right_left.png
+Loaded 396 rows from 66 eval files
+Saved results/analysis_new/tables/all_comparisons.csv (260 rows)
+Saved results/analysis_new/tables/main_results.tex
+Saved results/analysis_new/tables/effect_sizes.tex
+Saved results/analysis_new/tables/per_scenario_mean_return.tex
+Saved results/analysis_new/tables/per_scenario_collision_rate.tex
+Saved results/analysis_new/tables/per_scenario_success_rate.tex
+Saved results/analysis_new/tables/per_scenario_mean_ttc.tex
+Saved results/analysis_new/tables/per_scenario_min_ttc.tex
+Saved results/analysis_new/tables/per_scenario_ttc_p10_mean.tex
+Saved results/analysis_new/tables/per_scenario_action_entropy_mean.tex
+Saved results/analysis_new/tables/per_scenario_hard_brakes_per_ep_mean.tex
+Saved results/analysis_new/tables/per_scenario_row_violations_per_ep_mean.tex
+Saved results/analysis_new/tables/per_scenario_action_go_frac.tex
+Saved results/analysis_new/tables/per_scenario_action_yield_frac.tex
+Saved results/analysis_new/tables/per_scenario_switching_rate_mean.tex
+Saved results/analysis_new/tables/per_scenario_decision_latency_mean.tex
+Saved results/analysis_new/tables/pde_vs_pde_comparisons.csv (780 rows)
+Saved results/analysis_new/tables/paradigm_comparison.tex
+
+All tables saved to results/analysis_new/tables/

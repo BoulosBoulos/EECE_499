@@ -65,7 +65,10 @@ def cell_action_dist(method: str, scenario: str) -> Optional[pd.DataFrame]:
         return None
     aligned = frames[0].copy()
     for c in [f"action_dist_{a}" for a in ACTIONS]:
-        aligned[c] = np.mean([f[c].values for f in frames], axis=0)
+        arrays = [f[c].values for f in frames]
+        n = min(len(a) for a in arrays)
+        aligned[c] = np.mean(np.stack([a[:n] for a in arrays]), axis=0) if n > 0 else aligned[c].iloc[:0]
+        aligned = aligned.iloc[:n].copy() if n > 0 else aligned.iloc[:0]
     return aligned
 
 
@@ -94,7 +97,10 @@ def cell_termination_fractions(method: str, scenario: str) -> Optional[pd.DataFr
         return None
     aligned = frames[0].copy()
     for c in ["frac_collision", "frac_success", "frac_timeout", "frac_abort", "ep_len", "n_eps"]:
-        aligned[c] = np.mean([f[c].values for f in frames], axis=0)
+        arrays = [f[c].values for f in frames]
+        n = min(len(a) for a in arrays)
+        aligned[c] = np.mean(np.stack([a[:n] for a in arrays]), axis=0) if n > 0 else aligned[c].iloc[:0]
+        aligned = aligned.iloc[:n].copy() if n > 0 else aligned.iloc[:0]
     return aligned
 
 

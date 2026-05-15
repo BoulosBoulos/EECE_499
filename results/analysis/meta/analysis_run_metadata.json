@@ -1,11 +1,11 @@
 {
-  "ran_at": "2026-05-15T14:44:39.508803+00:00",
-  "elapsed_seconds": 8.177391290664673,
+  "ran_at": "2026-05-15T16:09:01.035132+00:00",
+  "elapsed_seconds": 8.000322103500366,
   "hostname": "DSP0000107020LU",
   "python_version": "3.12.3",
   "args": {
     "results_root": "results/tier_1_combined",
-    "output_root": "results/analysis",
+    "output_root": "results/analysis_new",
     "tiers": [
       "tier1"
     ],

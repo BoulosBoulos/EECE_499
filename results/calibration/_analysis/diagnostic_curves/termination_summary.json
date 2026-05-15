@@ -74,26 +74,26 @@
   {
     "method": "eikonal_aux",
     "scenario": "1a",
-    "ep_len_start": 455.5196891996892,
-    "ep_len_end": 211.4887037037037,
+    "ep_len_start": 451.5877447552448,
+    "ep_len_end": 248.0494836355595,
     "frac_collision_start": 0.0,
     "frac_collision_end": 0.0,
-    "frac_timeout_start": 0.7208333333333333,
+    "frac_timeout_start": 0.6796296296296296,
     "frac_timeout_end": 0.0,
-    "frac_success_start": 0.2791666666666667,
+    "frac_success_start": 0.3203703703703703,
     "frac_success_end": 1.0
   },
   {
     "method": "eikonal_aux",
     "scenario": "2_dense",
-    "ep_len_start": 472.8069865319865,
-    "ep_len_end": 474.58518518518514,
-    "frac_collision_start": 0.16862794612794613,
-    "frac_collision_end": 0.215,
-    "frac_timeout_start": 0.8144107744107743,
-    "frac_timeout_end": 0.773425925925926,
-    "frac_success_start": 0.016961279461279462,
-    "frac_success_end": 0.011574074074074073
+    "ep_len_start": 463.23569023569024,
+    "ep_len_end": 461.3814225589226,
+    "frac_collision_start": 0.2434427609427609,
+    "frac_collision_end": 0.3271548821548821,
+    "frac_timeout_start": 0.7288552188552189,
+    "frac_timeout_end": 0.6496969696969697,
+    "frac_success_start": 0.0277020202020202,
+    "frac_success_end": 0.023148148148148147
   },
   {
     "method": "cbf_aux",

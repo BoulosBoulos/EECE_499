@@ -1,0 +1,32 @@
+[diag] generating per-cell overlay…
+[diag] generating Eikonal diagnostic…
+[diag] generating per-run JSON…
+
+=== 2_dense reward trajectory summary (mean across 3 seeds) ===
+  DR-PPO      start= -11930.5  end= -21818.4  Δ=-9887.9
+  HJB         start= -11593.2  end= -23842.3  Δ=-12249.1
+  Soft-HJB    start= -12577.3  end= -23576.7  Δ=-10999.4
+  Eikonal     start=  -6954.2  end= -13567.3  Δ=-6613.1
+  CBF         start= -10831.3  end= -20476.7  Δ=-9645.4
+  Fusion      start= -12311.7  end= -27333.6  Δ=-15021.9
+
+=== Eikonal residual head/tail summary ===
+  eikonal/1a/s42: head=1.52 tail=1.56 ratio=1.02 (flat)
+  eikonal/1a/s123: head=3.29 tail=3.34 ratio=1.02 (flat)
+  eikonal/1a/s456: head=2.54 tail=3.25 ratio=1.28 (increasing)
+  eikonal/2_dense/s42: head=2.83 tail=2.67 ratio=0.943 (flat)
+  eikonal/2_dense/s123: head=3.35 tail=4.65 ratio=1.39 (increasing)
+  eikonal/2_dense/s456: head=3.55 tail=4.33 ratio=1.22 (increasing)
+
+=== Top 3 cells closest to passing (smallest violation magnitude) ===
+  CAL_soft_hjb_aux_2_dense_s123: violation=0.1017  reward_std_rel=5.52%  coll_std=0.1164
+  CAL_soft_hjb_aux_1a_s456: violation=0.1022  reward_std_rel=15.22%  coll_std=0.0000
+  CAL_soft_hjb_aux_2_dense_s42: violation=0.1115  reward_std_rel=6.97%  coll_std=0.1118
+
+=== Files ===
+  results/calibration/_analysis/diagnostic_curves/all_runs_per_cell.png
+  results/calibration/_analysis/diagnostic_curves/all_runs_per_cell.pdf
+  results/calibration/_analysis/diagnostic_curves/eikonal_diagnostic.png
+  results/calibration/_analysis/diagnostic_curves/eikonal_diagnostic.pdf
+  results/calibration/_analysis/diagnostic_curves/eikonal_residual_head_tail.txt
+  results/calibration/_analysis/diagnostic_curves/per_run_diagnostic.json

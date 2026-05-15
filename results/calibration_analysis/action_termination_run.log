@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/boulosboulos/Desktop/EECE_499-main/analysis/calibration_action_termination.py", line 191, in <module>
+    main()
+  File "/home/boulosboulos/Desktop/EECE_499-main/analysis/calibration_action_termination.py", line 178, in main
+    plot_action_termination(OUT_DIR / "action_dist_2dense_vs_1a")
+  File "/home/boulosboulos/Desktop/EECE_499-main/analysis/calibration_action_termination.py", line 115, in plot_action_termination
+    ad = cell_action_dist(method, scen)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/boulosboulos/Desktop/EECE_499-main/analysis/calibration_action_termination.py", line 68, in cell_action_dist
+    aligned[c] = np.mean([f[c].values for f in frames], axis=0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/boulosboulos/.venvs/eece499/lib/python3.12/site-packages/numpy/_core/fromnumeric.py", line 3824, in mean
+    return _methods._mean(a, axis=axis, dtype=dtype,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/boulosboulos/.venvs/eece499/lib/python3.12/site-packages/numpy/_core/_methods.py", line 116, in _mean
+    arr = asanyarray(a)
+          ^^^^^^^^^^^^^
+ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (3,) + inhomogeneous part.
+[1.2] generating action+termination plots…
+[1.2] generating action+termination plots…
+[1.2] computing termination summary table…
+      method scenario  ep_len_start  ep_len_end  frac_collision_start  frac_collision_end  frac_timeout_start  frac_timeout_end  frac_success_start  frac_success_end
+       drppo       1a    441.767429  209.621292              0.000000            0.000000            0.650345          0.000000            0.349655          1.000000
+       drppo  2_dense    462.118426  442.311617              0.244907            0.362379            0.750926          0.626418            0.004167          0.011204
+     hjb_aux       1a    450.341449  207.352544              0.000000            0.000000            0.709722          0.000000            0.290278          1.000000
+     hjb_aux  2_dense    467.954722  455.191296              0.223056            0.262778            0.759167          0.722315            0.017778          0.014907
+soft_hjb_aux       1a    440.960774  247.085189              0.000000            0.000000            0.590152          0.000000            0.409848          1.000000
+soft_hjb_aux  2_dense    445.869658  481.315741              0.257041            0.143056            0.734626          0.856944            0.008333          0.000000
+ eikonal_aux       1a    451.587745  248.049484              0.000000            0.000000            0.679630          0.000000            0.320370          1.000000
+ eikonal_aux  2_dense    463.235690  461.381423              0.243443            0.327155            0.728855          0.649697            0.027702          0.023148
+     cbf_aux       1a    460.337377  209.814688              0.000000            0.000000            0.741852          0.000000            0.258148          1.000000
+     cbf_aux  2_dense    452.237263  473.036481              0.280520            0.237685            0.710389          0.758148            0.009091          0.004167
+  fusion_aux       1a    418.363849  257.427523              0.000000            0.000000            0.486709          0.005000            0.513291          0.995000
+  fusion_aux  2_dense    458.256920  458.648333              0.232864            0.266852            0.749038          0.733148            0.018098          0.000000
+
+[wrote] /home/boulosboulos/Desktop/EECE_499-main/results/calibration/_analysis/diagnostic_curves/termination_summary.csv
+[wrote] /home/boulosboulos/Desktop/EECE_499-main/results/calibration/_analysis/diagnostic_curves/termination_summary.json

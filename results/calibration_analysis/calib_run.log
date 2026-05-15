@@ -1,0 +1,27 @@
+[cal-analysis] 36 runs analyzed; status=non_converged_cells_present
+[cal-analysis] NON-CONVERGED cells present:
+   CAL_cbf_aux_2_dense_s123
+   CAL_cbf_aux_2_dense_s42
+   CAL_cbf_aux_2_dense_s456
+   CAL_drppo_2_dense_s123
+   CAL_drppo_2_dense_s42
+   CAL_drppo_2_dense_s456
+   CAL_eikonal_aux_1a_s42
+   CAL_eikonal_aux_2_dense_s123
+   CAL_eikonal_aux_2_dense_s42
+   CAL_eikonal_aux_2_dense_s456
+   CAL_fusion_aux_2_dense_s123
+   CAL_fusion_aux_2_dense_s42
+   CAL_fusion_aux_2_dense_s456
+   CAL_hjb_aux_2_dense_s123
+   CAL_hjb_aux_2_dense_s42
+   CAL_hjb_aux_2_dense_s456
+   CAL_soft_hjb_aux_2_dense_s123
+   CAL_soft_hjb_aux_2_dense_s42
+   CAL_soft_hjb_aux_2_dense_s456
+[cal-analysis] STOP — calibration spec requires explicit human approval before 1M extension.
+[cal-analysis] wrote 6 plot files to results/calibration_analysis_new/plots
+[cal-analysis] outputs:
+   convergence_per_run: results/calibration_analysis_new/convergence_per_run.csv
+   convergence_per_method: results/calibration_analysis_new/convergence_per_method.csv
+   calibrated_total_steps: results/calibration_analysis_new/calibrated_total_steps.json

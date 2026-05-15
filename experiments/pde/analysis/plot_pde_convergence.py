@@ -75,14 +75,16 @@ def main():
         color = METHOD_COLORS.get(method, "black")
 
         if all_residuals:
-            steps = all_residuals[0]["step"].values
-            vals = np.array([df[res_col].values[:len(steps)] for df in all_residuals])
+            n = min(len(df) for df in all_residuals)
+            steps = all_residuals[0]["step"].values[:n]
+            vals = np.stack([df[res_col].values[:n] for df in all_residuals])
             mean = np.nanmean(vals, axis=0)
             axes[0].plot(steps[:len(mean)], mean, color=color, label=label, linewidth=2)
 
         if all_distill:
-            steps = all_distill[0]["step"].values
-            vals = np.array([df["distill_loss"].values[:len(steps)] for df in all_distill])
+            n = min(len(df) for df in all_distill)
+            steps = all_distill[0]["step"].values[:n]
+            vals = np.stack([df["distill_loss"].values[:n] for df in all_distill])
             mean = np.nanmean(vals, axis=0)
             axes[1].plot(steps[:len(mean)], mean, color=color, label=label, linewidth=2)
 
