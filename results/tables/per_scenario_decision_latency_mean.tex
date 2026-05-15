@@ -1,0 +1,17 @@
+% Per-scenario breakdown: Latency
+\begin{table*}[ht]
+\centering
+\caption{Per-scenario Latency vs.\ DRPPO.}
+\label{tab:per_scenario_decision_latency_mean}
+\begin{tabular}{llcccc}
+\toprule
+Scenario & Maneuver & Hard-HJB & Soft-HJB & Eikonal & CBF-PDE \\
+\midrule
+1a & right_stem & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $0.59$ [$0.22, 1.07$] n/a \\
+1a & stem_left & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $0.13$ [$0.09, 0.17$] n/a \\
+1a & stem_right & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $0.20$ [$0.15, 0.26$] ns \\
+1b & stem_right & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $13.48$ [$9.14, 18.56$] ns \\
+2_dense & right_left & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $16.15$ [$12.09, 20.56$] ns \\
+\bottomrule
+\end{tabular}
+\end{table*}

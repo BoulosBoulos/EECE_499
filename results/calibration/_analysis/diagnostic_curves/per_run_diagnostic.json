@@ -1,0 +1,1010 @@
+{
+  "CAL_drppo_1a_s42": {
+    "method": "drppo",
+    "scenario": "1a",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1903.4987670898438,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -1520.6230891301082,
+      "reward_std": 568.0369733187395,
+      "reward_std_rel_pct": 37.355540460962764,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.3235554046096277,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_drppo_1a_s123": {
+    "method": "drppo",
+    "scenario": "1a",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -2930.231201171875,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -2349.3517784705527,
+      "reward_std": 575.7592062185288,
+      "reward_std_rel_pct": 24.507151780962865,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.19507151780962861,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_drppo_1a_s456": {
+    "method": "drppo",
+    "scenario": "1a",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1702.80810546875,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -1891.8999680739182,
+      "reward_std": 552.6273684738684,
+      "reward_std_rel_pct": 29.210179068636506,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.24210179068636506,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_drppo_2_dense_s42": {
+    "method": "drppo",
+    "scenario": "2_dense",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -20356.409375,
+    "final_collision_rate_last5": 0.34500000000000003,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -19390.724759615383,
+      "reward_std": 1698.4147878116087,
+      "reward_std_rel_pct": 8.758903077974981,
+      "collision_mean": 0.3243589743589743,
+      "collision_std": 0.25339047095191003
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.037589030779749816,
+      "collision_violation_above_thresh": 0.23339047095191004
+    }
+  },
+  "CAL_drppo_2_dense_s123": {
+    "method": "drppo",
+    "scenario": "2_dense",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -21833.54296875,
+    "final_collision_rate_last5": 0.32222222222222224,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -20918.820162259617,
+      "reward_std": 1480.2354776789616,
+      "reward_std_rel_pct": 7.076094474723325,
+      "collision_mean": 0.2897435897435897,
+      "collision_std": 0.23510784840125407
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.02076094474723325,
+      "collision_violation_above_thresh": 0.21510784840125408
+    }
+  },
+  "CAL_drppo_2_dense_s456": {
+    "method": "drppo",
+    "scenario": "2_dense",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -24098.159375,
+    "final_collision_rate_last5": 0.33611111111111114,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -23853.564302884617,
+      "reward_std": 3261.227155957884,
+      "reward_std_rel_pct": 13.671865196110348,
+      "collision_mean": 0.4170279192903627,
+      "collision_std": 0.2664408782768244
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.08671865196110347,
+      "collision_violation_above_thresh": 0.2464408782768244
+    }
+  },
+  "CAL_hjb_aux_1a_s42": {
+    "method": "hjb_aux",
+    "scenario": "1a",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -2737.65302734375,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -3147.0333345853364,
+      "reward_std": 673.6740333996394,
+      "reward_std_rel_pct": 21.406637991281556,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.16406637991281553,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_hjb_aux_1a_s123": {
+    "method": "hjb_aux",
+    "scenario": "1a",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -2606.3083984375,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -2365.9533034104566,
+      "reward_std": 685.7966531931585,
+      "reward_std_rel_pct": 28.986060384395646,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.23986060384395647,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_hjb_aux_1a_s456": {
+    "method": "hjb_aux",
+    "scenario": "1a",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1923.58701171875,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -2170.26801945613,
+      "reward_std": 593.0859668231228,
+      "reward_std_rel_pct": 27.327775256613258,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.22327775256613258,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_hjb_aux_2_dense_s42": {
+    "method": "hjb_aux",
+    "scenario": "2_dense",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -24954.519921875,
+    "final_collision_rate_last5": 0.225,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -23733.204326923078,
+      "reward_std": 2233.6411038544343,
+      "reward_std_rel_pct": 9.411460302983949,
+      "collision_mean": 0.2420940170940171,
+      "collision_std": 0.12536903423562185
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.04411460302983948,
+      "collision_violation_above_thresh": 0.10536903423562184
+    }
+  },
+  "CAL_hjb_aux_2_dense_s123": {
+    "method": "hjb_aux",
+    "scenario": "2_dense",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -27999.328125,
+    "final_collision_rate_last5": 0.3833333333333333,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -26326.942157451922,
+      "reward_std": 3536.8472851316956,
+      "reward_std_rel_pct": 13.434326189418774,
+      "collision_mean": 0.3653846153846153,
+      "collision_std": 0.16061391746772907
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.08434326189418774,
+      "collision_violation_above_thresh": 0.14061391746772908
+    }
+  },
+  "CAL_hjb_aux_2_dense_s456": {
+    "method": "hjb_aux",
+    "scenario": "2_dense",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -20343.413671875,
+    "final_collision_rate_last5": 0.19166666666666665,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -19122.881084735578,
+      "reward_std": 2451.7270160871817,
+      "reward_std_rel_pct": 12.820908132113102,
+      "collision_mean": 0.15705128205128205,
+      "collision_std": 0.1560450935629545
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.07820908132113101,
+      "collision_violation_above_thresh": 0.13604509356295452
+    }
+  },
+  "CAL_soft_hjb_aux_1a_s42": {
+    "method": "soft_hjb_aux",
+    "scenario": "1a",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -3311.423193359375,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -3621.138615534856,
+      "reward_std": 1028.2399748717773,
+      "reward_std_rel_pct": 28.3954878297279,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.233954878297279,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_soft_hjb_aux_1a_s123": {
+    "method": "soft_hjb_aux",
+    "scenario": "1a",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -3277.134765625,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -3086.1420616736777,
+      "reward_std": 769.7829202107191,
+      "reward_std_rel_pct": 24.943210805832123,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.19943210805832123,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_soft_hjb_aux_1a_s456": {
+    "method": "soft_hjb_aux",
+    "scenario": "1a",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -3718.875048828125,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -3448.869121844952,
+      "reward_std": 524.7512918061416,
+      "reward_std_rel_pct": 15.215169763398531,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.10215169763398531,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_soft_hjb_aux_2_dense_s42": {
+    "method": "soft_hjb_aux",
+    "scenario": "2_dense",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -23226.43125,
+    "final_collision_rate_last5": 0.2,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -22443.07091346154,
+      "reward_std": 1564.9646006242722,
+      "reward_std_rel_pct": 6.973041285921319,
+      "collision_mean": 0.12286324786324787,
+      "collision_std": 0.11181003468227045
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.01973041285921319,
+      "collision_violation_above_thresh": 0.09181003468227045
+    }
+  },
+  "CAL_soft_hjb_aux_2_dense_s123": {
+    "method": "soft_hjb_aux",
+    "scenario": "2_dense",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -22370.33671875,
+    "final_collision_rate_last5": 0.075,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -22973.986177884617,
+      "reward_std": 1268.8988482689542,
+      "reward_std_rel_pct": 5.523198449080772,
+      "collision_mean": 0.09081196581196581,
+      "collision_std": 0.11642603389071264
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.005231984490807723,
+      "collision_violation_above_thresh": 0.09642603389071264
+    }
+  },
+  "CAL_soft_hjb_aux_2_dense_s456": {
+    "method": "soft_hjb_aux",
+    "scenario": "2_dense",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -25732.7484375,
+    "final_collision_rate_last5": 0.1,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -25324.803936298078,
+      "reward_std": 1304.8851525282473,
+      "reward_std_rel_pct": 5.152597255285967,
+      "collision_mean": 0.18055555555555555,
+      "collision_std": 0.16705202363582144
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.0015259725528596682,
+      "collision_violation_above_thresh": 0.14705202363582145
+    }
+  },
+  "CAL_eikonal_aux_1a_s42": {
+    "method": "eikonal_aux",
+    "scenario": "1a",
+    "seed": 42,
+    "total_iterations": 25,
+    "total_steps_actual": 102400,
+    "final_mean_reward_last5": 38814.7875,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 53248,
+      "last_step": 102400,
+      "n_iters": 13,
+      "reward_mean": 33466.67202524038,
+      "reward_std": 5841.148831623786,
+      "reward_std_rel_pct": 17.45362917238506,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.1245362917238506,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_eikonal_aux_1a_s123": {
+    "method": "eikonal_aux",
+    "scenario": "1a",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -2059.1521728515627,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -2006.8168100210337,
+      "reward_std": 551.5483636909371,
+      "reward_std_rel_pct": 27.483742459041704,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.22483742459041706,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_eikonal_aux_1a_s456": {
+    "method": "eikonal_aux",
+    "scenario": "1a",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1630.70234375,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -1825.7373704176682,
+      "reward_std": 632.2049857388715,
+      "reward_std_rel_pct": 34.62737828465679,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.2962737828465679,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_eikonal_aux_2_dense_s42": {
+    "method": "eikonal_aux",
+    "scenario": "2_dense",
+    "seed": 42,
+    "total_iterations": 25,
+    "total_steps_actual": 102400,
+    "final_mean_reward_last5": 2654.769189453125,
+    "final_collision_rate_last5": 0.5768181818181819,
+    "final_50k_window": {
+      "first_step": 53248,
+      "last_step": 102400,
+      "n_iters": 13,
+      "reward_mean": 3042.5850923978364,
+      "reward_std": 1003.1497941018641,
+      "reward_std_rel_pct": 32.970311877499206,
+      "collision_mean": 0.4323232323232323,
+      "collision_std": 0.2628128990741057
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.2797031187749921,
+      "collision_violation_above_thresh": 0.24281289907410572
+    }
+  },
+  "CAL_eikonal_aux_2_dense_s123": {
+    "method": "eikonal_aux",
+    "scenario": "2_dense",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -20109.38359375,
+    "final_collision_rate_last5": 0.05,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -20488.90129206731,
+      "reward_std": 1372.686379495687,
+      "reward_std_rel_pct": 6.699658317096537,
+      "collision_mean": 0.125,
+      "collision_std": 0.13501543121683043
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.016996583170965363,
+      "collision_violation_above_thresh": 0.11501543121683043
+    }
+  },
+  "CAL_eikonal_aux_2_dense_s456": {
+    "method": "eikonal_aux",
+    "scenario": "2_dense",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -23021.615234375,
+    "final_collision_rate_last5": 0.3138888888888889,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -22881.42638221154,
+      "reward_std": 1466.89135426343,
+      "reward_std_rel_pct": 6.4108387727253735,
+      "collision_mean": 0.36367521367521366,
+      "collision_std": 0.17480685085558348
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.01410838772725373,
+      "collision_violation_above_thresh": 0.1548068508555835
+    }
+  },
+  "CAL_cbf_aux_1a_s42": {
+    "method": "cbf_aux",
+    "scenario": "1a",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1385.173681640625,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -1813.4381009615386,
+      "reward_std": 743.3223655422406,
+      "reward_std_rel_pct": 40.98967398711371,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.35989673987113713,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_cbf_aux_1a_s123": {
+    "method": "cbf_aux",
+    "scenario": "1a",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1687.57060546875,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -1812.2840951772837,
+      "reward_std": 543.2620777082069,
+      "reward_std_rel_pct": 29.976650965149215,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.24976650965149216,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_cbf_aux_1a_s456": {
+    "method": "cbf_aux",
+    "scenario": "1a",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -1359.2092895507812,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -1465.5566265399639,
+      "reward_std": 603.4097401099335,
+      "reward_std_rel_pct": 41.17273458989606,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.3617273458989606,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_cbf_aux_2_dense_s42": {
+    "method": "cbf_aux",
+    "scenario": "2_dense",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -19540.1125,
+    "final_collision_rate_last5": 0.30277777777777776,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -18947.573016826922,
+      "reward_std": 1635.792881730882,
+      "reward_std_rel_pct": 8.633258097373053,
+      "collision_mean": 0.19337606837606838,
+      "collision_std": 0.1721196620455608
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.03633258097373053,
+      "collision_violation_above_thresh": 0.15211966204556082
+    }
+  },
+  "CAL_cbf_aux_2_dense_s123": {
+    "method": "cbf_aux",
+    "scenario": "2_dense",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -20930.328125,
+    "final_collision_rate_last5": 0.3,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -20029.89393028846,
+      "reward_std": 1496.886476128296,
+      "reward_std_rel_pct": 7.47326212179666,
+      "collision_mean": 0.2403846153846154,
+      "collision_std": 0.17424740945689116
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.0247326212179666,
+      "collision_violation_above_thresh": 0.15424740945689117
+    }
+  },
+  "CAL_cbf_aux_2_dense_s456": {
+    "method": "cbf_aux",
+    "scenario": "2_dense",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -21891.863671875,
+    "final_collision_rate_last5": 0.125,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -22848.174278846152,
+      "reward_std": 1005.6609576643976,
+      "reward_std_rel_pct": 4.401493727205517,
+      "collision_mean": 0.38675213675213677,
+      "collision_std": 0.26369426021056314
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": true,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.0,
+      "collision_violation_above_thresh": 0.24369426021056315
+    }
+  },
+  "CAL_fusion_aux_1a_s42": {
+    "method": "fusion_aux",
+    "scenario": "1a",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -4047.740380859375,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -3710.0778057391826,
+      "reward_std": 833.0520265594125,
+      "reward_std_rel_pct": 22.453761623833067,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.1745376162383307,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_fusion_aux_1a_s123": {
+    "method": "fusion_aux",
+    "scenario": "1a",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -3041.213916015625,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -2998.6647291917066,
+      "reward_std": 874.0031317182016,
+      "reward_std_rel_pct": 29.146410507645854,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.24146410507645855,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_fusion_aux_1a_s456": {
+    "method": "fusion_aux",
+    "scenario": "1a",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -2442.5952880859377,
+    "final_collision_rate_last5": 0.0,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -2560.3104341947114,
+      "reward_std": 593.9435594326816,
+      "reward_std_rel_pct": 23.198107209975625,
+      "collision_mean": 0.0,
+      "collision_std": 0.0
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": true,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.18198107209975622,
+      "collision_violation_above_thresh": 0.0
+    }
+  },
+  "CAL_fusion_aux_2_dense_s42": {
+    "method": "fusion_aux",
+    "scenario": "2_dense",
+    "seed": 42,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -29003.53203125,
+    "final_collision_rate_last5": 0.3872222222222222,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -27231.00721153846,
+      "reward_std": 1968.093275145152,
+      "reward_std_rel_pct": 7.227398016740348,
+      "collision_mean": 0.3155982905982906,
+      "collision_std": 0.18860115087681936
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.02227398016740348,
+      "collision_violation_above_thresh": 0.16860115087681937
+    }
+  },
+  "CAL_fusion_aux_2_dense_s123": {
+    "method": "fusion_aux",
+    "scenario": "2_dense",
+    "seed": 123,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -26697.830078125,
+    "final_collision_rate_last5": 0.3111111111111111,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -25632.869591346152,
+      "reward_std": 1776.9460880101403,
+      "reward_std_rel_pct": 6.93229480873281,
+      "collision_mean": 0.2254273504273504,
+      "collision_std": 0.19919412665780778
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.019322948087328096,
+      "collision_violation_above_thresh": 0.1791941266578078
+    }
+  },
+  "CAL_fusion_aux_2_dense_s456": {
+    "method": "fusion_aux",
+    "scenario": "2_dense",
+    "seed": 456,
+    "total_iterations": 123,
+    "total_steps_actual": 503808,
+    "final_mean_reward_last5": -27802.38359375,
+    "final_collision_rate_last5": 0.18888888888888888,
+    "final_50k_window": {
+      "first_step": 454656,
+      "last_step": 503808,
+      "n_iters": 13,
+      "reward_mean": -28152.999849759617,
+      "reward_std": 1446.63383506294,
+      "reward_std_rel_pct": 5.138471362849427,
+      "collision_mean": 0.22649572649572652,
+      "collision_std": 0.18227322352774333
+    },
+    "criteria": {
+      "reward_std_rel_threshold": 0.05,
+      "collision_std_abs_threshold": 0.02,
+      "reward_passed": false,
+      "collision_passed": false,
+      "all_passed": false,
+      "reward_violation_above_thresh": 0.0013847136284942663,
+      "collision_violation_above_thresh": 0.16227322352774334
+    }
+  }
+}

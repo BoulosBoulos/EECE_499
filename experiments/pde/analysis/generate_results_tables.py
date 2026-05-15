@@ -153,7 +153,11 @@ def compute_paired_p(x, y):
         return float("nan")
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
-    # Drop pairs where either is NaN
+    if x.shape != y.shape:
+        n = min(len(x), len(y))
+        if n < 2:
+            return float("nan")
+        x, y = x[:n], y[:n]
     valid = ~(np.isnan(x) | np.isnan(y))
     x, y = x[valid], y[valid]
     if len(x) < 2:
@@ -291,6 +295,7 @@ def main():
     # ------------------------------------------------------------------
     pattern = os.path.join(args.eval_dir, "**", "eval_*.csv")
     csv_files = glob.glob(pattern, recursive=True)
+    csv_files = [f for f in csv_files if os.path.basename(f) != "eval_metrics.csv"]
     if not csv_files:
         pattern = os.path.join(args.eval_dir, "ablation_results.csv")
         csv_files = glob.glob(pattern)

@@ -1,0 +1,7 @@
+metric,scenario,ego_maneuver,intent_on,method_test,method_baseline,n_test,n_baseline,mean_test,mean_baseline,std_test,std_baseline,t_stat,p_raw,cohens_d,mean_test_ci_low,mean_test_ci_high,mean_baseline_ci_low,mean_baseline_ci_high,insufficient_n,p_holm,significant_holm,effect_size_label,family
+min_ttc_eval,1a,stem_right,True,cbf_aux,drppo,5,5,0.0,0.05117628412810264,0.0,0.11443365014628105,-1.0000000000000002,0.3739009663000589,-0.6324555320336759,0.0,0.0,0.0,0.15352885238430794,False,0.3739009663000589,False,medium,A
+min_ttc_eval,1a,stem_right,False,cbf_aux,drppo,5,5,0.0,0.0,0.0,0.0,,,0.0,0.0,0.0,0.0,0.0,False,,False,negligible,A
+min_ttc_eval,1b,stem_right,True,cbf_aux,drppo,5,5,0.0,0.0,0.0,0.0,,,0.0,0.0,0.0,0.0,0.0,False,,False,negligible,A
+min_ttc_eval,1b,stem_right,False,cbf_aux,drppo,5,5,0.0,0.0,0.0,0.0,,,0.0,0.0,0.0,0.0,0.0,False,,False,negligible,A
+min_ttc_eval,2_dense,right_left,True,cbf_aux,drppo,5,5,0.0,0.0,0.0,0.0,,,0.0,0.0,0.0,0.0,0.0,False,,False,negligible,A
+min_ttc_eval,2_dense,right_left,False,cbf_aux,drppo,5,5,0.0,0.0,0.0,0.0,,,0.0,0.0,0.0,0.0,0.0,False,,False,negligible,A

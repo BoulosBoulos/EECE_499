@@ -1,0 +1,6 @@
+metric,method,n_cells_significant,mean_cohens_d,win_rate_pct
+final_collision_rate,CBF,0/6,0.149,0%
+final_mean_reward,CBF,0/6,0.020,0%
+final_success_rate,CBF,0/6,-0.029,0%
+mean_return_eval,CBF,0/6,0.204,0%
+min_ttc_eval,CBF,0/6,-0.105,0%

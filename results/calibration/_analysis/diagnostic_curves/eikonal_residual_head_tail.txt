@@ -1,0 +1,6 @@
+eikonal_aux/1a/s42: head=1.525 tail=1.561 ratio_t/h=1.024
+eikonal_aux/1a/s123: head=3.288 tail=3.34 ratio_t/h=1.016
+eikonal_aux/1a/s456: head=2.535 tail=3.254 ratio_t/h=1.284
+eikonal_aux/2_dense/s42: head=2.835 tail=2.673 ratio_t/h=0.9429
+eikonal_aux/2_dense/s123: head=3.348 tail=4.647 ratio_t/h=1.388
+eikonal_aux/2_dense/s456: head=3.549 tail=4.334 ratio_t/h=1.221

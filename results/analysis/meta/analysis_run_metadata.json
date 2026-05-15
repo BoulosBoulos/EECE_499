@@ -1,0 +1,25 @@
+{
+  "ran_at": "2026-05-15T14:44:39.508803+00:00",
+  "elapsed_seconds": 8.177391290664673,
+  "hostname": "DSP0000107020LU",
+  "python_version": "3.12.3",
+  "args": {
+    "results_root": "results/tier_1_combined",
+    "output_root": "results/analysis",
+    "tiers": [
+      "tier1"
+    ],
+    "skip_failed": true,
+    "no_plots": false,
+    "no_tex": false,
+    "no_prompt": false
+  },
+  "n_runs_loaded": 71,
+  "n_iterations_loaded": 6958,
+  "quality_summary": {
+    "n_runs_discovered": 93,
+    "n_runs_valid": 71,
+    "n_runs_failed": 22,
+    "failure_rate": 0.23655913978494625
+  }
+}

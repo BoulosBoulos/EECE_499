@@ -1,0 +1,13 @@
+method,scenario,S_min,S_max,S_mean,noisy,S_to_use,all_seeds_converged
+cbf_aux,1a,,,,False,,False
+cbf_aux,2_dense,,,,False,,False
+drppo,1a,,,,False,,False
+drppo,2_dense,,,,False,,False
+eikonal_aux,1a,,,,False,,False
+eikonal_aux,2_dense,,,,False,,False
+fusion_aux,1a,,,,False,,False
+fusion_aux,2_dense,,,,False,,False
+hjb_aux,1a,,,,False,,False
+hjb_aux,2_dense,,,,False,,False
+soft_hjb_aux,1a,16384.0,233472.0,121514.0,True,233472.0,True
+soft_hjb_aux,2_dense,,,,False,,False
