@@ -71,7 +71,7 @@ def compute_aulc(df, metric_col="episode_return", step_col="step"):
     step_range = steps[-1] - steps[0]
     if step_range <= 0:
         return float("nan")
-    area = np.trapz(values, steps)
+    area = np.trapezoid(values, steps) if hasattr(np, "trapezoid") else np.trapz(values, steps)
     return float(area / step_range)
 
 

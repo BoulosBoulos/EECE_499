@@ -1,0 +1,25 @@
+\begin{table}[htbp]
+\centering
+\caption{Tier 1 main comparison: mean ± std per cell.}
+\label{tab:tier1_main}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+scenario & maneuver & intent & method & n & final\_collision\_rate & final\_success\_rate & final\_mean\_reward & min\_ttc\_eval & mean\_ttc\_eval \\
+\midrule
+1a & right\_stem & 0 & CBF & 10 & 0.0525±0.0461 & 0.946±0.0439 & 3.11e+04±1.23e+04 & 0±0 & 6.62±1.17 \\
+1a & stem\_left & 0 & CBF & 1 & 0.0988 & 0.901 & 2.14e+04 & 0 & 6.23 \\
+1a & stem\_right & 0 & DRPPO & 5 & 0.0486±0.00815 & 0.951±0.00815 & 2.17e+04±170 & 0±0 & 6.11±0.0501 \\
+1a & stem\_right & 0 & CBF & 5 & 0.0477±0.0172 & 0.952±0.0172 & 2.34e+04±3.25e+03 & 0±0 & 6.21±0.173 \\
+1a & stem\_right & 1 & DRPPO & 5 & 0.0386±0.0113 & 0.961±0.0113 & 2.46e+04±6.11e+03 & 0.0512±0.114 & 8.06±4.25 \\
+1a & stem\_right & 1 & CBF & 5 & 0.0399±0.00488 & 0.96±0.00488 & 2.18e+04±158 & 0±0 & 6.14±0.0946 \\
+1b & stem\_right & 0 & DRPPO & 5 & 0.529±0.0542 & 0.176±0.0706 & 9.35e+03±2.99e+03 & 0±0 & 72.4±34.2 \\
+1b & stem\_right & 0 & CBF & 5 & 0.579±0.0461 & 0.2±0.0245 & 9.65e+03±999 & 0±0 & 72.6±54.6 \\
+1b & stem\_right & 1 & DRPPO & 5 & 0.594±0.118 & 0.163±0.126 & 8.86e+03±3.93e+03 & 0±0 & 64±35.1 \\
+1b & stem\_right & 1 & CBF & 5 & 0.578±0.0516 & 0.134±0.078 & 7.89e+03±2.49e+03 & 0±0 & 67.3±53.4 \\
+2\_dense & right\_left & 0 & DRPPO & 5 & 0±0 & 0.318±0.399 & 1.75e+04±7.02e+03 & 0±0 & 9.37±2.72 \\
+2\_dense & right\_left & 0 & CBF & 5 & 0±0 & 0.272±0.419 & 1.36e+04±5.23e+03 & 0±0 & 16.8±13.6 \\
+2\_dense & right\_left & 1 & DRPPO & 5 & 0±0 & 0.0524±0.0657 & 9.55e+03±2.04e+03 & 0±0 & 11.8±4.77 \\
+2\_dense & right\_left & 1 & CBF & 5 & 0±0 & 0.0417±0.0701 & 1.15e+04±2.89e+03 & 0±0 & 11.1±1.81 \\
+\bottomrule
+\end{tabular}
+\end{table}

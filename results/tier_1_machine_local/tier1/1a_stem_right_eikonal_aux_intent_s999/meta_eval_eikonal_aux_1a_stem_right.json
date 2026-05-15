@@ -1,0 +1,18 @@
+{
+  "method": "eikonal_aux",
+  "checkpoint_path": "results/ablation/tier1/1a_stem_right_eikonal_aux_intent_s999/model_eikonal_aux_1a_stem_right.pt",
+  "scenario": "1a",
+  "ego_maneuver": "stem_right",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1999,
+    2999,
+    3999
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 27018.730369329453
+}

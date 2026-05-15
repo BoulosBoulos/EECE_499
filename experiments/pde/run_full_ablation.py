@@ -918,6 +918,20 @@ def main():
         else:
             out_dir_idx = job["cmd_train"].index("--out_dir") + 1
             job_out_dir = job["cmd_train"][out_dir_idx]
+
+        # Skip if final checkpoint already exists (safe restart after wall-time kill)
+        if job["cmd_train"] is not None:
+            import glob as _glob
+            _done = _glob.glob(os.path.join(job_out_dir, f"*_step{args.total_steps}.pt"))
+            if _done:
+                completed += 1
+                print(f"  [SKIP] {job['tag']} (step{args.total_steps} checkpoint found)")
+                continue
+        elif os.path.exists(os.path.join(job_out_dir, "eval_metrics.csv")):
+            completed += 1
+            print(f"  [SKIP] {job['tag']} (eval_metrics.csv found)")
+            continue
+
         os.makedirs(job_out_dir, exist_ok=True)
         log_path = os.path.join(job_out_dir, "stdout.log")
         # Chain train then eval in one shell command

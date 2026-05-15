@@ -1,0 +1,17 @@
+% Main results: mean [95\% bootstrap CI] with Holm-Bonferroni significance vs DRPPO
+\begin{table*}[ht]
+\centering
+\caption{Main comparison. Significance vs.\ DRPPO with Holm-Bonferroni correction.}
+\label{tab:main_results}
+\begin{tabular}{lccccccccccccc}
+\toprule
+Method & Return & Collision & Success & Mean TTC & Min TTC & TTC p10 & Act. Entropy & Hard Brakes & ROW Viol. & Go Frac. & Yield Frac. & Switch Rate & Latency \\
+\midrule
+Hard-HJB & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a \\
+Soft-HJB & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a \\
+Eikonal & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a & $nan$ [$nan, nan$] n/a \\
+CBF-PDE & $449.95$ [$427.33, 472.62$] n/a & $0.07$ [$0.05, 0.08$] n/a & $0.93$ [$0.91, 0.94$] n/a & $6.62$ [$6.26, 7.09$] n/a & $0.13$ [$0.11, 0.16$] n/a & $0.70$ [$0.65, 0.76$] n/a & $0.58$ [$0.46, 0.69$] n/a & $0.93$ [$0.91, 0.94$] n/a & $10.29$ [$9.39, 11.17$] n/a & $0.79$ [$0.75, 0.84$] n/a & $0.05$ [$0.04, 0.05$] n/a & $0.14$ [$0.11, 0.18$] n/a & $0.59$ [$0.22, 1.07$] n/a \\
+DRPPO & $246.27$ [$223.45, 269.08$] & $0.24$ [$0.19, 0.28$] & $0.48$ [$0.41, 0.55$] & $31.97$ [$24.10, 40.64$] & $0.54$ [$0.47, 0.61$] & $1.61$ [$1.44, 1.77$] & $0.82$ [$0.74, 0.90$] & $0.48$ [$0.41, 0.55$] & $13.72$ [$11.25, 16.42$] & $0.50$ [$0.44, 0.55$] & $0.13$ [$0.11, 0.15$] & $0.27$ [$0.23, 0.31$] & $10.17$ [$7.08, 13.61$] \\
+\bottomrule
+\end{tabular}
+\end{table*}
