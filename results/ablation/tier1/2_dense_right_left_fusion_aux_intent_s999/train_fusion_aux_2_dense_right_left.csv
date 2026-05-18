@@ -1,0 +1,2 @@
+step,episode_return,episode_len,actor_loss,vf_loss,collision_count,collision_rate,mean_ttc,min_ttc,entropy,soft_residual_mean,cbf_residual_mean,anchor_loss_optimality,anchor_loss_safety,bc_loss_optimality,bc_loss_safety,distill_loss,distill_gap,actor_align_kl,train_time_per_iter
+4096,0.7472402340839129,10,0.0299527645111084,6.831150054931641,0,0.0,80.09049688029896,0.20382356074366242,1.5268406867980957,1.3955576419830322,0.01975429803133011,13.19375991821289,4.569854736328125,0.0,0.0,0.7812240123748779,0.7812240123748779,0.7742933630943298,2120.6687486171722

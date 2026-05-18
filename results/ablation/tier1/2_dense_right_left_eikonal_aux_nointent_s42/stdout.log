@@ -1,0 +1,2001 @@
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=10.50.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=14.90.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=10.00.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=8.30.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=8.20.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=14.10.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=10.30.
+Warning: Collision of person 'ped2' and person 'ped1', lane='left_in_0', time=2.60.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=9.30.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=5.30.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=9.10.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=11.70.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=4096 ret=-133.87 coll=0 ttc=16.11 L_eik=6.82 L_bc=0 L_ground=0 |rho|=2.170 ALM[λ=0,μ=1] σ_bc=0.98 σ_g=0.98 buf=[0/0/0] T_succ~0.0 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=8192  λ=6.461  μ=1  mean L_eik (epoch)=6.460678332485259  μ_grew=False  μ@max=False
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=16384  λ=12.25  μ=5  mean L_eik (epoch)=5.791659703943878  μ_grew=True  μ@max=False
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=24576  λ=36.87  μ=25  mean L_eik (epoch)=4.924457365646958  μ_grew=True  μ@max=False
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=32768  λ=171.9  μ=125  mean L_eik (epoch)=5.401269183959812  μ_grew=True  μ@max=False
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=40960  λ=896.6  μ=625  mean L_eik (epoch)=5.797230386175215  μ_grew=True  μ@max=False
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=311 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=9.40.
+Warning: Collision of person 'ped2' and person 'ped1', lane='left_in_0', time=2.50.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=9.80.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_13_0' with decel=9.00, wished=5.00, severity=1.00, time=8.40.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=14.60.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=9.10.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=45056 ret=-65.66 coll=0 ttc=17.32 L_eik=6.08 L_bc=0 L_ground=0 |rho|=2.004 ALM[λ=897,μ=625] σ_bc=0.96 σ_g=0.96 buf=[0/0/0] T_succ~0.0 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=49152  λ=4941  μ=3125  mean L_eik (epoch)=6.471672574989498  μ_grew=True  μ@max=False
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=57344  λ=2.382e+04  μ=1e+04  mean L_eik (epoch)=6.040170482359827  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=65536  λ=9.138e+04  μ=1e+04  mean L_eik (epoch)=6.756104551255703  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=73728  λ=1.739e+05  μ=1e+04  mean L_eik (epoch)=8.251218312419951  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=81920  λ=2.518e+05  μ=1e+04  mean L_eik (epoch)=7.788025623187423  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=468 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=320 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=10.70.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=11.20, stage=move.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=7.10.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=13.40.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=11.40.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=11.00.
+ Retrying in 1 seconds
+[eikonal_aux] step=86016 ret=-35.47 coll=0 ttc=8.52 L_eik=8.08 L_bc=433 L_ground=3.89e+03 |rho|=2.391 ALM[λ=2.52e+05,μ=1e+04] σ_bc=0.97 σ_g=0.97 buf=[8/0/644] T_succ~20.8 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=90112  λ=3.317e+05  μ=1e+04  mean L_eik (epoch)=7.99145438708365  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=98304  λ=4.105e+05  μ=1e+04  mean L_eik (epoch)=7.882141774520278  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=106496  λ=4.94e+05  μ=1e+04  mean L_eik (epoch)=8.353963002562523  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=114688  λ=5.807e+05  μ=1e+04  mean L_eik (epoch)=8.666055978275836  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=122880  λ=6.67e+05  μ=1e+04  mean L_eik (epoch)=8.625659978948534  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=367 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=474 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=12.00.
+Warning: Collision of person 'ped2' and person 'ped1', lane='right_out_0', time=3.10.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=126976 ret=-5.01 coll=0 ttc=11.77 L_eik=8.65 L_bc=361 L_ground=3.62e+03 |rho|=2.482 ALM[λ=6.67e+05,μ=1e+04] σ_bc=0.97 σ_g=1.04 buf=[8/0/644] T_succ~19.0 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=131072  λ=7.65e+05  μ=1e+04  mean L_eik (epoch)=9.807970114052296  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=139264  λ=8.505e+05  μ=1e+04  mean L_eik (epoch)=8.54990879446268  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=147456  λ=9.372e+05  μ=1e+04  mean L_eik (epoch)=8.664692322723567  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=155648  λ=1.03e+06  μ=1e+04  mean L_eik (epoch)=9.299851899966598  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=414 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=400 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=9.20.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=9.80, stage=move.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=12.90.
+Warning: Vehicle 'other' collision with person 'ped2', lane=':center_13_0', time=13.20, stage=move.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=163840  λ=1.136e+06  μ=1e+04  mean L_eik (epoch)=10.579756623134017  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=167936 ret=-4.24 coll=0 ttc=20.45 L_eik=11.1 L_bc=46.7 L_ground=1.99e+03 |rho|=3.031 ALM[λ=1.14e+06,μ=1e+04] σ_bc=0.98 σ_g=1.16 buf=[24/0/1000] T_succ~6.7 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=172032  λ=1.248e+06  μ=1e+04  mean L_eik (epoch)=11.191554304212332  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=180224  λ=1.364e+06  μ=1e+04  mean L_eik (epoch)=11.6197369992733  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=426 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=11.50.
+Warning: Collision of person 'ped2' and person 'ped1', lane='left_in_0', time=3.10.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=13.70.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=12.80.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=11.10.
+Warning: Vehicle 'other2' collision with person 'ped2', lane=':center_13_0', time=11.50, stage=move.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=5.10.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=11.40.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=12.80.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.00.
+Warning: Vehicle 'other3' collision with person 'ped0', lane=':center_13_0', time=8.90, stage=move.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=9.40.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=9.90, stage=move.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=188416  λ=1.471e+06  μ=1e+04  mean L_eik (epoch)=10.70804544724524  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=196608  λ=1.588e+06  μ=1e+04  mean L_eik (epoch)=11.657135676592588  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=204800  λ=1.697e+06  μ=1e+04  mean L_eik (epoch)=10.972713943570852  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=208896 ret=-5.98 coll=0 ttc=15.78 L_eik=9.64 L_bc=6.28 L_ground=2.29e+03 |rho|=2.683 ALM[λ=1.7e+06,μ=1e+04] σ_bc=1.00 σ_g=1.36 buf=[32/0/1000] T_succ~0.3 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=212992  λ=1.79e+06  μ=1e+04  mean L_eik (epoch)=9.262413007207215  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=221184  λ=1.879e+06  μ=1e+04  mean L_eik (epoch)=8.889216498471797  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=229376  λ=1.964e+06  μ=1e+04  mean L_eik (epoch)=8.517369315959513  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=237568  λ=2.055e+06  μ=1e+04  mean L_eik (epoch)=9.070021241903305  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=245760  λ=2.151e+06  μ=1e+04  mean L_eik (epoch)=9.58685247041285  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=249856 ret=-6.01 coll=0 ttc=13.19 L_eik=9.6 L_bc=164 L_ground=984 |rho|=2.661 ALM[λ=2.15e+06,μ=1e+04] σ_bc=1.02 σ_g=1.68 buf=[32/0/1000] T_succ~10.4 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=253952  λ=2.244e+06  μ=1e+04  mean L_eik (epoch)=9.324220764450729  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=465 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=15.60.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=13.10.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=262144  λ=2.333e+06  μ=1e+04  mean L_eik (epoch)=8.854357791133225  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=270336  λ=2.409e+06  μ=1e+04  mean L_eik (epoch)=7.6203569723293185  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=278528  λ=2.477e+06  μ=1e+04  mean L_eik (epoch)=6.8389005940407515  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=321 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=12.90.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_7_0', time=19.10, stage=events.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=286720  λ=2.542e+06  μ=1e+04  mean L_eik (epoch)=6.460411756299436  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=410 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=432 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=225 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=192 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=357 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=8.30.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=9.20.
+ Retrying in 1 seconds
+[eikonal_aux] step=290816 ret=7.42 coll=0 ttc=12.24 L_eik=4.88 L_bc=31 L_ground=2.36e+03 |rho|=1.769 ALM[λ=2.54e+06,μ=1e+04] σ_bc=1.09 σ_g=2.90 buf=[48/0/1000] T_succ~3.7 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=294912  λ=2.596e+06  μ=1e+04  mean L_eik (epoch)=5.421655464917421  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=303104  λ=2.652e+06  μ=1e+04  mean L_eik (epoch)=5.651133838575333  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=311296  λ=2.713e+06  μ=1e+04  mean L_eik (epoch)=6.0225359704345465  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=305 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=474 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=9.00.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=9.80, stage=move.
+Warning: Collision of person 'ped2' and person 'ped1', lane='right_out_0', time=2.40.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=12.30.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=319488  λ=2.774e+06  μ=1e+04  mean L_eik (epoch)=6.093031553551555  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=327680  λ=2.835e+06  μ=1e+04  mean L_eik (epoch)=6.0933282524347305  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=353 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=9.30.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=473 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=287 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=8.70.
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=342 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=444 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=379 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=10.60.
+Warning: Vehicle 'other3' collision with person 'ped2', lane=':center_7_0', time=14.60, stage=events.
+Warning: Vehicle 'other3' collision with person 'ped1', lane=':center_7_0', time=15.20, stage=events.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=331776 ret=22.11 coll=0 ttc=7.61 L_eik=6.6 L_bc=21.2 L_ground=2.68e+03 |rho|=2.068 ALM[λ=2.83e+06,μ=1e+04] σ_bc=1.18 σ_g=5.13 buf=[64/0/1000] T_succ~1.2 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=467 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_13_0' with decel=9.00, wished=5.00, severity=1.00, time=9.50.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=9.10.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=335872  λ=2.894e+06  μ=1e+04  mean L_eik (epoch)=5.943074956536293  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=344064  λ=2.963e+06  μ=1e+04  mean L_eik (epoch)=6.871619615703821  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=432 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=11.90.
+Warning: Vehicle 'other2' collision with person 'ped2', lane=':center_13_0', time=12.60, stage=move.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.30.
+Warning: Collision of person 'ped2' and person 'ped1', lane='left_in_0', time=2.90.
+Warning: Collision of person 'ped2' and person 'ped1', lane='left_in_0', time=3.00.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=2.10.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=2.20.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.70.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.80.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.90.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=8.50.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.60.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.70.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=9.40.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=352256  λ=3.038e+06  μ=1e+04  mean L_eik (epoch)=7.522527932189405  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=360448  λ=3.119e+06  μ=1e+04  mean L_eik (epoch)=8.13948168233037  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=368640  λ=3.2e+06  μ=1e+04  mean L_eik (epoch)=8.117014273069799  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux] step=372736 ret=19.65 coll=0 ttc=8.80 L_eik=7.48 L_bc=80.3 L_ground=1.86e+03 |rho|=2.273 ALM[λ=3.2e+06,μ=1e+04] σ_bc=1.46 σ_g=7.71 buf=[80/0/1000] T_succ~5.9 T_coll~0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=376832  λ=3.28e+06  μ=1e+04  mean L_eik (epoch)=7.907841400243342  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=385024  λ=3.359e+06  μ=1e+04  mean L_eik (epoch)=7.9398066168650985  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=393216  λ=3.445e+06  μ=1e+04  mean L_eik (epoch)=8.601011399179697  μ_grew=True  μ@max=True
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=440 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[eikonal_aux ALM] step=401408  λ=3.531e+06  μ=1e+04  mean L_eik (epoch)=8.571205685846508  μ_grew=True  μ@max=True
+Saved eikonal_aux to results/ablation/tier1/2_dense_right_left_eikonal_aux_nointent_s42/model_eikonal_aux_2_dense_right_left.pt
+
+Running post-training checkpoint selection (30 eps each)...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  step=200000: return=-5.10, coll=0.00, score=-5.10
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=386 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=476 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=442 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=432 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=453 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  step=300000: return=+69.66, coll=0.00, score=69.66
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=330 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  step=400000: return=+12.15, coll=0.00, score=12.15
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=330 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  step=final: return=+12.15, coll=0.00, score=12.15
+  Best: step=300000 (margin=57.51). Copied to results/ablation/tier1/2_dense_right_left_eikonal_aux_nointent_s42/model_eikonal_aux_2_dense_right_left.pt
+Training complete. Metrics in results/ablation/tier1/2_dense_right_left_eikonal_aux_nointent_s42/train_eikonal_aux_2_dense_right_left.csv
+=== EVAL ===
+Eval seed=1042 [deterministic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=297 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=246 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=218 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=392 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=356 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=247 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=345 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=326 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=8.80.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=9.40, stage=move.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=261 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=9.50.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=10.00, stage=move.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=364 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=11.60.
+Warning: Vehicle 'other3' collision with person 'ped2', lane=':center_13_0', time=12.00, stage=move.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=239 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=378 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=248 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=393 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=11.30.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=7.60.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=234 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=242 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=336 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.00.
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=452 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=245 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=380 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=242 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=303 d_init=95.9 d_final=0.0
+Warning: Collision of person 'ped0' and person 'ped2', lane='right_out_0', time=2.00.
+Warning: Collision of person 'ped0' and person 'ped2', lane='right_out_0', time=2.10.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=427 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=12.40.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=8.80.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=9.40, stage=move.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=9.50.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=10.00, stage=move.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=11.60.
+Warning: Vehicle 'other3' collision with person 'ped2', lane=':center_13_0', time=12.00, stage=move.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=11.30.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=7.60.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.00.
+Warning: Collision of person 'ped0' and person 'ped2', lane='right_out_0', time=2.00.
+Warning: Collision of person 'ped0' and person 'ped2', lane='right_out_0', time=2.10.
+  return=81.20 coll=0.000 success=0.230 ttc=10.68 ent=1.04 brakes=0.2
+Eval seed=1042 [stochastic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=14.23 coll=0.000 success=0.000 ttc=11.13 ent=1.54 brakes=0.0
+Eval seed=2042 [deterministic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=197 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=8.60.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=472 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=218 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=175 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=449 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=237 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=174 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=291 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=213 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=226 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=498 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=11.50.
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=477 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=277 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=6.00.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=222 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=209 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=252 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=418 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=9.40.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=208 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=297 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=261 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=491 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=4.00, severity=1.00, time=8.60.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.90.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=9.40, stage=move.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=11.50.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=6.00.
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=9.40.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=77.37 coll=0.000 success=0.210 ttc=11.79 ent=1.03 brakes=0.2
+Eval seed=2042 [stochastic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=21.91 coll=0.000 success=0.000 ttc=11.29 ent=1.53 brakes=0.0
+Eval seed=3042 [deterministic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=358 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=10.90.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=215 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=273 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other3' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=3.00, severity=1.00, time=13.70.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=439 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=357 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=232 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=206 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=434 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=268 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=7.20.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=374 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=494 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=227 d_init=95.9 d_final=0.0
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.30.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.40.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.50.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=439 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=248 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=222 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=418 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.50.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=445 d_init=95.9 d_final=0.0
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+[shaping_diag] success_cum_shaping=287.70 T=235 d_init=95.9 d_final=0.0
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=5.00, severity=1.00, time=10.00.
+Warning: Vehicle 'other2' collision with person 'ped0', lane=':center_13_0', time=10.50, stage=move.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=11.80.
+Warning: Vehicle 'other' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=7.00, severity=1.00, time=7.20.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.30.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.40.
+Warning: Collision of person 'ped0' and person 'ped2', lane='left_in_0', time=1.50.
+Warning: Vehicle 'other2' performs emergency braking on lane ':center_7_0' with decel=9.00, wished=6.00, severity=1.00, time=8.50.
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=58.39 coll=0.000 success=0.180 ttc=10.85 ent=0.97 brakes=0.2
+Eval seed=3042 [stochastic]...
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+ Retrying in 1 seconds
+  return=22.86 coll=0.000 success=0.000 ttc=11.73 ent=1.53 brakes=0.0
+Saved results/ablation/tier1/2_dense_right_left_eikonal_aux_nointent_s42/eval_eikonal_aux_2_dense_right_left.csv
