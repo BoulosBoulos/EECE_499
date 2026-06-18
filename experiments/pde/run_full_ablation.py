@@ -916,16 +916,27 @@ def main():
             out_dir_idx = job["cmd_eval"].index("--out_dir") + 1
             job_out_dir = job["cmd_eval"][out_dir_idx]
         else:
-            out_dir_idx = job["cmd_train"].index("--out_dir") + 1
+            _dir_flag = "--out_dir" if "--out_dir" in job["cmd_train"] else "--output_dir"
+            out_dir_idx = job["cmd_train"].index(_dir_flag) + 1
             job_out_dir = job["cmd_train"][out_dir_idx]
 
-        # Skip if final checkpoint already exists (safe restart after wall-time kill)
+        # Skip if done; re-run eval only if checkpoint exists but eval was killed.
         if job["cmd_train"] is not None:
             import glob as _glob
             _done = _glob.glob(os.path.join(job_out_dir, f"*_step{args.total_steps}.pt"))
-            if _done:
+            _eval_done = os.path.exists(os.path.join(job_out_dir, "eval_metrics.csv"))
+            if _done and _eval_done:
                 completed += 1
                 print(f"  [SKIP] {job['tag']} (step{args.total_steps} checkpoint found)")
+                continue
+            elif _done and not _eval_done:
+                # Training complete but eval was killed — re-run eval only
+                os.makedirs(job_out_dir, exist_ok=True)
+                eval_str = " ".join(f"'{c}'" for c in job["cmd_eval"])
+                log_f = open(os.path.join(job_out_dir, "stdout.log"), "a")
+                proc = subprocess.Popen(f"({eval_str})", stdout=log_f, stderr=subprocess.STDOUT, shell=True)
+                active.append((proc, job["tag"], log_f, job_out_dir, f"tier_{job['tier']}"))
+                print(f"  [EVAL-ONLY] {job['tag']} (pid {proc.pid})")
                 continue
         elif os.path.exists(os.path.join(job_out_dir, "eval_metrics.csv")):
             completed += 1
