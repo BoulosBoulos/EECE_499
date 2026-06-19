@@ -70,4 +70,13 @@ SUPP_R2=$(sbatch --parsable --dependency=afterany:${SUPP_R1} "$REPO/scripts/run_
 echo "Tier 3 retry chain:        $T3_R1 → $T3_R2"
 echo "Supplementary retry chain: $SUPP_R1 → $SUPP_R2"
 echo "Both Tier 3 + Supp run in parallel."
+
+# Chain Tier 4 after BOTH T3 and Supp last retries finish.
+# afterany:A:B waits for both A and B to reach any terminal state.
+chmod +x "$REPO/scripts/auto_aggregate_and_submit_tier4.sh"
+AGG4_JOB=$(sbatch --parsable --dependency=afterany:${T3_R2}:${SUPP_R2} \
+    "$REPO/scripts/auto_aggregate_and_submit_tier4.sh")
+echo "Tier 4 launcher queued:    $AGG4_JOB (afterany:$T3_R2:$SUPP_R2)"
+echo ""
+echo "Full chain: T3($T3_R1→$T3_R2) + Supp($SUPP_R1→$SUPP_R2) → T4-submit($AGG4_JOB) → T4"
 echo "Monitor: squeue -u \$USER"

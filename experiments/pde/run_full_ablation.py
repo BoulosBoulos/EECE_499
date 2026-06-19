@@ -104,19 +104,35 @@ TIER4_N_EVAL_EPISODES = int(_TIER4_CFG["n_eval_episodes"])
 TIER4_EVAL_SEED_OFFSETS = list(_TIER4_CFG["eval_seed_offsets"])
 
 
-def generate_tier4_jobs(total_steps: int = 50000) -> list[dict]:
-    """Generate held-out eval-only jobs from existing checkpoints."""
+def generate_tier4_jobs(total_steps: int = 50000, output_root: str | None = None,
+                        source_overrides: dict | None = None) -> list[dict]:
+    """Generate held-out eval-only jobs from existing checkpoints.
+
+    Args:
+        output_root: base dir for tier4 eval outputs (default: results/ablation).
+        source_overrides: dict mapping source_tier key → actual path on disk.
+            Used by multi-machine cluster runs where checkpoints live in
+            per-machine dirs (e.g. results/tier_1_machine_cmu1_p2/tier1).
+            Falls back to results/ablation/{source_tier} when key is absent.
+    """
     import glob as _glob
     jobs = []
-    base_dir = "results/ablation"
+    _output_root = output_root if output_root is not None else "results/ablation"
+    _source_overrides = source_overrides or {}
     METHODS_SET = ["soft_hjb_aux", "hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
 
     for ho_cfg in TIER4_HELDOUT_CONFIGS:
         ho_name = ho_cfg["name"]
-        source_dir = os.path.join(base_dir, ho_cfg["source_tier"])
+        source_key = ho_cfg["source_tier"]
+        if source_key in _source_overrides:
+            source_dir = _source_overrides[source_key]
+        else:
+            source_dir = os.path.join("results/ablation", source_key)
         if not os.path.isdir(source_dir):
             continue
-        ckpt_paths = _glob.glob(os.path.join(source_dir, "*", "model_*.pt"))
+        # tier2_noocc: only pick up models trained without occlusion (occOFF dirs)
+        glob_subdir = "*occOFF*" if source_key == "tier2_noocc" else "*"
+        ckpt_paths = _glob.glob(os.path.join(source_dir, glob_subdir, "model_*.pt"))
         for ckpt_path in ckpt_paths:
             ckpt_file = os.path.basename(ckpt_path)
             ckpt_dir = os.path.basename(os.path.dirname(ckpt_path))
@@ -155,7 +171,7 @@ def generate_tier4_jobs(total_steps: int = 50000) -> list[dict]:
             if seed is None:
                 continue
 
-            eval_out_dir = os.path.join(base_dir, f"tier4_{ho_name}",
+            eval_out_dir = os.path.join(_output_root, f"tier4_{ho_name}",
                                         f"{scenario}_{maneuver}_{method}_s{seed}")
             eval_cmd = _build_eval_cmd(
                 method, scenario, maneuver, seed, eval_out_dir,
@@ -544,7 +560,7 @@ def _generate_tier2_jobs(
 
 def generate_jobs(
     tier: str, total_steps: int = 50000, subgrid: str | None = None,
-    output_root: str | None = None,
+    output_root: str | None = None, source_overrides: dict | None = None,
 ) -> list[dict]:
     """Generate all jobs for the given tier."""
     jobs = []
@@ -666,7 +682,8 @@ def generate_jobs(
 
     # ── TIER 4: Held-out eval (eval-only on existing checkpoints) ────────
     if tier in ("4",):
-        jobs.extend(generate_tier4_jobs(total_steps))
+        jobs.extend(generate_tier4_jobs(total_steps, output_root=base_dir,
+                                        source_overrides=source_overrides))
 
     return jobs
 
@@ -732,6 +749,12 @@ def main():
     parser.add_argument("--output_root", type=str, default=None,
                         help="Override base output dir (default: results/ablation). Phase 2 smoke tests "
                         "use /tmp/phase2_smoke for transient outputs.")
+    parser.add_argument(
+        "--tier4_source_dir", nargs=2, action="append", metavar=("KEY", "PATH"),
+        default=[],
+        help="Map a source_tier key to a directory for Tier 4 checkpoint discovery. "
+             "Pass multiple times. Example: --tier4_source_dir tier1 results/tier_1_machine_cmu1_p2/tier1"
+    )
     # ── Multi-machine Tier 1 launch (SPEC_TIER_1_MULTI_MACHINE_LAUNCH) ───
     # Each rental runs a deterministic slice of the full sorted manifest.
     # job_index_start/end indices are computed locally via
@@ -777,9 +800,10 @@ def main():
             if confirm.strip().lower() != "y":
                 sys.exit(1)
 
+    tier4_source_overrides = {k: v for k, v in args.tier4_source_dir}
     jobs = generate_jobs(
         args.tier, args.total_steps, subgrid=args.subgrid,
-        output_root=args.output_root,
+        output_root=args.output_root, source_overrides=tier4_source_overrides,
     )
 
     # Phase 2 / Step 2: apply CLI filter flags
