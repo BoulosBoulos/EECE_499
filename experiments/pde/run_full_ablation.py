@@ -171,16 +171,17 @@ def generate_tier4_jobs(total_steps: int = 50000, output_root: str | None = None
             if seed is None:
                 continue
 
+            use_intent = ("_intent_" in ckpt_dir and "_nointent_" not in ckpt_dir)
+            intent_tag = "intent" if use_intent else "nointent"
             eval_out_dir = os.path.join(_output_root, f"tier4_{ho_name}",
-                                        f"{scenario}_{maneuver}_{method}_s{seed}")
+                                        f"{scenario}_{maneuver}_{method}_{intent_tag}_s{seed}")
             eval_cmd = _build_eval_cmd(
                 method, scenario, maneuver, seed, eval_out_dir,
                 n_eval_episodes=TIER4_N_EVAL_EPISODES,
                 no_buildings=ho_cfg["eval_overrides"].get("no_buildings", False),
                 style_filter=ho_cfg["eval_overrides"].get("style_filter", None),
                 state_ablation=ho_cfg["eval_overrides"].get("state_ablation", None),
-                use_intent=("_intent_" in ckpt_dir
-                            and "_nointent_" not in ckpt_dir),
+                use_intent=use_intent,
             )
             # Override checkpoint path to point to source
             if "--checkpoint" in eval_cmd:
