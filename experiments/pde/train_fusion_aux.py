@@ -237,6 +237,24 @@ def main():
     next_ckpt_idx = 0
     intermediate_ckpts = {}
 
+    # Auto-resume from highest intermediate checkpoint saved by a previous run.
+    _resume_candidates = sorted([s for s in ckpt_steps if s < args.total_steps], reverse=True)
+    for _rs in _resume_candidates:
+        _rp = os.path.join(output_dir,
+            f"model_fusion_aux_{args.scenario}_{args.ego_maneuver}_step{_rs}.pt")
+        if os.path.exists(_rp):
+            policy = type(policy).from_checkpoint(_rp, device=device)
+            step = _rs
+            next_log_step = step
+            next_ckpt_idx = sum(1 for s in ckpt_steps if s <= _rs)
+            for _s in _resume_candidates:
+                _sp = os.path.join(output_dir,
+                    f"model_fusion_aux_{args.scenario}_{args.ego_maneuver}_step{_s}.pt")
+                if _s <= _rs and os.path.exists(_sp):
+                    intermediate_ckpts[_s] = _sp
+            print(f"[resume] Resuming from step {_rs}: {_rp}")
+            break
+
     iteration = 0
     while step < args.total_steps:
         iteration += 1

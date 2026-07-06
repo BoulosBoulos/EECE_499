@@ -104,19 +104,35 @@ TIER4_N_EVAL_EPISODES = int(_TIER4_CFG["n_eval_episodes"])
 TIER4_EVAL_SEED_OFFSETS = list(_TIER4_CFG["eval_seed_offsets"])
 
 
-def generate_tier4_jobs(total_steps: int = 50000) -> list[dict]:
-    """Generate held-out eval-only jobs from existing checkpoints."""
+def generate_tier4_jobs(total_steps: int = 50000, output_root: str | None = None,
+                        source_overrides: dict | None = None) -> list[dict]:
+    """Generate held-out eval-only jobs from existing checkpoints.
+
+    Args:
+        output_root: base dir for tier4 eval outputs (default: results/ablation).
+        source_overrides: dict mapping source_tier key → actual path on disk.
+            Used by multi-machine cluster runs where checkpoints live in
+            per-machine dirs (e.g. results/tier_1_machine_cmu1_p2/tier1).
+            Falls back to results/ablation/{source_tier} when key is absent.
+    """
     import glob as _glob
     jobs = []
-    base_dir = "results/ablation"
+    _output_root = output_root if output_root is not None else "results/ablation"
+    _source_overrides = source_overrides or {}
     METHODS_SET = ["soft_hjb_aux", "hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
 
     for ho_cfg in TIER4_HELDOUT_CONFIGS:
         ho_name = ho_cfg["name"]
-        source_dir = os.path.join(base_dir, ho_cfg["source_tier"])
+        source_key = ho_cfg["source_tier"]
+        if source_key in _source_overrides:
+            source_dir = _source_overrides[source_key]
+        else:
+            source_dir = os.path.join("results/ablation", source_key)
         if not os.path.isdir(source_dir):
             continue
-        ckpt_paths = _glob.glob(os.path.join(source_dir, "*", "model_*.pt"))
+        # tier2_noocc: only pick up models trained without occlusion (occOFF dirs)
+        glob_subdir = "*occOFF*" if source_key == "tier2_noocc" else "*"
+        ckpt_paths = _glob.glob(os.path.join(source_dir, glob_subdir, "model_*.pt"))
         for ckpt_path in ckpt_paths:
             ckpt_file = os.path.basename(ckpt_path)
             ckpt_dir = os.path.basename(os.path.dirname(ckpt_path))
@@ -155,16 +171,17 @@ def generate_tier4_jobs(total_steps: int = 50000) -> list[dict]:
             if seed is None:
                 continue
 
-            eval_out_dir = os.path.join(base_dir, f"tier4_{ho_name}",
-                                        f"{scenario}_{maneuver}_{method}_s{seed}")
+            use_intent = ("_intent_" in ckpt_dir and "_nointent_" not in ckpt_dir)
+            intent_tag = "intent" if use_intent else "nointent"
+            eval_out_dir = os.path.join(_output_root, f"tier4_{ho_name}",
+                                        f"{scenario}_{maneuver}_{method}_{intent_tag}_s{seed}")
             eval_cmd = _build_eval_cmd(
                 method, scenario, maneuver, seed, eval_out_dir,
                 n_eval_episodes=TIER4_N_EVAL_EPISODES,
                 no_buildings=ho_cfg["eval_overrides"].get("no_buildings", False),
                 style_filter=ho_cfg["eval_overrides"].get("style_filter", None),
                 state_ablation=ho_cfg["eval_overrides"].get("state_ablation", None),
-                use_intent=("_intent_" in ckpt_dir
-                            and "_nointent_" not in ckpt_dir),
+                use_intent=use_intent,
             )
             # Override checkpoint path to point to source
             if "--checkpoint" in eval_cmd:
@@ -544,7 +561,7 @@ def _generate_tier2_jobs(
 
 def generate_jobs(
     tier: str, total_steps: int = 50000, subgrid: str | None = None,
-    output_root: str | None = None,
+    output_root: str | None = None, source_overrides: dict | None = None,
 ) -> list[dict]:
     """Generate all jobs for the given tier."""
     jobs = []
@@ -666,7 +683,8 @@ def generate_jobs(
 
     # ── TIER 4: Held-out eval (eval-only on existing checkpoints) ────────
     if tier in ("4",):
-        jobs.extend(generate_tier4_jobs(total_steps))
+        jobs.extend(generate_tier4_jobs(total_steps, output_root=base_dir,
+                                        source_overrides=source_overrides))
 
     return jobs
 
@@ -732,6 +750,12 @@ def main():
     parser.add_argument("--output_root", type=str, default=None,
                         help="Override base output dir (default: results/ablation). Phase 2 smoke tests "
                         "use /tmp/phase2_smoke for transient outputs.")
+    parser.add_argument(
+        "--tier4_source_dir", nargs=2, action="append", metavar=("KEY", "PATH"),
+        default=[],
+        help="Map a source_tier key to a directory for Tier 4 checkpoint discovery. "
+             "Pass multiple times. Example: --tier4_source_dir tier1 results/tier_1_machine_cmu1_p2/tier1"
+    )
     # ── Multi-machine Tier 1 launch (SPEC_TIER_1_MULTI_MACHINE_LAUNCH) ───
     # Each rental runs a deterministic slice of the full sorted manifest.
     # job_index_start/end indices are computed locally via
@@ -777,9 +801,10 @@ def main():
             if confirm.strip().lower() != "y":
                 sys.exit(1)
 
+    tier4_source_overrides = {k: v for k, v in args.tier4_source_dir}
     jobs = generate_jobs(
         args.tier, args.total_steps, subgrid=args.subgrid,
-        output_root=args.output_root,
+        output_root=args.output_root, source_overrides=tier4_source_overrides,
     )
 
     # Phase 2 / Step 2: apply CLI filter flags
@@ -916,16 +941,27 @@ def main():
             out_dir_idx = job["cmd_eval"].index("--out_dir") + 1
             job_out_dir = job["cmd_eval"][out_dir_idx]
         else:
-            out_dir_idx = job["cmd_train"].index("--out_dir") + 1
+            _dir_flag = "--out_dir" if "--out_dir" in job["cmd_train"] else "--output_dir"
+            out_dir_idx = job["cmd_train"].index(_dir_flag) + 1
             job_out_dir = job["cmd_train"][out_dir_idx]
 
-        # Skip if final checkpoint already exists (safe restart after wall-time kill)
+        # Skip if done; re-run eval only if checkpoint exists but eval was killed.
         if job["cmd_train"] is not None:
             import glob as _glob
             _done = _glob.glob(os.path.join(job_out_dir, f"*_step{args.total_steps}.pt"))
-            if _done:
+            _eval_done = os.path.exists(os.path.join(job_out_dir, "eval_metrics.csv"))
+            if _done and _eval_done:
                 completed += 1
                 print(f"  [SKIP] {job['tag']} (step{args.total_steps} checkpoint found)")
+                continue
+            elif _done and not _eval_done:
+                # Training complete but eval was killed — re-run eval only
+                os.makedirs(job_out_dir, exist_ok=True)
+                eval_str = " ".join(f"'{c}'" for c in job["cmd_eval"])
+                log_f = open(os.path.join(job_out_dir, "stdout.log"), "a")
+                proc = subprocess.Popen(f"({eval_str})", stdout=log_f, stderr=subprocess.STDOUT, shell=True)
+                active.append((proc, job["tag"], log_f, job_out_dir, f"tier_{job['tier']}"))
+                print(f"  [EVAL-ONLY] {job['tag']} (pid {proc.pid})")
                 continue
         elif os.path.exists(os.path.join(job_out_dir, "eval_metrics.csv")):
             completed += 1
