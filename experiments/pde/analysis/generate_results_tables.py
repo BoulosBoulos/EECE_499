@@ -18,6 +18,7 @@ Usage:
 
 import argparse
 import os
+import re
 import csv
 import glob
 import numpy as np
@@ -37,7 +38,7 @@ except ImportError:
 # Known sets for filename parsing
 # ---------------------------------------------------------------------------
 KNOWN_METHODS = [
-    "soft_hjb_aux", "hjb_aux", "eikonal_aux", "cbf_aux", "drppo", "rule_based",
+    "soft_hjb_aux", "hjb_aux", "eikonal_aux", "fusion_aux", "cbf_aux", "drppo", "rule_based",
 ]
 KNOWN_SCENARIOS = [
     "1a", "1b", "1c", "1d", "2_dense", "3_dense", "4_dense", "2", "3", "4",
@@ -46,8 +47,8 @@ KNOWN_MANEUVERS = [
     "stem_right", "stem_left", "right_left", "right_stem", "left_right", "left_stem",
 ]
 
-ALL_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux", "drppo"]
-PDE_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "cbf_aux"]
+ALL_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "fusion_aux", "cbf_aux", "drppo", "rule_based"]
+PDE_METHODS = ["hjb_aux", "soft_hjb_aux", "eikonal_aux", "fusion_aux", "cbf_aux", "rule_based"]
 BASELINE = "drppo"
 
 METRICS = [
@@ -78,9 +79,13 @@ METHOD_LABELS = {
     "hjb_aux": "Hard-HJB",
     "soft_hjb_aux": "Soft-HJB",
     "eikonal_aux": "Eikonal",
+    "fusion_aux": "Fusion",
     "cbf_aux": "CBF-PDE",
     "rule_based": "Rule-Based",
 }
+
+# Methods excluded from formal significance tests (reported descriptively only)
+NO_FORMAL_TEST_METHODS = {"rule_based"}
 
 
 # ---------------------------------------------------------------------------
@@ -314,6 +319,12 @@ def main():
                 tmp["_parsed_scenario"] = scenario
             if maneuver:
                 tmp["_parsed_maneuver"] = maneuver
+            # Parse training seed from the run directory name: e.g. ".../1a_right_stem_cbf_aux_intent_s4444/..."
+            # The _s\d+ suffix in the directory identifies the training run.
+            run_dir = os.path.basename(os.path.dirname(f))
+            m_tseed = re.search(r"_s(\d+)$", run_dir)
+            if m_tseed:
+                tmp["_training_seed"] = m_tseed.group(1)
             dfs.append(tmp)
         except Exception:
             continue
@@ -323,6 +334,22 @@ def main():
 
     df = pd.concat(dfs, ignore_index=True)
     print(f"Loaded {len(df)} rows from {len(dfs)} eval files")
+
+    # ------------------------------------------------------------------
+    # Training-run-level aggregation: average all eval rows (eval seeds
+    # and eval_modes) within each training run so the statistical unit
+    # is one trained model.  We group by training seed (parsed from the
+    # run directory name) rather than by the eval-time seed column.
+    # N per cell = number of distinct training runs (~10 per method×cell).
+    # ------------------------------------------------------------------
+    group_cols = [c for c in ["_parsed_method", "_parsed_scenario", "_parsed_maneuver", "_training_seed"]
+                  if c in df.columns]
+    if "_training_seed" in df.columns and len(group_cols) >= 2:
+        skip_cols = set(group_cols) | {"eval_mode", "seed"}
+        numeric_cols = [c for c in df.columns if c not in skip_cols
+                        and pd.api.types.is_numeric_dtype(df[c])]
+        df = df.groupby(group_cols, as_index=False)[numeric_cols].mean()
+        print(f"After training-run aggregation: {len(df)} rows (one per training run)")
 
     # Determine method column
     if "_parsed_method" in df.columns and df["_parsed_method"].notna().any():
@@ -446,14 +473,24 @@ def main():
         for r, (_, cw, sw), (_, cm, sm), (_, cp, sp) in zip(
                 metric_results, corrected_welch, corrected_mwu, corrected_paired):
             r["corrected_p_welch"] = cw
-            r["significant_welch"] = sw
-            r["marker_welch"] = significance_marker(cw)
             r["corrected_p_mwu"] = cm
-            r["significant_mwu"] = sm
-            r["marker_mwu"] = significance_marker(cm)
             r["corrected_p_paired"] = cp
-            r["significant_paired"] = sp
-            r["marker_paired"] = significance_marker(cp)
+            # Methods in NO_FORMAL_TEST_METHODS are reported descriptively only —
+            # significance flags and stars are suppressed.
+            if r.get("method") in NO_FORMAL_TEST_METHODS:
+                r["significant_welch"] = False
+                r["marker_welch"] = "desc"
+                r["significant_mwu"] = False
+                r["marker_mwu"] = "desc"
+                r["significant_paired"] = False
+                r["marker_paired"] = "desc"
+            else:
+                r["significant_welch"] = sw
+                r["marker_welch"] = significance_marker(cw)
+                r["significant_mwu"] = sm
+                r["marker_mwu"] = significance_marker(cm)
+                r["significant_paired"] = sp
+                r["marker_paired"] = significance_marker(cp)
 
     # ------------------------------------------------------------------
     # Output: all_comparisons.csv
@@ -504,14 +541,23 @@ def main():
                     else:
                         row += " & --"
                 else:
-                    matching = [r for r in results if r["method"] == method
-                                and r["metric"] == metric]
-                    if matching:
-                        # Aggregate across scenarios: use first or average
-                        r0 = matching[0]
-                        marker = r0.get("marker_welch", "")
-                        row += (f" & ${r0['mean']:.2f}$ "
-                                f"[${r0['ci_low']:.2f}, {r0['ci_high']:.2f}$] {marker}")
+                    # Pool raw values across all scenarios/maneuvers for this method+metric
+                    if method_col:
+                        pool_vals = df[df[method_col] == method][metric].dropna().values
+                    else:
+                        pool_vals = np.array([])
+                    if len(pool_vals) > 0:
+                        m_pool = float(np.mean(pool_vals))
+                        lo_pool, hi_pool = bootstrap_ci(pool_vals)
+                        # Collect best significance marker across all cells
+                        matching = [r for r in results if r["method"] == method
+                                    and r["metric"] == metric]
+                        markers = [r.get("marker_welch", "n/a") for r in matching]
+                        marker_rank = {"***": 0, "**": 1, "*": 2, "ns": 3, "n/a": 4}
+                        best_marker = min(markers, key=lambda x: marker_rank.get(x, 4),
+                                          default="")
+                        row += (f" & ${m_pool:.2f}$ "
+                                f"[${lo_pool:.2f}, {hi_pool:.2f}$] {best_marker}")
                     else:
                         row += " & --"
             row += " \\\\\n"
