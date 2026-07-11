@@ -1,0 +1,7 @@
+method,n_runs,mean_iter_time_s,mean_learn_step_time_s,mean_residual_compute_time_s,residual_frac_of_iter,residual_frac_ci_low,residual_frac_ci_high,walltime_ratio_vs_drppo_HW_CONFOUNDED
+DRPPO,240,544.2125,5.7653,0.0,0.0,0.0,0.0,1.0
+Hard-HJB,240,503.7423,13.9255,13.87861,0.08627,0.07606,0.09693,0.926
+Soft-HJB,240,598.3854,26.5608,26.51333,0.14414,0.12566,0.16396,1.1
+Eikonal,240,484.7893,17.9081,17.86206,0.12534,0.11148,0.13924,0.891
+Fusion,240,565.9796,34.9238,34.8704,0.18274,0.16231,0.20357,1.04
+CBF-PDE,240,772.9293,17.938,17.88849,0.09889,0.08594,0.11207,1.42
