@@ -168,7 +168,7 @@ def _sig(p):
 def aggregate_t2a(machines_root, out_dir):
     """Scan all per-machine T2a dirs and write tier2a_lambda_sensitivity.csv."""
     rows = []  # one per training run
-    for m in range(1, 9):
+    for m in range(1, 10):
         d = os.path.join(machines_root, f"tier_2_machine_cmu{m}", "tier2", "2a_lambda_sweep")
         if not os.path.isdir(d):
             continue
@@ -235,7 +235,7 @@ def aggregate_t2a(machines_root, out_dir):
 
 def aggregate_t2b(machines_root, out_dir):
     rows = []
-    for m in range(1, 9):
+    for m in range(1, 10):
         d = os.path.join(machines_root, f"tier_2_machine_cmu{m}", "tier2", "2b_occlusion_sweep")
         if not os.path.isdir(d):
             continue
@@ -322,7 +322,7 @@ def aggregate_t2b(machines_root, out_dir):
 
 def aggregate_t2c(machines_root, out_dir):
     rows = []
-    for m in range(1, 9):
+    for m in range(1, 10):
         d = os.path.join(machines_root, f"tier_2_machine_cmu{m}", "tier2", "2c_fusion_weights")
         if not os.path.isdir(d):
             continue
