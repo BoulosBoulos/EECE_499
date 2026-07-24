@@ -1,0 +1,6 @@
+method,n_runs_with_trace,n_residual_grew,rate_residual_grew,median_late_over_early,median_residual_late
+cbf_aux,224,77,0.3438,0.55735,0.05333776
+eikonal_aux,240,40,0.1667,0.630339,1.36113836
+fusion_aux,240,169,0.7042,3.734797,680.31878482
+hjb_aux,240,142,0.5917,1.826051,470.20765554
+soft_hjb_aux,240,124,0.5167,1.115838,362.50866084

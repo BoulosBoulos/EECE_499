@@ -1,0 +1,18 @@
+{
+  "method": "rule_based",
+  "checkpoint_path": "results/tier_1_machine_cmu5/tier1/2_dense_right_left_rule_based_nointent_s999/model_rule_based_2_dense_right_left.pt",
+  "scenario": "2_dense",
+  "ego_maneuver": "right_left",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1999,
+    2999,
+    3999
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 2194.029702425003
+}

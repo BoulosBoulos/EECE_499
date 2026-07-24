@@ -1,0 +1,18 @@
+{
+  "method": "soft_hjb_aux",
+  "checkpoint_path": "results/tier_1_machine_cmu8_p2/tier1/3_right_left_soft_hjb_aux_intent_s789/model_soft_hjb_aux_3_right_left.pt",
+  "scenario": "3",
+  "ego_maneuver": "right_left",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1789,
+    2789,
+    3789
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 107859.54143452644
+}

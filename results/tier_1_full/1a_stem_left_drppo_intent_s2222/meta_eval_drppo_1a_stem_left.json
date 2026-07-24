@@ -1,0 +1,18 @@
+{
+  "method": "drppo",
+  "checkpoint_path": "results/tier_1_machine_cmu5_p2/tier1/1a_stem_left_drppo_intent_s2222/model_drppo_1a_stem_left.pt",
+  "scenario": "1a",
+  "ego_maneuver": "stem_left",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    3222,
+    4222,
+    5222
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 11792.972792625427
+}

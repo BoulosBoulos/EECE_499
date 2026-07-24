@@ -1,0 +1,18 @@
+{
+  "method": "cbf_aux",
+  "checkpoint_path": "results/tier_1_machine_cmu2_p2/tier1/1b_stem_left_cbf_aux_intent_s123/model_cbf_aux_1b_stem_left.pt",
+  "scenario": "1b",
+  "ego_maneuver": "stem_left",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1123,
+    2123,
+    3123
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 27218.41944885254
+}
