@@ -1,0 +1,18 @@
+{
+  "method": "hjb_aux",
+  "checkpoint_path": "results/tier_1_machine_cmu6_p2/tier1/4_stem_right_hjb_aux_intent_s2222/model_hjb_aux_4_stem_right.pt",
+  "scenario": "4",
+  "ego_maneuver": "stem_right",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    3222,
+    4222,
+    5222
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 27563.490545511246
+}

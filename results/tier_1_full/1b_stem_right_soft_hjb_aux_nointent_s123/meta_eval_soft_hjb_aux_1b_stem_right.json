@@ -1,0 +1,18 @@
+{
+  "method": "soft_hjb_aux",
+  "checkpoint_path": "results/tier_1_machine_cmu3/tier1/1b_stem_right_soft_hjb_aux_nointent_s123/model_soft_hjb_aux_1b_stem_right.pt",
+  "scenario": "1b",
+  "ego_maneuver": "stem_right",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1123,
+    2123,
+    3123
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 2225.3489048480988
+}

@@ -1,0 +1,18 @@
+{
+  "method": "rule_based",
+  "checkpoint_path": "results/tier_1_machine_cmu1_p2/tier1/1a_right_stem_rule_based_intent_s2222/model_rule_based_1a_right_stem.pt",
+  "scenario": "1a",
+  "ego_maneuver": "right_stem",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    3222,
+    4222,
+    5222
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 17414.835807085037
+}

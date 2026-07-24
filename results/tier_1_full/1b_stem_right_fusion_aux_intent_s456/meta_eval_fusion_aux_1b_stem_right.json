@@ -1,0 +1,18 @@
+{
+  "method": "fusion_aux",
+  "checkpoint_path": "results/tier_1_machine_cmu1/tier1/1b_stem_right_fusion_aux_intent_s456/model_fusion_aux_1b_stem_right.pt",
+  "scenario": "1b",
+  "ego_maneuver": "stem_right",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1456,
+    2456,
+    3456
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 18807.21483397484
+}

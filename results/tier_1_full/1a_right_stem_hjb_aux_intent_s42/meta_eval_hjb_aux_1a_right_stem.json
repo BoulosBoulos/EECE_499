@@ -1,0 +1,18 @@
+{
+  "method": "hjb_aux",
+  "checkpoint_path": "/data/group_data/wehbelab/ahlayhel/EECE_499/results/tier_1_full/1a_right_stem_hjb_aux_intent_s42/model_hjb_aux_1a_right_stem.pt",
+  "scenario": "1a",
+  "ego_maneuver": "right_stem",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    1042,
+    2042,
+    3042
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 7770.126160144806
+}

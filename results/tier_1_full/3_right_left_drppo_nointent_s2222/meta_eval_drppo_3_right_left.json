@@ -1,0 +1,18 @@
+{
+  "method": "drppo",
+  "checkpoint_path": "results/tier_1_machine_cmu8_p2/tier1/3_right_left_drppo_nointent_s2222/model_drppo_3_right_left.pt",
+  "scenario": "3",
+  "ego_maneuver": "right_left",
+  "no_buildings": false,
+  "style_filter": null,
+  "state_ablation": null,
+  "n_eval_seeds": 3,
+  "eval_seeds": [
+    3222,
+    4222,
+    5222
+  ],
+  "episodes_per_seed": 100,
+  "total_eval_episodes": 600,
+  "eval_wall_time_seconds": 11363.893826007843
+}

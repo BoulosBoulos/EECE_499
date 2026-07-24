@@ -1,0 +1,29 @@
+{
+  "method": "drppo",
+  "scenario": "1a",
+  "ego_maneuver": "right_stem",
+  "seed": 42,
+  "use_intent": false,
+  "total_steps": 400000,
+  "algo_config_file": "configs/algo/default.yaml",
+  "algo_config": {
+    "use_pinn": true,
+    "lr": "3e-4",
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "ent_coef": 0.01,
+    "vf_coef": 0.5,
+    "n_steps": 4096,
+    "batch_size": 128,
+    "n_epochs": 8,
+    "gru_hidden": 128,
+    "gru_layers": 1
+  },
+  "device": "cpu",
+  "start_time": "2026-06-19T06:58:17",
+  "wall_time_seconds": 11491.446578502655,
+  "best_checkpoint_step": 400000,
+  "best_checkpoint_score": 390.5294333333336,
+  "git_hash": "6773a11fe7a1cafe54db2a168d543c1aad18b811"
+}
