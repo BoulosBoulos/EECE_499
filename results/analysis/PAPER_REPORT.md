@@ -1,3 +1,38 @@
+> # ⚠️ SUPERSEDED — DO NOT CITE
+>
+> **This document is pre-audit analysis and is retained for provenance only. Its
+> numbers contradict the current, audited results and must not be used in the paper.**
+>
+> It was generated on 2026-05-15 from a partial local dataset (439 per-run eval
+> summaries; 71/93 runs passing quality gates) **before** the full cluster campaign
+> and before the statistical-unit audit. Two classes of defect are known:
+>
+> 1. **Episode-level pooling.** Per-cell n values here are multiples of 3/6
+>    (e.g. n = 90, 71, 67, 41, 75 against a baseline n = 30) because evaluation
+>    episodes, not training runs, were treated as the statistical unit. Every
+>    p-value in this document is therefore anticonservative.
+> 2. **Contradicted specific claims.** Line ~496 reports a fusion_aux
+>    distillation gap of 0.18 → 71.9 ("GROWING"); lines ~329–333 report TTC
+>    comparisons against a DRPPO baseline of 28.617 s. Neither survives the
+>    run-level recomputation (the audited DRPPO mean_ttc is ≈ 5.7 s per cell).
+>
+> **Authoritative replacements** (run-level, one row per training run, seed from
+> the directory name, percentile bootstrap B=1000 seed 12345, Welch + Holm):
+>
+> | Superseded content here | Use instead |
+> |---|---|
+> | DRPPO baseline values | `results/tables/baseline_per_cell_tier1.csv`, `baseline_per_run_tier1.csv` |
+> | Method-vs-method comparisons | `results/tables/pde_vs_pde_comparisons.csv` |
+> | Residual / distillation convergence | `results/tables/pde_diagnostics.csv`, `pde_diagnostics_summary.csv` |
+> | Intent vs no-intent | `results/tables/tier1_intent_effect.csv` |
+> | Main Tier-1 comparison | `results/tables/all_comparisons.csv`, `main_results.tex` |
+> | Held-out transfer | `results/tables/heldout_comparisons.csv`, `tier4_ho2_extended.csv` |
+> | Computational overhead | `results/tables/computational_overhead.csv` |
+>
+> Superseded 2026-07-19.
+
+---
+
 # Paper Results Report — EECE 499
 Generated: 2026-05-15 16:26:34 UTC
 Analysis pipeline version: 4bc62af
