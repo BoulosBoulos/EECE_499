@@ -1,0 +1,54 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite the paper below."
+title: "Physics-Informed Auxiliary Critics for Behavioral Decision-Making at Unstructured Intersections"
+abstract: >-
+  Code, configuration and analysis outputs for a study of whether the choice of
+  partial differential equation used to regularize a value function changes how
+  a reinforcement-learning agent negotiates an unstructured T-intersection under
+  partial observability. A recurrent PPO agent selecting among five discrete
+  behavioral actions is augmented with an auxiliary critic trained on one of
+  four PDE residuals (hard and soft Hamilton-Jacobi-Bellman, Eikonal
+  time-of-arrival, control barrier function) and their convex fusion, evaluated
+  across twelve scenario-maneuver cells at ten training runs each.
+type: software
+authors:
+  - family-names: Boulos
+    given-names: Boulos
+    affiliation: "American University of Beirut"
+  - family-names: Daher
+    given-names: Naseem
+    affiliation: "American University of Beirut"
+    orcid: ""            # add if available
+repository-code: "https://github.com/BoulosBoulos/EECE_499"
+license: MIT             # change if AUB policy requires otherwise
+version: "paper-tiv-v1"
+commit: "68aaf0627329e186e7300d17b20406d64749acc5"
+date-released: "2026-09-17"
+keywords:
+  - autonomous vehicles
+  - behavioral decision-making
+  - physics-informed reinforcement learning
+  - partial observability
+  - Hamilton-Jacobi-Bellman
+  - control barrier functions
+  - Eikonal equation
+  - unstructured intersections
+  - SUMO
+
+preferred-citation:
+  type: article
+  title: "Physics-Informed Auxiliary Critics for Safe Decision-Making of Autonomous Vehicles at Unstructured Intersections"
+  authors:
+    - family-names: Boulos
+      given-names: Boulos
+    - family-names: Daher
+      given-names: Naseem
+  journal: "IEEE Transactions on Intelligent Vehicles"
+  year: 2026
+  # Fill these in once the paper is accepted:
+  # volume:
+  # issue:
+  # start:
+  # end:
+  # doi:
+  notes: "Under review at time of release."
