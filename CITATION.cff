@@ -19,11 +19,11 @@ authors:
     given-names: Naseem
     affiliation: "American University of Beirut"
     orcid: ""            # add if available
-repository-code: "https://github.com/BoulosBoulos/EECE_499"
+repository-code: "https://github.com/BoulosBoulos/physics-informed-auxiliary-critics"
 license: MIT             # change if AUB policy requires otherwise
 version: "paper-tiv-v1"
 commit: "68aaf0627329e186e7300d17b20406d64749acc5"
-date-released: "2026-09-17"
+date-released: "2026-09-18"
 keywords:
   - autonomous vehicles
   - behavioral decision-making
