@@ -52,3 +52,17 @@ output_*.xml
 *.swp
 *.swo
 .DS_Store
+
+# ---------------------------------------------------------------------------
+# NOTE ON results/ AND *.pt
+#
+# The rules above ignore NEW files under results/ and new checkpoints. They do
+# not untrack what is already committed: 18,126 files under results/ and 502
+# .pt checkpoints are tracked deliberately, because commit 68aaf062 (tag
+# paper-tiv-v1) is cited in the accompanying paper as the provenance for every
+# reported number.
+#
+# Do not "clean up" those files. See REPO_AUDIT.md before changing anything
+# here. If you add a new result that should be versioned, force it:
+#     git add -f results/<path>
+# ---------------------------------------------------------------------------
