@@ -108,8 +108,8 @@ You do not need SUMO, a GPU or any training to check the paper's numbers. The
 analysis tables are in the repository.
 
 ```bash
-git clone --depth 1 https://github.com/BoulosBoulos/EECE_499
-cd EECE_499
+git clone --depth 1 https://github.com/BoulosBoulos/physics-informed-auxiliary-critics
+cd physics-informed-auxiliary-critics
 pip install pandas numpy
 ```
 
@@ -145,7 +145,7 @@ The bootstrap parameters (1000 resamples, 95 per cent, seed 12345) come from
 ## 3. Repository layout
 
 ```
-EECE_499/
+physics-informed-auxiliary-critics/
 ├── env/
 │   └── sumo_env.py              SUMO Gymnasium environment (TraCI wrapper)
 ├── models/
@@ -627,8 +627,8 @@ needs both files.
 run on CPU).
 
 ```bash
-git clone https://github.com/BoulosBoulos/EECE_499
-cd EECE_499
+git clone https://github.com/BoulosBoulos/physics-informed-auxiliary-critics
+cd physics-informed-auxiliary-critics
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 export PYTHONPATH=$PWD
@@ -746,10 +746,17 @@ Stated plainly so that nobody has to discover them.
 
 If you use this code or these results, please cite the paper (see
 `CITATION.cff`). Until it appears, cite the repository at tag
-[`paper-tiv-v1`](https://github.com/BoulosBoulos/EECE_499/releases/tag/paper-tiv-v1),
+[`paper-tiv-v1`](https://github.com/BoulosBoulos/physics-informed-auxiliary-critics/releases/tag/paper-tiv-v1),
 which pins commit `68aaf062`, the state every reported number was computed from.
 
 Licence: see `LICENSE`. Code and analysis outputs are released for research use.
+
+**A note on the commit history.** Training runs were executed on a shared
+compute machine, and commits pushed from it carry that machine's configured git
+identity rather than the author's. All work in this repository is the author's.
+
+The repository was renamed from `EECE_499` in September 2026. GitHub redirects
+the old address, but the current one is preferred.
 
 ---
 
